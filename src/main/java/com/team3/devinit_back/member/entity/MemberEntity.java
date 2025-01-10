@@ -16,9 +16,9 @@ public class MemberEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String socialId;
     private String name;
+    private String nickName;
+    private String socialId;
     private String socialProvider;
     private String role;
 

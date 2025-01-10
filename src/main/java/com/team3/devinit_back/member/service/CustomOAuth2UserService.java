@@ -1,23 +1,24 @@
 package com.team3.devinit_back.member.service;
 
-import com.team3.devinit_back.dto.*;
+
 import com.team3.devinit_back.member.dto.*;
 import com.team3.devinit_back.member.entity.MemberEntity;
 import com.team3.devinit_back.member.repository.MemberRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+@RequiredArgsConstructor
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final MemberRepository memberRepository;
+    private final RandomNickname randomNickname;
 
-    public CustomOAuth2UserService(MemberRepository memberRepository){
-        this.memberRepository =memberRepository;
-    }
+
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 
@@ -52,6 +53,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             memberEntity.setSocialProvider(socialProvider);
             memberEntity.setName(oAuth2Response.getName());
             memberEntity.setRole("ROLE_USER");
+
+            String nickname;
+            do{
+                nickname = randomNickname.generate();
+            } while (memberRepository.existsByNickName(nickname));
+            memberEntity.setNickName(nickname);
 
             memberRepository.save(memberEntity);
 
