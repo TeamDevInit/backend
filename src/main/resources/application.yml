@@ -1,0 +1,16 @@
+spring:
+    application:
+        name: devinit-back
+
+cloud:
+    aws:
+        credentials:
+            accessKey: ${aws.accessKeyId}
+            secretKey: ${aws.secretAccessKey}
+        region:
+            static: ${aws.region}
+        stack:
+            auto: false
+
+s3:
+    bucket: ${aws.s3.bucket}
