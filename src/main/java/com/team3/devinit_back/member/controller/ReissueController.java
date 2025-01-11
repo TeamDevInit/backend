@@ -38,7 +38,6 @@ public class ReissueController {
         }
 
         if (refresh == null) {
-
             //response status code
             return new ResponseEntity<>("refresh token null", HttpStatus.BAD_REQUEST);
         }
@@ -61,20 +60,20 @@ public class ReissueController {
             return new ResponseEntity<>("invalid refresh token", HttpStatus.BAD_REQUEST);
         }
 
-        String username = jwtUtil.getSocialId(refresh);
+        String socialId = jwtUtil.getSocialId(refresh);
         String role = jwtUtil.getRole(refresh);
 
         //make new jwt
-        String newAccess = jwtUtil.createJwt("access", username, role, 600000L);
-        String newRefresh = jwtUtil.createJwt("refresh", username, role,86400000L); // refresh rotate
+        String newAccess = jwtUtil.createJwt("access", socialId, role, 600000L);
+        String newRefresh = jwtUtil.createJwt("refresh", socialId, role,86400000L); // refresh rotate
 
         //Refresh 토큰 저장
         // delete old refresh in DB  -> save new Refresh save
+        response.setHeader("access", newAccess);
         refreshRepository.deleteByRefresh(refresh);
-        addRefreshEntity(username, newRefresh, 86400000L);
+        addRefreshEntity(socialId, newRefresh, 86400000L);
 
         //response
-        response.setHeader("access", newAccess);
         response.addCookie(createCookie("refresh", newRefresh));
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -88,12 +87,12 @@ public class ReissueController {
 
         return cookie;
     }
-    private void addRefreshEntity(String username, String refresh, Long expiredMs) {
+    private void addRefreshEntity(String socailId, String refresh, Long expiredMs) {
 
         Date date = new Date(System.currentTimeMillis() + expiredMs);
 
         RefreshEntity refreshEntity = new RefreshEntity();
-        refreshEntity.setSocialId(username);
+        refreshEntity.setSocialId(socailId);
         refreshEntity.setRefresh(refresh);
         refreshEntity.setExpiration(date.toString());
 

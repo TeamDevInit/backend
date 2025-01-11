@@ -22,7 +22,7 @@ public class JWTUtil {
     // JWT검증
     public String getSocialId(String token) {
 
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("username", String.class);
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("socialId", String.class);
     }
 
     public String getRole(String token) {

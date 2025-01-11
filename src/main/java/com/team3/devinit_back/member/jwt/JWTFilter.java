@@ -57,42 +57,14 @@ public class JWTFilter extends OncePerRequestFilter {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
-        /*Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
-
-            if (cookie.getName().equals("Authorization")) {
-                authorization = cookie.getValue();
-            }
-        }
-        //Authorization 헤더 검증
-        if (authorization == null) {
-
-            System.out.println("token null");
-            filterChain.doFilter(request, response);
-
-            //조건이 해당되면 메소드 종료
-            return;
-        }
-
-        String token = authorization;
-
-        //토큰 소멸 시간 검증
-        if (jwtUtil.isExpired(token)) {
-
-            System.out.println("token expired");
-            filterChain.doFilter(request, response);
-
-            //조건이 해당되면 메소드 종료 (필수)
-            return;
-        }*/
 
         //토큰에서 username과 role 획득
-        String username = jwtUtil.getSocialId(accessToken);
+        String socialId = jwtUtil.getSocialId(accessToken);
         String role = jwtUtil.getRole(accessToken);
 
         //MEMBERDTO를 생성하여 값 set
         MemberDto memberDto = new MemberDto();
-        memberDto.setUsername(username);
+        memberDto.setName(socialId);
         memberDto.setRole(role);
 
         //UserDetails에 회원 정보 객체 담기

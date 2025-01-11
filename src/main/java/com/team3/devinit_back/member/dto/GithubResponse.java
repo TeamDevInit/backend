@@ -2,10 +2,10 @@ package com.team3.devinit_back.member.dto;
 
 import java.util.Map;
 
-public class GoogleResponse implements OAuth2Response {
+public class GithubResponse implements OAuth2Response {
     private final Map<String, Object> attribute;
 
-    public GoogleResponse(Map<String, Object> attribute) {
+    public GithubResponse(Map<String, Object> attribute) {
 
         this.attribute = attribute;
     }
@@ -13,13 +13,13 @@ public class GoogleResponse implements OAuth2Response {
     @Override
     public String getProvider() {
 
-        return "google";
+        return "github";
     }
 
     @Override
     public String getProviderId() {
 
-        return attribute.get("sub").toString();
+        return attribute.get("login").toString();
     }
 
     @Override
@@ -28,9 +28,8 @@ public class GoogleResponse implements OAuth2Response {
         return attribute.get("email").toString();
     }
 
-    @Override
-    public String getName() {
-
-        return attribute.get("name").toString();
-    }
+//    @Override
+//    public String getName() {
+//        return attribute.get("name").toString();
+//    }
 }

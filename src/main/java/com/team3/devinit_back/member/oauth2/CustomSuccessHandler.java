@@ -38,7 +38,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         //OAuth2User(유저정보)
         CustomOAuth2User customUserDetails = (CustomOAuth2User) authentication.getPrincipal();
 
-        String username = customUserDetails.getUsername();
+        String socialId = customUserDetails.getName();
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
@@ -46,15 +46,13 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String role = auth.getAuthority();
 
         //토큰 생성
-        String refreshToken = jwtUtil.createJwt("refresh",username, role, 86400000L);
-        //String accessToken = jwtUtil.createJwt("access",username,role,600000L);
+        String refreshToken = jwtUtil.createJwt("refresh",socialId, role, 86400000L);
 
         //Refresh 토큰 저장
-        addRefreshEntity(username, refreshToken, 86400000L);
+        addRefreshEntity(socialId, refreshToken, 86400000L);
 
         // refresh -> 쿠키, access -> 헤더? -> 하이퍼링크에서 넘어오는거라 바로 못줌
         response.addCookie(createCookie("refresh", refreshToken));
-       // response.setHeader("access",accessToken);
 
         response.sendRedirect("http://localhost:3000/");
         response.setStatus(HttpStatus.OK.value());

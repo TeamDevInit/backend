@@ -33,9 +33,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
             oAuth2Response = new NaverResponse(oAuth2User.getAttributes());
         }
-        else if (registrationId.equals("google")) {  //---> 카카오로 변경 카카오 데이터 형식이 어떤지를 모름
+        else if (registrationId.equals("github")) {
 
-            oAuth2Response = new GoogleResponse(oAuth2User.getAttributes());
+            oAuth2Response = new GithubResponse(oAuth2User.getAttributes());
         }
         else {
 
@@ -51,7 +51,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             MemberEntity memberEntity = new MemberEntity();
             memberEntity.setSocialId(socialId);
             memberEntity.setSocialProvider(socialProvider);
-            memberEntity.setName(oAuth2Response.getName());
+            //memberEntity.setName(oAuth2Response.getName());
             memberEntity.setRole("ROLE_USER");
 
             String nickname;
@@ -63,20 +63,20 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             memberRepository.save(memberEntity);
 
             MemberDto memberDto = new MemberDto();
-            memberDto.setUsername(socialId);
-            memberDto.setName(oAuth2Response.getName());
+            memberDto.setName(socialId);
+            //memberDto.setName(oAuth2Response.getName());
             memberDto.setRole("ROLE_USER");
 
             return new CustomOAuth2User(memberDto);
         }
         else{ // 있으면 변경가능한 값만 재세팅 하고 저장
-            existData.setName(oAuth2Response.getName());
+            //existData.setName(oAuth2Response.getName());
 
             memberRepository.save(existData);
 
             MemberDto memberDto = new MemberDto();
-            memberDto.setUsername(existData.getSocialId());
-            memberDto.setName(oAuth2Response.getName());
+            memberDto.setName(existData.getSocialId());
+            //memberDto.setName(oAuth2Response.getName());
             memberDto.setRole(existData.getRole());
 
             return new CustomOAuth2User(memberDto);
