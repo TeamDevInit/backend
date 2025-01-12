@@ -13,8 +13,8 @@ import lombok.Setter;
 public class RefreshEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
     private String socialId;
     private String refresh;

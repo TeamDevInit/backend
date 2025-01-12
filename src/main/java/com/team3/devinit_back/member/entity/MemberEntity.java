@@ -1,9 +1,6 @@
 package com.team3.devinit_back.member.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,12 +11,18 @@ public class MemberEntity {
 
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String name;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
+    //private String name;
+
+    @Column(nullable = false, unique = true)
     private String nickName;
+
+    @Column(nullable = false, unique = true)
     private String socialId;
     private String socialProvider;
     private String role;
+
+
 
 }

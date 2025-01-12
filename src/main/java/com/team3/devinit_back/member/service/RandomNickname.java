@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import java.text.MessageFormat;
 import java.util.Random;
 
+
+// 랜덤닉네임 생성 클래스
 @Service
 public class RandomNickname {
 
