@@ -24,9 +24,6 @@ public class Profile {
     @JoinColumn(name = "grade_id", nullable = false)
     private Grade grade;
 
-    @Column(name = "profile_image", length = 2000)
-    private String profileImage;
-
     @Column(name = "about", length = 255)
     private String about;
 
@@ -38,5 +35,4 @@ public class Profile {
 
     @Column(name = "following_cnt", nullable = false)
     private int followingCount = 0;
-
 }
