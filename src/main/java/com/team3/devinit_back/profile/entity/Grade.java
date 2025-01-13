@@ -3,7 +3,7 @@ package com.team3.devinit_back.profile.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "grades")
+@Table(name = "Grades")
 public class Grade {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
