@@ -13,7 +13,7 @@ import java.util.UUID;
 public class S3Service {
     private final AmazonS3 amazonS3;
 
-    @Value("${s3.bucket}")
+    @Value("${aws.s3.bucket}")
     private String bucketName;
 
     public S3Service(AmazonS3 amazonS3) {
@@ -35,5 +35,4 @@ public class S3Service {
     private String generateFileName(String originalFilename) {
         return UUID.randomUUID().toString() + "-" + originalFilename;
     }
-
 }
