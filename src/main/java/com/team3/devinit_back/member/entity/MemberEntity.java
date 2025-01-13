@@ -7,9 +7,8 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
+@Table(name = "Members")
 public class MemberEntity {
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
@@ -22,7 +21,5 @@ public class MemberEntity {
     private String socialId;
     private String socialProvider;
     private String role;
-
-
 
 }
