@@ -3,7 +3,7 @@ spring:
     name: devinit-back
 
   config:
-    import: optional:file:.env[.properties]
+    import: "optional:classpath:.env[.properties]"
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
