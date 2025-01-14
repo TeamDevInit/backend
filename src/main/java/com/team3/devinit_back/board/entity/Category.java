@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @RequiredArgsConstructor
@@ -15,8 +18,8 @@ public class Category {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @OneToOne(mappedBy = "category", fetch = FetchType.LAZY)
-    private Board board;
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Board> boards = new ArrayList<>();
     public Category(String name) {
         this.name = name;
     }

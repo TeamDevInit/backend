@@ -6,10 +6,12 @@ import com.team3.devinit_back.member.entity.Member;
 import lombok.Data;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Data
 @Getter
 public class BoardResponseDto {
-    private String id;
+    private Long id;
     private String title;
     private String content;
 
@@ -21,6 +23,9 @@ public class BoardResponseDto {
     private String nickName;
     private String profile_image;
     private Long categoryId;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     public BoardResponseDto(Board board){
         this.id = board.getId();
         this.title = board.getTitle();
@@ -34,6 +39,9 @@ public class BoardResponseDto {
         }
         Category category = board.getCategory();
         this.categoryId = category.getId();
+
+        this.createdAt = board.getCreatedAt();
+        this.updatedAt = board.getUpdatedAt();
 
     }
     public static BoardResponseDto fromEntity(Board board){ return new BoardResponseDto(board);}

@@ -1,7 +1,7 @@
 package com.team3.devinit_back.board.controller;
 
-import com.team3.devinit_back.board.entity.Category;
-import com.team3.devinit_back.board.service.CategoryService;
+import com.team3.devinit_back.board.entity.Tag;
+import com.team3.devinit_back.board.service.TagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/category")
+@RequestMapping("/api/tag")
 @RequiredArgsConstructor
-public class CategoryController {
-    private final CategoryService categoryService;
+public class TagController {
+    private final TagService tagService;
 
     @GetMapping
-    public ResponseEntity<List<Category>> getAllCategories() {
-        List<Category> categories = categoryService.getAllCategory();
-        return ResponseEntity.ok(categories);
+    public ResponseEntity<List<Tag>> getAllTags(){
+        List<Tag> tags = tagService.getAllTag();
+        return  ResponseEntity.ok(tags);
     }
 }

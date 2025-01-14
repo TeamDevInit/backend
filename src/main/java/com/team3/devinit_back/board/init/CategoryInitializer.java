@@ -16,7 +16,7 @@ public class CategoryInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        List<String> defaultCategories = List.of("전체", "자유게시판", "코딩 질문", "스터디 구인",
+        List<String> defaultCategories = List.of("자유게시판", "코딩 질문", "스터디 구인",
                 "프로젝트 구인", "경험 공유");
 
 

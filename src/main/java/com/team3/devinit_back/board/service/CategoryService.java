@@ -4,6 +4,7 @@ import com.team3.devinit_back.board.entity.Category;
 import com.team3.devinit_back.board.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
