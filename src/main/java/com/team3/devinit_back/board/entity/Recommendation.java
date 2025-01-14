@@ -3,6 +3,7 @@ package com.team3.devinit_back.board.entity;
 import com.team3.devinit_back.common.BaseEntity;
 import com.team3.devinit_back.member.entity.Member;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,4 +23,10 @@ public class Recommendation extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id", nullable = false)
     private Board board;
+
+    @Builder
+    public Recommendation(Member member, Board board){
+        this.member = member;
+        this.board = board;
+    }
 }

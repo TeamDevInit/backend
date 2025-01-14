@@ -35,7 +35,7 @@ public class Board extends BaseEntity {
     private Member member;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Recommendation> recommendationEntities = new ArrayList<>();
+    private List<Recommendation> recommendation = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
