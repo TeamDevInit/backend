@@ -30,21 +30,39 @@ public class ProfileService {
     private final ResumeRepository resumeRepository;
 
     @Transactional(readOnly = true)
-    public ProfileDetailDto getProfile(String memberId) {
-        MemberEntity member = memberRepository.findById(memberId)
-            .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
+    public ProfileDetailDto getMyProfile(String memberId) {
+        Profile profile = profileRepository.findByMemberId(memberId)
+            .orElseThrow(() -> new RuntimeException("프로필 정보를 찾을 수 없습니다."));
 
-        Profile profile = member.getProfile();
+        MemberEntity member = profile.getMember();
+        ProfileDetailDto dto = new ProfileDetailDto();
 
-        ProfileDetailDto profileDetailDto = new ProfileDetailDto();
-        profileDetailDto.setNickname(member.getNickName());
-        profileDetailDto.setProfileImage(member.getProfileImage());
-        profileDetailDto.setAbout(profile.getAbout());
-        profileDetailDto.setBoardCount(profile.getBoardCount());
-        profileDetailDto.setFollowerCount(followService.getFollowerCount(memberId));
-        profileDetailDto.setFollowingCount(followService.getFollowingCount(memberId));
+        dto.setNickname(member.getNickName());
+        dto.setProfileImage(member.getProfileImage());
+        dto.setAbout(profile.getAbout());
+        dto.setBoardCount(profile.getBoardCount());
+        dto.setFollowerCount(followService.getFollowerCount(memberId));
+        dto.setFollowingCount(followService.getFollowingCount(memberId));
 
-        return profileDetailDto;
+        return dto;
+    }
+
+    @Transactional(readOnly = true)
+    public ProfileDetailDto getProfileById(String profileId) {
+        Profile profile = profileRepository.findById(profileId)
+            .orElseThrow(() -> new RuntimeException("프로필 정보를 찾을 수 없습니다."));
+
+        MemberEntity member = profile.getMember();
+        ProfileDetailDto dto = new ProfileDetailDto();
+
+        dto.setNickname(member.getNickName());
+        dto.setProfileImage(member.getProfileImage());
+        dto.setAbout(profile.getAbout());
+        dto.setBoardCount(profile.getBoardCount());
+        dto.setFollowerCount(followService.getFollowerCount(member.getId()));
+        dto.setFollowingCount(followService.getFollowingCount(member.getId()));
+
+        return dto;
     }
 
     @Transactional(readOnly = true)
@@ -54,11 +72,11 @@ public class ProfileService {
 
         return randomProfiles.stream()
             .map(profile -> {
-                ProfileDto profileDto = new ProfileDto();
-                profileDto.setNickname(profile.getMember().getNickName());
-                profileDto.setProfileImage(profile.getMember().getProfileImage());
-                profileDto.setAbout(profile.getAbout());
-                return profileDto;
+                ProfileDto dto = new ProfileDto();
+                dto.setNickname(profile.getMember().getNickName());
+                dto.setProfileImage(profile.getMember().getProfileImage());
+                dto.setAbout(profile.getAbout());
+                return dto;
             }).collect(Collectors.toList());
     }
 
