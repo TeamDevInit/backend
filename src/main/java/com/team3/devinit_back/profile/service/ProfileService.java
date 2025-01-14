@@ -1,6 +1,5 @@
 package com.team3.devinit_back.profile.service;
 
-import com.team3.devinit_back.follow.repository.FollowRepository;
 import com.team3.devinit_back.follow.service.FollowService;
 import com.team3.devinit_back.member.entity.Member;
 import com.team3.devinit_back.member.repository.MemberRepository;
@@ -8,13 +7,10 @@ import com.team3.devinit_back.profile.dto.ProfileDetailDto;
 import com.team3.devinit_back.profile.dto.ProfileDto;
 import com.team3.devinit_back.profile.entity.Profile;
 import com.team3.devinit_back.profile.repository.ProfileRepository;
-import com.team3.devinit_back.resume.dto.ResumeDto;
-import com.team3.devinit_back.resume.entity.Resume;
 import com.team3.devinit_back.resume.repository.ResumeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +30,7 @@ public class ProfileService {
         Profile profile = profileRepository.findByMemberId(memberId)
             .orElseThrow(() -> new RuntimeException("프로필 정보를 찾을 수 없습니다."));
 
-        MemberEntity member = profile.getMember();
+        Member member = profile.getMember();
         ProfileDetailDto dto = new ProfileDetailDto();
 
         dto.setNickname(member.getNickName());
@@ -52,7 +48,7 @@ public class ProfileService {
         Profile profile = profileRepository.findById(profileId)
             .orElseThrow(() -> new RuntimeException("프로필 정보를 찾을 수 없습니다."));
 
-        MemberEntity member = profile.getMember();
+        Member member = profile.getMember();
         ProfileDetailDto dto = new ProfileDetailDto();
 
         dto.setNickname(member.getNickName());
