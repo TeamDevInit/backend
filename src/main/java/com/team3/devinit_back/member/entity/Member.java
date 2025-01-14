@@ -1,7 +1,8 @@
 package com.team3.devinit_back.member.entity;
 
-import com.team3.devinit_back.board.entity.BoardEntity;
-import com.team3.devinit_back.board.entity.RecommendationEntity;
+import com.team3.devinit_back.board.entity.Board;
+import com.team3.devinit_back.board.entity.Recommendation;
+import com.team3.devinit_back.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,8 +13,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-public class MemberEntity {
-
+public class Member extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -32,10 +32,13 @@ public class MemberEntity {
     @Column(nullable = false)
     private String role;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BoardEntity> boards = new ArrayList<>();
+
+    private String profileImage;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<RecommendationEntity> recommendationEntities = new ArrayList<>();
+    private List<Board> boards = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Recommendation> recommendationEntities = new ArrayList<>();
 
 }
