@@ -3,6 +3,7 @@ package com.team3.devinit_back.board.controller;
 import com.team3.devinit_back.board.entity.Category;
 import com.team3.devinit_back.board.service.CategoryService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,7 @@ public class CategoryController {
     @GetMapping
     public ResponseEntity<List<Category>> getAllCategories() {
         List<Category> categories = categoryService.getAllCategory();
+        System.out.println(categories);
         return ResponseEntity.ok(categories);
     }
 }
