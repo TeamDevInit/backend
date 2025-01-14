@@ -2,7 +2,7 @@ package com.team3.devinit_back.member.service;
 
 
 import com.team3.devinit_back.member.dto.*;
-import com.team3.devinit_back.member.entity.MemberEntity;
+import com.team3.devinit_back.member.entity.Member;
 import com.team3.devinit_back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -45,22 +45,22 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         //유저 정보확인 및 기존 회원 여부 판별
         String socialId = oAuth2Response.getProviderId();
         String socialProvider = oAuth2Response.getProvider();
-        MemberEntity existData =memberRepository.findBySocialId(socialId);
+        Member existData =memberRepository.findBySocialId(socialId);
 
         if(existData == null){ // 없으면 생성
-            MemberEntity memberEntity = new MemberEntity();
-            memberEntity.setSocialId(socialId);
-            memberEntity.setSocialProvider(socialProvider);
+            Member member = new Member();
+            member.setSocialId(socialId);
+            member.setSocialProvider(socialProvider);
             //memberEntity.setName(oAuth2Response.getName());
-            memberEntity.setRole("ROLE_USER");
-
+            member.setRole("ROLE_USER");
+            member.setProfileImage("https://elice-devinit.s3.ap-northeast-2.amazonaws.com/default_profile_image.png");
             String nickname;
             do{
                 nickname = randomNickname.generate();
             } while (memberRepository.existsByNickName(nickname));
-            memberEntity.setNickName(nickname);
+            member.setNickName(nickname);
 
-            memberRepository.save(memberEntity);
+            memberRepository.save(member);
 
             MemberDto memberDto = new MemberDto();
             memberDto.setName(socialId);

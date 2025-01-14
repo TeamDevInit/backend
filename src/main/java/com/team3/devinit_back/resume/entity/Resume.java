@@ -1,6 +1,6 @@
 package com.team3.devinit_back.resume.entity;
 
-import com.team3.devinit_back.member.entity.MemberEntity;
+import com.team3.devinit_back.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +16,7 @@ public class Resume {
 
     @OneToOne
     @JoinColumn(name = "memberId", nullable = false)
-    private MemberEntity member;
+    private Member member;
 
     @Column(name = "name", length = 50)
     private String name;

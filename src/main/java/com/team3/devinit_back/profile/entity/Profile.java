@@ -1,11 +1,9 @@
 package com.team3.devinit_back.profile.entity;
 
-import com.team3.devinit_back.member.entity.MemberEntity;
+import com.team3.devinit_back.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -18,7 +16,7 @@ public class Profile {
 
     @OneToOne
     @JoinColumn(name = "member_id", nullable = false)
-    private MemberEntity member;
+    private Member member;
 
     @ManyToOne
     @JoinColumn(name = "grade_id", nullable = false)

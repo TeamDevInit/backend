@@ -2,7 +2,7 @@ package com.team3.devinit_back.profile.service;
 
 import com.team3.devinit_back.follow.repository.FollowRepository;
 import com.team3.devinit_back.follow.service.FollowService;
-import com.team3.devinit_back.member.entity.MemberEntity;
+import com.team3.devinit_back.member.entity.Member;
 import com.team3.devinit_back.member.repository.MemberRepository;
 import com.team3.devinit_back.profile.dto.ProfileDetailDto;
 import com.team3.devinit_back.profile.dto.ProfileDto;
@@ -31,7 +31,7 @@ public class ProfileService {
 
     @Transactional(readOnly = true)
     public ProfileDetailDto getProfile(String memberId) {
-        MemberEntity member = memberRepository.findById(memberId)
+        Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
 
         Profile profile = member.getProfile();
@@ -64,7 +64,7 @@ public class ProfileService {
 
     @Transactional
     public void updateProfile(String memberId, ProfileDto profileDto) {
-        MemberEntity member = memberRepository.findById(memberId)
+        Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
 
         member.setNickName(profileDto.getNickname());
