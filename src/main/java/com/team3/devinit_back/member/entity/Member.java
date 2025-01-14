@@ -46,6 +46,6 @@ public class Member extends BaseEntity {
     private List<Board> boards = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Recommendation> recommendationEntities = new ArrayList<>();
+    private List<Recommendation> recommendation = new ArrayList<>();
 
 }
