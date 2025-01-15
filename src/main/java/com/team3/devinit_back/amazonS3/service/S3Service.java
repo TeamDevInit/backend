@@ -18,8 +18,16 @@ public class S3Service {
     @Value("${aws.s3.bucket}")
     private String bucketName;
 
+    @Value(("${aws.s3.default-profile-image}"))
+    private String defaultProfileImageUrl;
+
     public S3Service(AmazonS3 amazonS3) {
         this.amazonS3 = amazonS3;
+    }
+
+    // 프로필 기본 이미지 가져오기
+    public String getDefaultProfileImageUrl() {
+        return defaultProfileImageUrl;
     }
 
     // 파일 업로드
