@@ -1,5 +1,6 @@
 package com.team3.devinit_back.profile.service;
 
+import com.team3.devinit_back.amazonS3.service.S3Service;
 import com.team3.devinit_back.follow.service.FollowService;
 import com.team3.devinit_back.member.entity.Member;
 import com.team3.devinit_back.member.repository.MemberRepository;
@@ -13,7 +14,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +26,7 @@ public class ProfileService {
     private final ProfileRepository profileRepository;
     private final MemberRepository memberRepository;
     private final FollowService followService;
+    private final S3Service s3Service;
     private final ResumeRepository resumeRepository;
 
     @Transactional(readOnly = true)
@@ -77,15 +81,40 @@ public class ProfileService {
     }
 
     @Transactional
-    public void updateProfile(String memberId, ProfileDto profileDto) {
+    public void updateProfile(String memberId, ProfileDetailDto profileDetailDto, MultipartFile newProfileImage) {
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
 
-        member.setNickName(profileDto.getNickname());
-        member.setProfileImage(profileDto.getProfileImage());
+        // 기존 프로필 이미지 삭제
+        String oldProfileImageUrl = member.getProfileImage();
+        if (profileDetailDto.getProfileImage() != null && oldProfileImageUrl != null && !oldProfileImageUrl.isEmpty()) {
+            String oldFileName = extractFileNameFromUrl(oldProfileImageUrl);
+            s3Service.deleteFile(oldFileName);
+        }
+
+        // 새 프로필 이미지 업로드
+        String newProfileImageUrl = null;
+        if (newProfileImage != null) {
+            try {
+                newProfileImageUrl = s3Service.uploadFile(newProfileImage);
+            } catch (IOException e) {
+                throw new RuntimeException("프로필 이미지 업로드 실패: " + e.getMessage(), e);
+            }
+        } else if (newProfileImage == null && (oldProfileImageUrl == null || oldProfileImageUrl.isEmpty())) {
+            // 기본 이미지 설정
+            newProfileImageUrl = s3Service.getDefaultProfileImageUrl();
+        }
+
+        member.setNickName(profileDetailDto.getNickname());
+        member.setProfileImage(newProfileImageUrl != null ? newProfileImageUrl : member.getProfileImage());
+
         Profile profile = member.getProfile();
         if (profile != null) {
-            profile.setAbout(profileDto.getAbout());
+            profile.setAbout(profileDetailDto.getAbout());
         }
+    }
+
+    private String extractFileNameFromUrl(String fileUrl) {
+        return fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
     }
 }
