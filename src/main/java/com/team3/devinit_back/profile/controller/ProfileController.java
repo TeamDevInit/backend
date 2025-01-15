@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -46,12 +47,15 @@ public class ProfileController {
         summary = "프로필 정보 수정",
         security = @SecurityRequirement(name = "bearerAuth")
     )
-    @PatchMapping
-    public ResponseEntity<String> updateProfile(@RequestBody ProfileDto profileDto, Authentication authentication) {
+    @PatchMapping(consumes = {"multipart/form-data"})
+    public ResponseEntity<String> updateProfile
+        (@RequestPart(value = "profile", required = true) ProfileDetailDto profileDetailDto,
+         @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
+         Authentication authentication) {
         try {
             String memberId = authentication.getName();
 
-            profileService.updateProfile(memberId, profileDto);
+            profileService.updateProfile(memberId, profileDetailDto, profileImage);
             return ResponseEntity.ok("프로필이 성공적으로 업데이트되었습니다.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
