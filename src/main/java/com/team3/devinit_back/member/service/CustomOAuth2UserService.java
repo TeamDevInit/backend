@@ -47,6 +47,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String socialProvider = oAuth2Response.getProvider();
         Member existData =memberRepository.findBySocialId(socialId);
 
+        //---프로필 생성 추가
         if(existData == null){ // 없으면 생성
             Member member = new Member();
             member.setSocialId(socialId);
@@ -61,7 +62,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             member.setNickName(nickname);
 
             memberRepository.save(member);
-
             MemberDto memberDto = new MemberDto();
             memberDto.setName(socialId);
             //memberDto.setName(oAuth2Response.getName());
