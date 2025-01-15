@@ -21,7 +21,7 @@ public class BoardResponseDto {
 
     private String memberId;
     private String nickName;
-    private String profile_image;
+    private String profileImage;
     private Long categoryId;
 
     private LocalDateTime createdAt;
@@ -33,9 +33,9 @@ public class BoardResponseDto {
         this.upCnt = board.getUpCnt();
         Member member = board.getMember();
         if(member!= null){
-            this.memberId = member.getSocialId();
+            this.memberId = member.getId();
             this.nickName = member.getNickName();
-            this.profile_image = member.getProfileImage();
+            this.profileImage = member.getProfileImage();
         }
         Category category = board.getCategory();
         this.categoryId = category.getId();

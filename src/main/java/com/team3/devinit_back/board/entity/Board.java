@@ -47,9 +47,8 @@ public class Board extends BaseEntity {
 
 
     @Builder
-    public Board(Long id, String title, String content, Member member, int upCnt,
+    public Board(String title, String content, Member member, int upCnt,
                   int commentCnt, int viewCnt, Category category){
-        this.id = id;
         this.title = title;
         this.content = content;
         this.member = member;

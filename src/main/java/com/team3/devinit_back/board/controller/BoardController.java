@@ -35,7 +35,7 @@ public class BoardController {
     //게시글 생성
     @PostMapping
     public ResponseEntity<BoardResponseDto> createBoard(@AuthenticationPrincipal CustomOAuth2User userInfo,
-                                                        @RequestBody BoardRequestDto boardRequestDto) throws IOException, IllegalAccessException {
+                                                        @RequestBody BoardRequestDto boardRequestDto) {
         Member member = getMemberFromUserInfo(userInfo);
         BoardResponseDto boardResponseDto = boardService.createBoard(member, boardRequestDto);
 
