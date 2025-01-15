@@ -48,4 +48,8 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Recommendation> recommendation = new ArrayList<>();
 
+    public void updateProfile(String nickName, String profileImage) {
+        this.nickName = nickName;
+        this.profileImage = profileImage;
+    }
 }
