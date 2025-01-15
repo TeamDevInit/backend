@@ -57,3 +57,6 @@ aws:
   region: ${AWS_REGION}
   s3:
     bucket: ${S3_BUCKET}
+logging:
+  level:
+    root: INFO
