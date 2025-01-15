@@ -25,7 +25,8 @@ bin/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
-
+src/main/resources/.env
+db/mysql/data/
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
