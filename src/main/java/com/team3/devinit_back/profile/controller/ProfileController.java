@@ -49,13 +49,13 @@ public class ProfileController {
     )
     @PatchMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<String> updateProfile
-        (@RequestPart(value = "profile", required = true) ProfileDetailDto profileDetailDto,
+        (@RequestPart(value = "profile") ProfileDetailDto profileDetailDto,
          @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
          Authentication authentication) {
         try {
             String memberId = authentication.getName();
-
             profileService.updateProfile(memberId, profileDetailDto, profileImage);
+
             return ResponseEntity.ok("프로필이 성공적으로 업데이트되었습니다.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
