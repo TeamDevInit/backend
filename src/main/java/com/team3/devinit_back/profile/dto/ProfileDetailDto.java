@@ -1,10 +1,8 @@
 package com.team3.devinit_back.profile.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class ProfileDetailDto {
     private String nickname;
     private String profileImage;
