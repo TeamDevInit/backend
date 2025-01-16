@@ -1,6 +1,7 @@
 package com.team3.devinit_back.board.entity;
 
-import com.team3.devinit_back.common.BaseEntity;
+import com.team3.devinit_back.comment.entity.Comment;
+import com.team3.devinit_back.global.common.BaseEntity;
 import com.team3.devinit_back.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -44,6 +45,8 @@ public class Board extends BaseEntity {
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TagBoard> tagBoards = new ArrayList<>();
 
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comment  = new ArrayList<>();
 
 
     @Builder

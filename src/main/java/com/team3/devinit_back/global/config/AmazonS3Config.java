@@ -1,4 +1,4 @@
-package com.team3.devinit_back.config;
+package com.team3.devinit_back.global.config;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;

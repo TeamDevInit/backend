@@ -1,7 +1,7 @@
 package com.team3.devinit_back.member.service;
 
 
-import com.team3.devinit_back.amazonS3.service.S3Service;
+import com.team3.devinit_back.global.amazonS3.service.S3Service;
 import com.team3.devinit_back.member.dto.*;
 import com.team3.devinit_back.member.entity.Member;
 import com.team3.devinit_back.member.repository.MemberRepository;

@@ -2,7 +2,7 @@ package com.team3.devinit_back.comment.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.team3.devinit_back.board.entity.Board;
-import com.team3.devinit_back.common.BaseEntity;
+import com.team3.devinit_back.global.common.BaseEntity;
 import com.team3.devinit_back.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;

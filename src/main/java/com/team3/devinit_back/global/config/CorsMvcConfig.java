@@ -1,4 +1,4 @@
-package com.team3.devinit_back.config;
+package com.team3.devinit_back.global.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

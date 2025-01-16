@@ -6,6 +6,7 @@ import com.team3.devinit_back.board.entity.*;
 import com.team3.devinit_back.board.repository.BoardRepository;
 import com.team3.devinit_back.board.repository.CategoryRepository;
 import com.team3.devinit_back.board.repository.RecommendationRepository;
+import com.team3.devinit_back.comment.repository.CommentRepository;
 import com.team3.devinit_back.member.entity.Member;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final CategoryRepository categoryRepository;
     private final RecommendationRepository recommendationRepository;
+    private final CommentRepository commentRepository;
     private final TagService tagService;
 
     // 게시글 생성
@@ -67,7 +69,7 @@ public class BoardService {
 
     //게시물 상세 조회
     public BoardResponseDto getBoardDetail(Long id){
-        Board board = getBoardById(id);
+        Board board = getBoardByIdWithComment(id);
         return BoardResponseDto.fromEntity(board);
     }
 
@@ -121,16 +123,24 @@ public class BoardService {
         }
     }
 
+
+
+
     // 게시글 추천수 조회
     public  int getRecommendationCount(Long id){
         Board board = getBoardById(id);
         return recommendationRepository.countByBoard(board);
     }
 
-
     // boardId -> 게시글객체 조회
     private Board getBoardById(Long id) {
         return boardRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("ID에 해당하는 게시물을 찾을 수 없습니다." + id));
+    }
+
+    // boardId -> 게시글객체 조회 + 댓글포함
+    private Board getBoardByIdWithComment(Long id){
+        return boardRepository.findByIdWithComments(id)
                 .orElseThrow(() -> new EntityNotFoundException("ID에 해당하는 게시물을 찾을 수 없습니다." + id));
     }
 

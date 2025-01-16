@@ -67,7 +67,6 @@ public class BoardController {
     }
 
 
-
     // 게시글 수정
     @PatchMapping("/{id}")
     public ResponseEntity<BoardResponseDto> updateBoard(@AuthenticationPrincipal CustomOAuth2User userInfo,

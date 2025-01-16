@@ -2,11 +2,14 @@ package com.team3.devinit_back.board.dto;
 
 import com.team3.devinit_back.board.entity.Board;
 import com.team3.devinit_back.board.entity.Category;
+import com.team3.devinit_back.comment.dto.CommentResponseDto;
 import com.team3.devinit_back.member.entity.Member;
 import lombok.Data;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Getter
@@ -24,6 +27,8 @@ public class BoardResponseDto {
     private String profileImage;
     private Long categoryId;
 
+    private List<CommentResponseDto> comment;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     public BoardResponseDto(Board board){
@@ -39,6 +44,10 @@ public class BoardResponseDto {
         }
         Category category = board.getCategory();
         this.categoryId = category.getId();
+        this.comment = board.getComment() != null ? board.getComment().stream()
+                .map(CommentResponseDto::fromEntity)
+                .toList() : new ArrayList<>();
+
 
         this.createdAt = board.getCreatedAt();
         this.updatedAt = board.getUpdatedAt();

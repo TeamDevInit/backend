@@ -57,7 +57,6 @@ public class CommentController {
 
 
 
-
     private Member getMemberFromUserInfo(CustomOAuth2User userInfo) {
         String socialId = userInfo.getName();
         return memberService.findMemberBySocialId(socialId);

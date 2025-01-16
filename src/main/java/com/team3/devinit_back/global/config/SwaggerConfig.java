@@ -1,4 +1,4 @@
-package com.team3.devinit_back.config;
+package com.team3.devinit_back.global.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;

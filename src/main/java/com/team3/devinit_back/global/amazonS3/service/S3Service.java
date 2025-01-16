@@ -1,4 +1,4 @@
-package com.team3.devinit_back.amazonS3.service;
+package com.team3.devinit_back.global.amazonS3.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
