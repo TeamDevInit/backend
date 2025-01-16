@@ -11,10 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.nio.file.AccessDeniedException;
 
 @RestController
 @RequestMapping("/api/comment")
@@ -25,6 +24,7 @@ public class CommentController {
     private final MemberService memberService;
 
 
+    //댓글 작성
     @PostMapping
     public ResponseEntity<CommentResponseDto> createComment(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                             @RequestBody CommentRequestDto commentRequestDto){
@@ -32,6 +32,27 @@ public class CommentController {
         CommentResponseDto commentResponseDto = commentService.createComment(member, commentRequestDto);
 
         return  ResponseEntity.status(HttpStatus.CREATED).body(commentResponseDto);
+    }
+
+    //댓글 수정
+    @PatchMapping("/{id}")
+    public ResponseEntity<CommentResponseDto> updateComment(@AuthenticationPrincipal CustomOAuth2User userInfo,
+                                                            @RequestBody CommentRequestDto commentRequestDto,
+                                                            @PathVariable("id") Long id) throws AccessDeniedException {
+        Member member = getMemberFromUserInfo(userInfo);
+        commentService.updateComment(member.getId(), commentRequestDto, id);
+        return  ResponseEntity.status(HttpStatus.OK).build();
+
+    }
+
+    //댓글 삭제
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteComment(@AuthenticationPrincipal CustomOAuth2User userInfo,
+                                              @RequestBody CommentRequestDto commentRequestDto,
+                                              @PathVariable("id") Long id) throws AccessDeniedException {
+        Member member = getMemberFromUserInfo(userInfo);
+        commentService.deleteComment(member.getId(), commentRequestDto, id);
+        return ResponseEntity.ok().build();
     }
 
 

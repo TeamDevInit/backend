@@ -35,28 +35,62 @@ public class CommentService {
                 .content(commentRequestDto.getContent())
                 .member(member)
                 .board(board)
+                .parentComment(parentComment)
                 .build();
         Comment savedComment = commentRepository.save(comment);
         return  CommentResponseDto.fromEntity(savedComment);
 
     }
 
+    //댓글 수정
+    @Transactional
+    public void updateComment(String memberId, CommentRequestDto commentRequestDto, Long commentId) throws AccessDeniedException {
+        Comment comment = isAuthorizedForComment(commentId, commentRequestDto.getBoardId(), memberId);
+        comment.setContent(commentRequestDto.getContent());
+        commentRepository.save(comment);
+    }
 
+    //댓글 삭제
+    @Transactional
+    public void deleteComment(String memberId, CommentRequestDto commentRequestDto, Long commentId) throws AccessDeniedException {
+        Comment comment = isAuthorizedForComment(commentId, memberId, commentRequestDto.getBoardId());
+        commentRepository.delete(comment);
 
+    }
 
-
-
+    //--헬퍼 메소드--//
 
     // boardId -> 게시글객체 조회
     private Board getBoardById(Long id) {
         return boardRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("ID에 해당하는 게시물을 찾을 수 없습니다." + id));
     }
-    private Board isAuthorized(Long id, String memberId) throws AccessDeniedException {
-        Board board = getBoardById(id);
-        if (!board.getMember().getId().equals(memberId)) {
-            throw new AccessDeniedException("해당 게시물에 대한 권한이 없습니다.");
-        }
-        return board;
+
+    // commentId -> 댓글객체 조회
+    private Comment getCommentById(Long id){
+        return commentRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("ID에 해당하는 댓글을 찾을 수 없습니다." + id));
     }
+
+    // 권한 검사(댓글 수정)
+    private Comment isAuthorizedForComment(Long commentId, Long boardId, String memberId) throws AccessDeniedException {
+        Comment comment = getCommentById(commentId);
+        if ( !comment.getMember().getId().equals(memberId)) {
+            throw new AccessDeniedException("해당 댓글에 대한 권한이 없습니다.");
+        }
+        return comment;
+    }
+
+    // 권한 검사(댓글 삭제)
+    private Comment isAuthorizedForComment(Long commentId, String memberId, Long boardId) throws AccessDeniedException {
+        Board board = getBoardById(boardId);
+        Comment comment = getCommentById(commentId);
+        if (!board.getMember().getId().equals(memberId) & !comment.getMember().getId().equals(memberId)) {
+            throw new AccessDeniedException("해당 댓글에 대한 권한이 없습니다.");
+        }
+        return comment;
+    }
+
+
+
 }

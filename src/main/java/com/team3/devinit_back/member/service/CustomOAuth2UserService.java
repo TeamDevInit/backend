@@ -1,9 +1,12 @@
 package com.team3.devinit_back.member.service;
 
 
+import com.team3.devinit_back.amazonS3.service.S3Service;
 import com.team3.devinit_back.member.dto.*;
 import com.team3.devinit_back.member.entity.Member;
 import com.team3.devinit_back.member.repository.MemberRepository;
+import com.team3.devinit_back.profile.entity.Profile;
+import com.team3.devinit_back.profile.repository.ProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -16,8 +19,9 @@ import org.springframework.stereotype.Service;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final MemberRepository memberRepository;
+    private final ProfileRepository profileRepository;
     private final RandomNickname randomNickname;
-
+    private final S3Service s3Service;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -38,7 +42,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             oAuth2Response = new GithubResponse(oAuth2User.getAttributes());
         }
         else {
-
             return null;
         }
 
@@ -54,7 +57,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             member.setSocialProvider(socialProvider);
             //memberEntity.setName(oAuth2Response.getName());
             member.setRole("ROLE_USER");
-            member.setProfileImage("https://elice-devinit.s3.ap-northeast-2.amazonaws.com/default_profile_image.png");
+            member.setProfileImage(s3Service.getDefaultProfileImageUrl());
             String nickname;
             do{
                 nickname = randomNickname.generate();
@@ -62,6 +65,15 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             member.setNickName(nickname);
 
             memberRepository.save(member);
+
+            // 프로필 자동 생성
+            Profile profile = Profile.builder()
+                    .member(member)
+                    .about("")
+                    .build();
+
+            profileRepository.save(profile);
+
             MemberDto memberDto = new MemberDto();
             memberDto.setName(socialId);
             //memberDto.setName(oAuth2Response.getName());
@@ -81,6 +93,5 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
             return new CustomOAuth2User(memberDto);
         }
-
     }
 }
