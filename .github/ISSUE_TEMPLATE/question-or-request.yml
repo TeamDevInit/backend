@@ -1,0 +1,30 @@
+name: "🤔 Question or Request"
+description: "질문 또는 작업 요청"
+labels: ["question", "request"]
+body:
+  - type: textarea
+    attributes:
+      label: 📝 질문 또는 요청 내용
+      description: 질문이나 요청하고 싶은 내용을 상세히 작성해 주세요.
+      placeholder: "예: 특정 API의 동작 방식, 데이터 포맷, 추가 작업 요청 등"
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 📄 현재 상황
+      description: 현재 작업 상황이나 문제를 간략히 설명해 주세요.
+      placeholder: "예: 특정 API를 호출했지만 예상 결과가 나오지 않음, 데이터베이스 쿼리 결과 이상"
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 📊 예상 또는 요청 결과
+      description: 요청한 작업 또는 답변으로 기대하는 결과를 작성해 주세요.
+      placeholder: "예: API 응답에 추가 필드 포함, 특정 조건에서의 동작 수정 등"
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 🔗 참고 자료
+      description: 참고할 수 있는 자료, 링크 또는 스크린샷을 첨부해 주세요.
+      placeholder: "예: API 문서 링크, 로그 파일, 스크린샷 등"
