@@ -34,17 +34,14 @@ public class ProfileService {
         Profile profile = profileRepository.findByMemberId(memberId)
             .orElseThrow(() -> new RuntimeException("프로필 정보를 찾을 수 없습니다."));
 
-        Member member = profile.getMember();
-        ProfileDetailDto dto = new ProfileDetailDto();
-
-        dto.setNickname(member.getNickName());
-        dto.setProfileImage(member.getProfileImage());
-        dto.setAbout(profile.getAbout());
-        dto.setBoardCount(profile.getBoardCount());
-        dto.setFollowerCount(followService.getFollowerCount(memberId));
-        dto.setFollowingCount(followService.getFollowingCount(memberId));
-
-        return dto;
+        return new ProfileDetailDto(
+            profile.getMember().getNickName(),
+            profile.getMember().getProfileImage(),
+            profile.getAbout(),
+            profile.getBoardCount(),
+            followService.getFollowerCount(memberId),
+            followService.getFollowingCount(memberId)
+        );
     }
 
     @Transactional(readOnly = true)
@@ -52,17 +49,14 @@ public class ProfileService {
         Profile profile = profileRepository.findById(profileId)
             .orElseThrow(() -> new RuntimeException("프로필 정보를 찾을 수 없습니다."));
 
-        Member member = profile.getMember();
-        ProfileDetailDto dto = new ProfileDetailDto();
-
-        dto.setNickname(member.getNickName());
-        dto.setProfileImage(member.getProfileImage());
-        dto.setAbout(profile.getAbout());
-        dto.setBoardCount(profile.getBoardCount());
-        dto.setFollowerCount(followService.getFollowerCount(member.getId()));
-        dto.setFollowingCount(followService.getFollowingCount(member.getId()));
-
-        return dto;
+        return new ProfileDetailDto(
+            profile.getMember().getNickName(),
+            profile.getMember().getProfileImage(),
+            profile.getAbout(),
+            profile.getBoardCount(),
+            followService.getFollowerCount(profile.getMember().getId()),
+            followService.getFollowingCount(profile.getMember().getId())
+        );
     }
 
     @Transactional(readOnly = true)
@@ -71,13 +65,12 @@ public class ProfileService {
         List<Profile> randomProfiles = profileRepository.findRandomProfiles(pageable);
 
         return randomProfiles.stream()
-            .map(profile -> {
-                ProfileDto dto = new ProfileDto();
-                dto.setNickname(profile.getMember().getNickName());
-                dto.setProfileImage(profile.getMember().getProfileImage());
-                dto.setAbout(profile.getAbout());
-                return dto;
-            }).collect(Collectors.toList());
+            .map(profile -> new ProfileDto(
+                profile.getMember().getNickName(),
+                profile.getAbout(),
+                profile.getMember().getProfileImage()
+            ))
+            .collect(Collectors.toList());
     }
 
     @Transactional
@@ -87,7 +80,7 @@ public class ProfileService {
 
         // 기존 프로필 이미지 삭제
         String oldProfileImageUrl = member.getProfileImage();
-        if (profileDetailDto.getProfileImage() != null && oldProfileImageUrl != null && !oldProfileImageUrl.isEmpty()) {
+        if (newProfileImage != null && oldProfileImageUrl != null && !oldProfileImageUrl.isEmpty()) {
             String oldFileName = extractFileNameFromUrl(oldProfileImageUrl);
             s3Service.deleteFile(oldFileName);
         }
@@ -100,18 +93,12 @@ public class ProfileService {
             } catch (IOException e) {
                 throw new RuntimeException("프로필 이미지 업로드 실패: " + e.getMessage(), e);
             }
-        } else if (newProfileImage == null && (oldProfileImageUrl == null || oldProfileImageUrl.isEmpty())) {
-            // 기본 이미지 설정
-            newProfileImageUrl = s3Service.getDefaultProfileImageUrl();
+        } else if (oldProfileImageUrl == null || oldProfileImageUrl.isEmpty()) {
+            newProfileImageUrl = s3Service.getDefaultProfileImageUrl(); // 프로필 기본 이미지 설정
         }
 
-        member.setNickName(profileDetailDto.getNickname());
-        member.setProfileImage(newProfileImageUrl != null ? newProfileImageUrl : member.getProfileImage());
-
-        Profile profile = member.getProfile();
-        if (profile != null) {
-            profile.setAbout(profileDetailDto.getAbout());
-        }
+        member.getProfile().update(profileDetailDto.getAbout());
+        member.updateProfile(profileDetailDto.getNickname(), newProfileImageUrl);
     }
 
     private String extractFileNameFromUrl(String fileUrl) {

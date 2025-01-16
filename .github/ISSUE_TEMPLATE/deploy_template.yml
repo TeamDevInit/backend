@@ -1,0 +1,29 @@
+name: "🌏 Deploy"
+description: "배포 관련 작업"
+labels: ["deploy"]
+body:
+  - type: textarea
+    attributes:
+      label: 🌐 배포 목적
+      description: 이번 배포의 목적을 작성해 주세요.
+      placeholder: 배포의 주요 목표나 포함된 변경 사항을 적어주세요.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 🔧 배포 환경
+      description: 배포 대상 환경을 작성해 주세요.
+      placeholder: ex) Production, Staging, Test 등
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 📝 작업 내용
+      description: 배포 시 해야 할 작업을 체크리스트 형태로 작성해 주세요.
+      placeholder: 예) 서버 재시작, 환경 변수 설정, 데이터베이스 마이그레이션 등
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 📎 참고 자료
+      description: 참고할 만한 배포 관련 문서나 링크가 있다면 작성해 주세요.
