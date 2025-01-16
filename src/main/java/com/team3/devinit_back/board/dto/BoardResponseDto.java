@@ -47,7 +47,7 @@ public class BoardResponseDto {
         this.comment = board.getComment() != null ? board.getComment().stream()
                 .map(CommentResponseDto::fromEntity)
                 .toList() : new ArrayList<>();
-
+        this.commentCnt = board.getCommentCnt();
 
         this.createdAt = board.getCreatedAt();
         this.updatedAt = board.getUpdatedAt();

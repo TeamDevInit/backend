@@ -21,6 +21,7 @@ public class CommentService {
     private final BoardRepository boardRepository;
     private final CommentRepository commentRepository;
 
+    //댓글 생성
     @Transactional
     public CommentResponseDto createComment(Member member, CommentRequestDto commentRequestDto){
         Board board = getBoardById(commentRequestDto.getBoardId());
@@ -38,6 +39,9 @@ public class CommentService {
                 .parentComment(parentComment)
                 .build();
         Comment savedComment = commentRepository.save(comment);
+
+        board.setCommentCnt(board.getCommentCnt() + 1);
+        boardRepository.save(board);
         return  CommentResponseDto.fromEntity(savedComment);
 
     }
@@ -56,6 +60,10 @@ public class CommentService {
         Comment comment = isAuthorizedForComment(commentId, memberId, commentRequestDto.getBoardId());
         commentRepository.delete(comment);
 
+        Board board = getBoardById(commentRequestDto.getBoardId());
+
+        board.setCommentCnt(getCommentCount(board.getId()));
+        boardRepository.save(board);
     }
 
     //--헬퍼 메소드--//
@@ -70,6 +78,12 @@ public class CommentService {
     private Comment getCommentById(Long id){
         return commentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("ID에 해당하는 댓글을 찾을 수 없습니다." + id));
+    }
+
+    //게시글 댓글수 조회
+    public  int getCommentCount(Long id){
+        Board board = getBoardById(id);
+        return commentRepository.countByBoard(board);
     }
 
     // 권한 검사(댓글 수정)

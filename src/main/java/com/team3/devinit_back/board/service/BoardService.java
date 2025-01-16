@@ -63,8 +63,6 @@ public class BoardService {
         Category category = getCategoryById(categoryId);
         return boardRepository.findAllByCategory(category, pageable)
                 .map(BoardResponseDto::fromEntity);
-
-
     }
 
     //게시물 상세 조회
@@ -122,8 +120,6 @@ public class BoardService {
             return true;
         }
     }
-
-
 
 
     // 게시글 추천수 조회
