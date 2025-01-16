@@ -42,6 +42,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             oAuth2Response = new GithubResponse(oAuth2User.getAttributes());
         }
         else {
+
             return null;
         }
 
@@ -92,5 +93,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
             return new CustomOAuth2User(memberDto);
         }
+
     }
 }
