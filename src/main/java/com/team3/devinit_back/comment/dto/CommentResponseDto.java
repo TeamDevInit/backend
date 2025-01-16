@@ -27,8 +27,13 @@ public class CommentResponseDto {
     public CommentResponseDto(Comment comment){
         this.id = comment.getId();
         this.content= comment.getContent();
-        this.parentCommentId = comment.getParentComment().getId();
         this.boardId = comment.getBoard().getId();
+        if (comment.getParentComment() != null) {
+            this.parentCommentId = comment.getParentComment().getId();
+        } else {
+            this.parentCommentId = null;
+        }
+
         Member member = comment.getMember();
         if(member != null){
             this.memberId = member.getId();
