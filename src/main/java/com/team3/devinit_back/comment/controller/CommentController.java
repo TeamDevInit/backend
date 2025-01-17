@@ -14,6 +14,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.AccessDeniedException;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/comment")
@@ -32,6 +34,13 @@ public class CommentController {
         CommentResponseDto commentResponseDto = commentService.createComment(member, commentRequestDto);
 
         return  ResponseEntity.status(HttpStatus.CREATED).body(commentResponseDto);
+    }
+
+    //대댓글 조회
+    @GetMapping("/{id}")
+    public ResponseEntity<List<CommentResponseDto>> getRecomments(@PathVariable("id") Long id){
+        List<CommentResponseDto> commentResponseDto = commentService.getRecommentById(id);
+        return ResponseEntity.ok(commentResponseDto);
     }
 
     //댓글 수정
@@ -54,7 +63,6 @@ public class CommentController {
         commentService.deleteComment(member.getId(), commentRequestDto, id);
         return ResponseEntity.ok().build();
     }
-
 
 
     private Member getMemberFromUserInfo(CustomOAuth2User userInfo) {

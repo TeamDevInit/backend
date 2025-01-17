@@ -27,6 +27,8 @@ out/
 !**/src/test/**/out/
 src/main/resources/.env
 db/mysql/data/
+src/main/generated/
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
