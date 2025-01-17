@@ -28,6 +28,8 @@ public class Comment extends BaseEntity {
     @JsonIgnore
     private Comment parentComment;
 
+    private int commentCnt;
+
     @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Comment> children = new ArrayList<>(); // 대댓글 리스트
@@ -42,11 +44,12 @@ public class Comment extends BaseEntity {
 
 
     @Builder
-    public Comment(String content, Member member, Board board, Comment parentComment){
+    public Comment(String content, Member member, Board board, Comment parentComment, int commentCnt){
         this.content = content;
         this.member = member;
         this.board = board;
         this.parentComment = parentComment;
+        this.commentCnt = commentCnt;
 
     }
 

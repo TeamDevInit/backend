@@ -1,6 +1,7 @@
 package com.team3.devinit_back.board.service;
 
 import com.team3.devinit_back.board.dto.BoardRequestDto;
+import com.team3.devinit_back.board.dto.BoardDetailResponseDto;
 import com.team3.devinit_back.board.dto.BoardResponseDto;
 import com.team3.devinit_back.board.entity.*;
 import com.team3.devinit_back.board.repository.BoardRepository;
@@ -15,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.util.Optional;
 
@@ -30,7 +30,7 @@ public class BoardService {
 
     // 게시글 생성
     @Transactional
-    public BoardResponseDto createBoard(Member member, BoardRequestDto boardRequestDto) {
+    public BoardDetailResponseDto createBoard(Member member, BoardRequestDto boardRequestDto) {
 
         Category category = getCategoryById(boardRequestDto.getCategoryId());
         Board board = Board.builder()
@@ -39,16 +39,11 @@ public class BoardService {
                 .member(member)
                 .category(category)
                 .build();
-        if(boardRequestDto.getTags() != null){
-            for(String tagName : boardRequestDto.getTags()){
-                Tag tag = tagService.findTag(tagName);
-                TagBoard tagBoard = new TagBoard(board, tag);
-                board.getTagBoards().add(tagBoard);
-            }
-        }
+
+        makeTag(board, boardRequestDto);
 
         Board savedBoard = boardRepository.save(board);
-        return BoardResponseDto.fromEntity(savedBoard);
+        return BoardDetailResponseDto.fromEntity(savedBoard);
 
     }
 
@@ -66,9 +61,9 @@ public class BoardService {
     }
 
     //게시물 상세 조회
-    public BoardResponseDto getBoardDetail(Long id){
+    public BoardDetailResponseDto getBoardDetail(Long id){
         Board board = getBoardByIdWithComment(id);
-        return BoardResponseDto.fromEntity(board);
+        return BoardDetailResponseDto.fromEntity(board);
     }
 
     // 게시글 수정
@@ -80,14 +75,7 @@ public class BoardService {
         board.setContent(boardRequestDto.getContent());
         board.setCategory(category);
 
-        if (boardRequestDto.getTags() != null) {
-            board.getTagBoards().clear();
-            for (String tagName : boardRequestDto.getTags()) {
-                Tag tag = tagService.findTag(tagName);
-                TagBoard tagBoard = new TagBoard(board, tag);
-                board.getTagBoards().add(tagBoard);
-            }
-        }
+        makeTag(board, boardRequestDto);
 
         boardRepository.save(board);
     }
@@ -147,7 +135,16 @@ public class BoardService {
     }
 
     //태그설정
-
+    private void makeTag(Board board, BoardRequestDto boardRequestDto){
+        if (boardRequestDto.getTags() != null) {
+            board.getTagBoards().clear();
+            for (String tagName : boardRequestDto.getTags()) {
+                Tag tag = tagService.findTag(tagName);
+                TagBoard tagBoard = new TagBoard(board, tag);
+                board.getTagBoards().add(tagBoard);
+            }
+        }
+    }
 
     // 권한 검사
     private Board isAuthorized(Long id, String memberId) throws AccessDeniedException {

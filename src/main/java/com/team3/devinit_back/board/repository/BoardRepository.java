@@ -17,7 +17,10 @@ public interface BoardRepository extends JpaRepository<Board,Long> {
 
     Page<Board> findAllByCategory(Category category, Pageable pageable);
 
-    @Query("SELECT b FROM Board b LEFT JOIN FETCH b.comment c WHERE b.id = :id")
+    @Query("SELECT b FROM Board b " +
+            "LEFT JOIN FETCH b.comment c " +
+            "WHERE b.id = :id " +
+            "AND c.parentComment IS NULL")
     Optional<Board> findByIdWithComments(@Param("id") Long id);
 
 
