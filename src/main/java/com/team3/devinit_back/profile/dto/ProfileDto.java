@@ -2,13 +2,10 @@ package com.team3.devinit_back.profile.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-public class RandomProfileResponse {
-    private String id;
+public class ProfileDto {
     private String nickname;
     private String about;
     private String profileImage;
