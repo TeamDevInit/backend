@@ -54,14 +54,14 @@ public class BoardService {
 
     // 전체 게시물 조회
     public Page<BoardResponseDto> getAllBoard(Pageable pageable){
-        return boardRepository.findAll(pageable)
+        return boardRepository.findAllWithTags(pageable)
                 .map(BoardResponseDto::fromEntity);
     }
 
     // 카테고리별 게시물 조회
     public Page<BoardResponseDto> getBoardByCategory(Pageable pageable, Long categoryId) {
         Category category = getCategoryById(categoryId);
-        return boardRepository.findAllByCategory(category, pageable)
+        return boardRepository.findAllByCategoryWithTags(category, pageable)
                 .map(BoardResponseDto::fromEntity);
     }
 
@@ -145,6 +145,9 @@ public class BoardService {
         return categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new EntityNotFoundException("ID에 해당하는 카테고리를 찾을 수 없습니다." + categoryId));
     }
+
+    //태그설정
+
 
     // 권한 검사
     private Board isAuthorized(Long id, String memberId) throws AccessDeniedException {
