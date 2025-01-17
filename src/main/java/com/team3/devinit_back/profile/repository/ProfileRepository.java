@@ -15,4 +15,6 @@ public interface ProfileRepository extends JpaRepository<Profile, String> {
     List<Profile> findRandomProfiles(Pageable pageable);
 
     Optional<Profile> findByMemberId(String memberId);
+
+    Optional<Profile> findById(String id);
 }

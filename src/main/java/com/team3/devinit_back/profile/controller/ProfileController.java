@@ -1,45 +1,55 @@
 package com.team3.devinit_back.profile.controller;
 
-import com.team3.devinit_back.profile.dto.ProfileDetailDto;
-import com.team3.devinit_back.profile.dto.ProfileDto;
+import com.team3.devinit_back.member.dto.CustomOAuth2User;
+import com.team3.devinit_back.member.entity.Member;
+import com.team3.devinit_back.member.service.MemberService;
+import com.team3.devinit_back.profile.dto.ProfileDetailResponse;
+import com.team3.devinit_back.profile.dto.ProfileUpdateRequest;
+import com.team3.devinit_back.profile.dto.RandomProfileResponse;
 import com.team3.devinit_back.profile.service.ProfileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import lombok.Getter;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.expression.AccessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/profile")
 @RequiredArgsConstructor
 public class ProfileController {
     private final ProfileService profileService;
+    private final MemberService memberService;
 
     @Operation(summary = "내 프로필 상세 조회")
     @GetMapping("/me")
-    public ResponseEntity<ProfileDetailDto> getMyProfile(Authentication authentication) {
-        String memberId = authentication.getName();
-        ProfileDetailDto profileDetailDto = profileService.getMyProfile(memberId);
-        return ResponseEntity.ok(profileDetailDto);
+    public ResponseEntity<ProfileDetailResponse> getMyProfile(@AuthenticationPrincipal CustomOAuth2User userInfo) {
+        Member member = getMemberFromUserInfo(userInfo);
+        ProfileDetailResponse response = profileService.getMyProfile(member.getId());
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "상대 프로필 상세 조회")
     @GetMapping("{profileId}")
-    public ResponseEntity<ProfileDetailDto> getProfile(@PathVariable String profileId) {
-        ProfileDetailDto profileDetailDto = profileService.getProfileById(profileId);
-        return ResponseEntity.ok(profileDetailDto);
+    public ResponseEntity<ProfileDetailResponse> getProfile(@PathVariable("profileId") String profileId) {
+        ProfileDetailResponse response = profileService.getProfile(profileId);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "프로필 랜덤 조회")
     @GetMapping("/random")
-    public ResponseEntity<List<ProfileDto>> getRandomProfiles() {
-        List<ProfileDto> randomProfiles = profileService.getRandomProfiles();
+    public ResponseEntity<List<RandomProfileResponse>> getRandomProfiles() {
+        List<RandomProfileResponse> randomProfiles = profileService.getRandomProfiles();
         return ResponseEntity.ok(randomProfiles);
     }
 
@@ -47,19 +57,21 @@ public class ProfileController {
         summary = "프로필 정보 수정",
         security = @SecurityRequirement(name = "bearerAuth")
     )
-    @PatchMapping(consumes = {"multipart/form-data"})
-    public ResponseEntity<String> updateProfile
-        (@RequestPart(value = "profile") ProfileDetailDto profileDetailDto,
-         @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
-         Authentication authentication) {
-        try {
-            String memberId = authentication.getName();
-            profileService.updateProfile(memberId, profileDetailDto, profileImage);
+    @PatchMapping(value = "/{profileId}", consumes = {MediaType.APPLICATION_JSON_VALUE,
+        MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<ProfileDetailResponse> updateProfile
+        (@AuthenticationPrincipal CustomOAuth2User userInfo,
+         @PathVariable("profileId") String profileId,
+         @RequestPart(value = "profile") ProfileUpdateRequest request,
+         @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) throws AccessException {
+        Member member = getMemberFromUserInfo(userInfo);
+        profileService.updateProfile(member.getId(), profileId, request, profileImage);
+        ProfileDetailResponse updateProfile = profileService.getProfile(profileId);
+        return ResponseEntity.ok(updateProfile);
+    }
 
-            return ResponseEntity.ok("프로필이 성공적으로 업데이트되었습니다.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("프로필 업데이트 실패: " + e.getMessage());
-        }
+    private Member getMemberFromUserInfo(CustomOAuth2User userInfo) {
+        String socialId = userInfo.getName();
+        return memberService.findMemberBySocialId(socialId);
     }
 }
