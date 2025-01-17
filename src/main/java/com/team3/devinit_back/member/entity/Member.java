@@ -2,7 +2,7 @@ package com.team3.devinit_back.member.entity;
 
 import com.team3.devinit_back.board.entity.Board;
 import com.team3.devinit_back.board.entity.Recommendation;
-import com.team3.devinit_back.common.BaseEntity;
+import com.team3.devinit_back.global.common.BaseEntity;
 import com.team3.devinit_back.profile.entity.Profile;
 import com.team3.devinit_back.resume.entity.Resume;
 import jakarta.persistence.*;

@@ -1,6 +1,7 @@
 package com.team3.devinit_back.board.controller;
 
 import com.team3.devinit_back.board.dto.BoardRequestDto;
+import com.team3.devinit_back.board.dto.BoardDetailResponseDto;
 import com.team3.devinit_back.board.dto.BoardResponseDto;
 import com.team3.devinit_back.board.service.BoardService;
 import com.team3.devinit_back.member.dto.CustomOAuth2User;
@@ -15,10 +16,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,10 +33,10 @@ public class BoardController {
 
     //게시글 생성
     @PostMapping
-    public ResponseEntity<BoardResponseDto> createBoard(@AuthenticationPrincipal CustomOAuth2User userInfo,
-                                                        @RequestBody BoardRequestDto boardRequestDto) {
+    public ResponseEntity<BoardDetailResponseDto> createBoard(@AuthenticationPrincipal CustomOAuth2User userInfo,
+                                                              @RequestBody BoardRequestDto boardRequestDto) {
         Member member = getMemberFromUserInfo(userInfo);
-        BoardResponseDto boardResponseDto = boardService.createBoard(member, boardRequestDto);
+        BoardDetailResponseDto boardResponseDto = boardService.createBoard(member, boardRequestDto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(boardResponseDto);
     }
@@ -53,7 +52,7 @@ public class BoardController {
     // 카테고리별 게시글 조회
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<Page<BoardResponseDto>> getBoardsByCategory(@PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
-                                                                      @PathVariable("categoryId") Long categoryId) {
+                                                                            @PathVariable("categoryId") Long categoryId) {
 
         Page<BoardResponseDto> boardResponseDtoPage = boardService.getBoardByCategory(pageable, categoryId);
         return  ResponseEntity.ok(boardResponseDtoPage);
@@ -61,18 +60,17 @@ public class BoardController {
 
     //게시글 상세 조회
     @GetMapping("/{id}")
-    public ResponseEntity<BoardResponseDto> getBoardDetail(@PathVariable("id") Long id){
-        BoardResponseDto boardResponseDto = boardService.getBoardDetail(id);
+    public ResponseEntity<BoardDetailResponseDto> getBoardDetail(@PathVariable("id") Long id){
+        BoardDetailResponseDto boardResponseDto = boardService.getBoardDetail(id);
         return ResponseEntity.ok(boardResponseDto);
     }
 
 
-
     // 게시글 수정
     @PatchMapping("/{id}")
-    public ResponseEntity<BoardResponseDto> updateBoard(@AuthenticationPrincipal CustomOAuth2User userInfo,
-                                                        @RequestBody BoardRequestDto boardRequestDto,
-                                                        @PathVariable("id") Long id){
+    public ResponseEntity<BoardDetailResponseDto> updateBoard(@AuthenticationPrincipal CustomOAuth2User userInfo,
+                                                              @RequestBody BoardRequestDto boardRequestDto,
+                                                              @PathVariable("id") Long id){
 
         Member member = getMemberFromUserInfo(userInfo);
         try{

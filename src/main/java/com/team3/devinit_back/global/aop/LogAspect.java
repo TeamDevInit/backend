@@ -1,4 +1,4 @@
-package com.team3.devinit_back.aop;
+package com.team3.devinit_back.global.aop;
 
 
 import jakarta.servlet.http.HttpServletRequest;

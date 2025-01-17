@@ -1,4 +1,4 @@
-package com.team3.devinit_back.common;
+package com.team3.devinit_back.global.common;
 
 import jakarta.persistence.*;
 import lombok.Getter;

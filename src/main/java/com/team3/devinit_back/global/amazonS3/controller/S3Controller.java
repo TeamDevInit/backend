@@ -1,6 +1,6 @@
-package com.team3.devinit_back.amazonS3.controller;
+package com.team3.devinit_back.global.amazonS3.controller;
 
-import com.team3.devinit_back.amazonS3.service.S3Service;
+import com.team3.devinit_back.global.amazonS3.service.S3Service;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.AccessDeniedException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +22,7 @@ public class CommentService {
     private final BoardRepository boardRepository;
     private final CommentRepository commentRepository;
 
+    //댓글 생성
     @Transactional
     public CommentResponseDto createComment(Member member, CommentRequestDto commentRequestDto){
         Board board = getBoardById(commentRequestDto.getBoardId());
@@ -28,8 +30,8 @@ public class CommentService {
         Comment parentComment = null;
         Long parentId = commentRequestDto.getParentCommentId();
         if(parentId != null){
-            parentComment = commentRepository.findById(parentId)
-                    .orElseThrow(() -> new EntityNotFoundException("부모 댓글을 찾을 수 없습니다."));
+            parentComment = getCommentById(parentId);
+            parentComment.setCommentCnt(parentComment.getCommentCnt() + 1);
         }
         Comment comment = Comment.builder()
                 .content(commentRequestDto.getContent())
@@ -38,6 +40,9 @@ public class CommentService {
                 .parentComment(parentComment)
                 .build();
         Comment savedComment = commentRepository.save(comment);
+
+        board.setCommentCnt(board.getCommentCnt() + 1);
+        boardRepository.save(board);
         return  CommentResponseDto.fromEntity(savedComment);
 
     }
@@ -45,7 +50,7 @@ public class CommentService {
     //댓글 수정
     @Transactional
     public void updateComment(String memberId, CommentRequestDto commentRequestDto, Long commentId) throws AccessDeniedException {
-        Comment comment = isAuthorizedForComment(commentId, commentRequestDto.getBoardId(), memberId);
+        Comment comment = isAuthorizedForComment(commentId, memberId);
         comment.setContent(commentRequestDto.getContent());
         commentRepository.save(comment);
     }
@@ -54,8 +59,24 @@ public class CommentService {
     @Transactional
     public void deleteComment(String memberId, CommentRequestDto commentRequestDto, Long commentId) throws AccessDeniedException {
         Comment comment = isAuthorizedForComment(commentId, memberId, commentRequestDto.getBoardId());
+        if (comment.getParentComment() != null) {
+            Comment parentComment = comment.getParentComment();
+            parentComment.setCommentCnt(parentComment.getCommentCnt() - 1);
+            commentRepository.save(parentComment);
+        }
         commentRepository.delete(comment);
 
+        Board board = getBoardById(commentRequestDto.getBoardId());
+        board.setCommentCnt(getCommentCount(board.getId()));
+        boardRepository.save(board);
+    }
+
+    //대댓글 조회
+    public List<CommentResponseDto> getRecommentById(Long id){
+        Comment parentComment  = getCommentById(id);
+        return commentRepository.findAllByParentComment(parentComment).stream()
+                .map(CommentResponseDto::fromEntity)
+                .toList();
     }
 
     //--헬퍼 메소드--//
@@ -72,8 +93,14 @@ public class CommentService {
                 .orElseThrow(() -> new EntityNotFoundException("ID에 해당하는 댓글을 찾을 수 없습니다." + id));
     }
 
+    //게시글 댓글수 조회
+    public  int getCommentCount(Long id){
+        Board board = getBoardById(id);
+        return commentRepository.countByBoard(board);
+    }
+
     // 권한 검사(댓글 수정)
-    private Comment isAuthorizedForComment(Long commentId, Long boardId, String memberId) throws AccessDeniedException {
+    private Comment isAuthorizedForComment(Long commentId, String memberId) throws AccessDeniedException {
         Comment comment = getCommentById(commentId);
         if ( !comment.getMember().getId().equals(memberId)) {
             throw new AccessDeniedException("해당 댓글에 대한 권한이 없습니다.");

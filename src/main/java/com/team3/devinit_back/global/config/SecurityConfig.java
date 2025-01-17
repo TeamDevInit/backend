@@ -1,4 +1,4 @@
-package com.team3.devinit_back.config;
+package com.team3.devinit_back.global.config;
 
 import com.team3.devinit_back.member.jwt.JWTFilter;
 import com.team3.devinit_back.member.jwt.JWTUtil;
