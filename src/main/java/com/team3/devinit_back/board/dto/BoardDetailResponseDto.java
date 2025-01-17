@@ -10,12 +10,14 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
 @Data
 @Getter
-public class BoardResponseDto {
+public class BoardDetailResponseDto {
     private Long id;
     private String title;
     private String content;
+
     private int upCnt;
     private int commentCnt;
     private int viewCnt;
@@ -25,11 +27,13 @@ public class BoardResponseDto {
     private String profileImage;
     private Long categoryId;
     private String categoryName;
+
+    private List<CommentResponseDto> comment;
     private List<TagResponseDto> tag;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    public BoardResponseDto(Board board){
+    public BoardDetailResponseDto(Board board){
         this.id = board.getId();
         this.title = board.getTitle();
         this.content = board.getContent();
@@ -43,6 +47,9 @@ public class BoardResponseDto {
         Category category = board.getCategory();
         this.categoryId = category.getId();
         this.categoryName = category.getName();
+        this.comment = board.getComment() != null ? board.getComment().stream()
+                .map(CommentResponseDto::fromEntity)
+                .toList() : new ArrayList<>();
         this.commentCnt = board.getCommentCnt();
         this.tag = board.getTagBoards() != null ? board.getTagBoards().stream()
                 .map(tagBoard -> new TagResponseDto(tagBoard.getTag()))
@@ -53,7 +60,8 @@ public class BoardResponseDto {
         this.updatedAt = board.getUpdatedAt();
 
     }
-    public static BoardResponseDto fromEntity(Board board){ return new BoardResponseDto(board);}
+    public static BoardDetailResponseDto fromEntity(Board board){ return new BoardDetailResponseDto(board);}
+
 
 
 }

@@ -8,6 +8,7 @@ import lombok.Setter;
 
 
 @Entity
+@Getter
 @NoArgsConstructor
 public class TagBoard {
 
