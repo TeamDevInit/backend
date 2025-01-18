@@ -20,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.AccessDeniedException;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +40,7 @@ public class BoardService {
         Board board = Board.builder()
                 .title(boardRequestDto.getTitle())
                 .content(boardRequestDto.getContent())
+                .thumbnail(extractImageUrl(boardRequestDto.getContent()))
                 .member(member)
                 .category(category)
                 .build();
@@ -146,6 +149,17 @@ public class BoardService {
                 board.getTagBoards().add(tagBoard);
             }
         }
+    }
+
+    //컨텐츠(마크다운) 첫번째 이미지(썸네일) 추출
+    private String extractImageUrl(String content){
+        String imageUrl;
+        String regex = "!\\[.*?\\]\\((.*?)\\)";  // !\[로 시작하고, ] 뒤에 (와 )로 감싸인 URL을 추출.
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(content);
+
+        if(matcher.find()){ return matcher.group(1); }
+        return null;
     }
 
     // 권한 검사

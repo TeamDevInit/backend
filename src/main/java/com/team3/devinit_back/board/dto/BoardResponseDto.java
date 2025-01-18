@@ -16,6 +16,7 @@ public class BoardResponseDto {
     private Long id;
     private String title;
     private String content;
+    private String thumbnail;
     private int upCnt;
     private int commentCnt;
     private int viewCnt;
@@ -34,6 +35,7 @@ public class BoardResponseDto {
         this.title = board.getTitle();
         this.content = board.getContent();
         this.upCnt = board.getUpCnt();
+        this.thumbnail = board.getThumbnail();
         Member member = board.getMember();
         if(member!= null){
             this.memberId = member.getId();
