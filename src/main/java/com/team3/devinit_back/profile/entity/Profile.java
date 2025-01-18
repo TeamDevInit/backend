@@ -1,6 +1,6 @@
 package com.team3.devinit_back.profile.entity;
 
-import com.team3.devinit_back.common.BaseEntity;
+import com.team3.devinit_back.global.common.BaseEntity;
 import com.team3.devinit_back.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
