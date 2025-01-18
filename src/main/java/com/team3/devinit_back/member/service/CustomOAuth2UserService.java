@@ -48,7 +48,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         //유저 정보확인 및 기존 회원 여부 판별
         String socialId = oAuth2Response.getProviderId();
         String socialProvider = oAuth2Response.getProvider();
-        Member existData =memberRepository.findBySocialId(socialId);
+        Member existData = memberRepository.findBySocialId(socialId);
 
         //---프로필 생성 추가
         if(existData == null){ // 없으면 생성

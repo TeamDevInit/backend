@@ -47,10 +47,10 @@ public class CommentController {
     @PatchMapping("/{id}")
     public ResponseEntity<CommentResponseDto> updateComment(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                             @RequestBody CommentRequestDto commentRequestDto,
-                                                            @PathVariable("id") Long id) throws AccessDeniedException {
+                                                            @PathVariable("id") Long id){
         Member member = getMemberFromUserInfo(userInfo);
         commentService.updateComment(member.getId(), commentRequestDto, id);
-        return  ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok().build();
 
     }
 
@@ -58,7 +58,7 @@ public class CommentController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteComment(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                               @RequestBody CommentRequestDto commentRequestDto,
-                                              @PathVariable("id") Long id) throws AccessDeniedException {
+                                              @PathVariable("id") Long id){
         Member member = getMemberFromUserInfo(userInfo);
         commentService.deleteComment(member.getId(), commentRequestDto, id);
         return ResponseEntity.ok().build();
