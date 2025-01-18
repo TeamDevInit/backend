@@ -1,5 +1,6 @@
 package com.team3.devinit_back.follow.service;
 
+import com.team3.devinit_back.follow.dto.FollowCountResponse;
 import com.team3.devinit_back.follow.entity.Follow;
 import com.team3.devinit_back.follow.repository.FollowRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,12 +34,9 @@ public class FollowService {
     }
 
     @Transactional(readOnly = true)
-    public int getFollowerCount(String memberId) {
-        return followRepository.countByReceiverId(memberId);
-    }
-
-    @Transactional(readOnly = true)
-    public int getFollowingCount(String memberId) {
-        return followRepository.countBySenderId(memberId);
+    public FollowCountResponse getFollowCounts(String memberId) {
+        int followerCount = followRepository.countByReceiverId(memberId);
+        int followingCount = followRepository.countBySenderId(memberId);
+        return new FollowCountResponse(followerCount, followingCount);
     }
 }

@@ -42,6 +42,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             oAuth2Response = new GithubResponse(oAuth2User.getAttributes());
         }
         else {
+
             return null;
         }
 
@@ -50,7 +51,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String socialProvider = oAuth2Response.getProvider();
         Member existData = memberRepository.findBySocialId(socialId);
 
-        //---프로필 생성 추가
         if(existData == null){ // 없으면 생성
             Member member = new Member();
             member.setSocialId(socialId);
@@ -93,5 +93,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
             return new CustomOAuth2User(memberDto);
         }
+
     }
 }
