@@ -8,6 +8,8 @@ import com.team3.devinit_back.board.repository.BoardRepository;
 import com.team3.devinit_back.board.repository.CategoryRepository;
 import com.team3.devinit_back.board.repository.RecommendationRepository;
 import com.team3.devinit_back.comment.repository.CommentRepository;
+import com.team3.devinit_back.global.exception.CustomException;
+import com.team3.devinit_back.global.exception.ErrorCode;
 import com.team3.devinit_back.member.entity.Member;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -68,7 +70,7 @@ public class BoardService {
 
     // 게시글 수정
     @Transactional
-    public void updateBoard(String memberId, Long id,BoardRequestDto boardRequestDto) throws AccessDeniedException {
+    public void updateBoard(String memberId, Long id,BoardRequestDto boardRequestDto){
         Category category = getCategoryById(boardRequestDto.getCategoryId());
         Board board = isAuthorized(id, memberId);
         board.setTitle(boardRequestDto.getTitle());
@@ -82,7 +84,7 @@ public class BoardService {
 
     //게시글 삭제
     @Transactional
-    public void deleteBoard(Long id, String memberId) throws AccessDeniedException {
+    public void deleteBoard(Long id, String memberId) {
         Board board = isAuthorized(id, memberId);
         boardRepository.deleteById(board.getId());
     }
@@ -119,19 +121,19 @@ public class BoardService {
     // boardId -> 게시글객체 조회
     private Board getBoardById(Long id) {
         return boardRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("ID에 해당하는 게시물을 찾을 수 없습니다." + id));
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
     }
 
     // boardId -> 게시글객체 조회 + 댓글포함
     private Board getBoardByIdWithComment(Long id){
         return boardRepository.findByIdWithComments(id)
-                .orElseThrow(() -> new EntityNotFoundException("ID에 해당하는 게시물을 찾을 수 없습니다." + id));
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
     }
 
     //CategoryId -> 카테고리객체 조회
     private Category getCategoryById(Long categoryId) {
         return categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new EntityNotFoundException("ID에 해당하는 카테고리를 찾을 수 없습니다." + categoryId));
+                .orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
     }
 
     //태그설정
@@ -147,10 +149,10 @@ public class BoardService {
     }
 
     // 권한 검사
-    private Board isAuthorized(Long id, String memberId) throws AccessDeniedException {
+    private Board isAuthorized(Long id, String memberId) {
         Board board = getBoardById(id);
         if (!board.getMember().getId().equals(memberId)) {
-            throw new AccessDeniedException("해당 게시물에 대한 권한이 없습니다.");
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
         return board;
     }

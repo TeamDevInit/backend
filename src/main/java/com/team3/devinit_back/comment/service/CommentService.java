@@ -7,6 +7,8 @@ import com.team3.devinit_back.comment.dto.CommentRequestDto;
 import com.team3.devinit_back.comment.dto.CommentResponseDto;
 import com.team3.devinit_back.comment.entity.Comment;
 import com.team3.devinit_back.comment.repository.CommentRepository;
+import com.team3.devinit_back.global.exception.CustomException;
+import com.team3.devinit_back.global.exception.ErrorCode;
 import com.team3.devinit_back.member.entity.Member;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +51,7 @@ public class CommentService {
 
     //댓글 수정
     @Transactional
-    public void updateComment(String memberId, CommentRequestDto commentRequestDto, Long commentId) throws AccessDeniedException {
+    public void updateComment(String memberId, CommentRequestDto commentRequestDto, Long commentId){
         Comment comment = isAuthorizedForComment(commentId, memberId);
         comment.setContent(commentRequestDto.getContent());
         commentRepository.save(comment);
@@ -57,7 +59,7 @@ public class CommentService {
 
     //댓글 삭제
     @Transactional
-    public void deleteComment(String memberId, CommentRequestDto commentRequestDto, Long commentId) throws AccessDeniedException {
+    public void deleteComment(String memberId, CommentRequestDto commentRequestDto, Long commentId) {
         Comment comment = isAuthorizedForComment(commentId, memberId, commentRequestDto.getBoardId());
         if (comment.getParentComment() != null) {
             Comment parentComment = comment.getParentComment();
@@ -84,13 +86,13 @@ public class CommentService {
     // boardId -> 게시글객체 조회
     private Board getBoardById(Long id) {
         return boardRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("ID에 해당하는 게시물을 찾을 수 없습니다." + id));
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
     }
 
     // commentId -> 댓글객체 조회
     private Comment getCommentById(Long id){
         return commentRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("ID에 해당하는 댓글을 찾을 수 없습니다." + id));
+                .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
     }
 
     //게시글 댓글수 조회
@@ -100,20 +102,20 @@ public class CommentService {
     }
 
     // 권한 검사(댓글 수정)
-    private Comment isAuthorizedForComment(Long commentId, String memberId) throws AccessDeniedException {
+    private Comment isAuthorizedForComment(Long commentId, String memberId){
         Comment comment = getCommentById(commentId);
         if ( !comment.getMember().getId().equals(memberId)) {
-            throw new AccessDeniedException("해당 댓글에 대한 권한이 없습니다.");
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
         return comment;
     }
 
     // 권한 검사(댓글 삭제)
-    private Comment isAuthorizedForComment(Long commentId, String memberId, Long boardId) throws AccessDeniedException {
+    private Comment isAuthorizedForComment(Long commentId, String memberId, Long boardId){
         Board board = getBoardById(boardId);
         Comment comment = getCommentById(commentId);
         if (!board.getMember().getId().equals(memberId) & !comment.getMember().getId().equals(memberId)) {
-            throw new AccessDeniedException("해당 댓글에 대한 권한이 없습니다.");
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
         return comment;
     }
