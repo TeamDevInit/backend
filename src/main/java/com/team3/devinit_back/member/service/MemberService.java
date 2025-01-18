@@ -1,5 +1,7 @@
 package com.team3.devinit_back.member.service;
 
+import com.team3.devinit_back.global.exception.CustomException;
+import com.team3.devinit_back.global.exception.ErrorCode;
 import com.team3.devinit_back.member.entity.Member;
 import com.team3.devinit_back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,10 +17,10 @@ public class MemberService {
 
     //닉네임 변경
     public boolean updateNicknameBySocailId(String socialId, String nickname){
+        if(isNicknameExists(nickname)){ throw new CustomException(ErrorCode.DUPLICATED_NAME); }
+
         Member member =  memberRepository.findBySocialId(socialId);
-        if (member == null) {
-            throw new IllegalArgumentException("해당 ID에 해당하는 회원을 찾을 수 없습니다: " + socialId);
-        }
+        if (member == null) { throw new CustomException(ErrorCode.INVALID_USER); }
 
         member.setNickName(nickname);
         memberRepository.save(member);

@@ -73,12 +73,10 @@ public class BoardController {
                                                               @PathVariable("id") Long id){
 
         Member member = getMemberFromUserInfo(userInfo);
-        try{
-            boardService.updateBoard(member.getId(),id, boardRequestDto);
-            return ResponseEntity.status(HttpStatus.OK).build();
-        } catch (AccessDeniedException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+
+        boardService.updateBoard(member.getId(),id, boardRequestDto);
+        return ResponseEntity.ok().build();
+
     }
 
     //게시글 삭제
@@ -86,12 +84,10 @@ public class BoardController {
     public ResponseEntity<Void> deleteBoard(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                       @PathVariable("id") Long id) {
         Member member = getMemberFromUserInfo(userInfo);
-        try{
-            boardService.deleteBoard(id,member.getId());
-            return ResponseEntity.ok().build();
-        } catch (AccessDeniedException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+
+        boardService.deleteBoard(id,member.getId());
+        return ResponseEntity.ok().build();
+
     }
 
     //게시글 추천
@@ -100,7 +96,7 @@ public class BoardController {
                                             @PathVariable("id") Long id){
         Member member = getMemberFromUserInfo(userInfo);
 
-        try{
+
             boolean recommended  = boardService.toggleRecommend(id, member);
             int recommendationCnt = boardService.getRecommendationCount(id);
 
@@ -109,11 +105,9 @@ public class BoardController {
             response.put("message", message);
             response.put("recommendationCnt", recommendationCnt);
 
-            return ResponseEntity.ok(response); // 200 OK 응답
+            return ResponseEntity.ok(response);
 
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("게시글을 찾을 수 없습니다.");
-        }
+
     }
 
     private Member getMemberFromUserInfo(CustomOAuth2User userInfo) {

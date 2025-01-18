@@ -27,17 +27,10 @@ public class MemberController{
                                                  @RequestBody MemberDto memberDto){
         String socialId = userInfo.getName();
         String newNickname = memberDto.getNickName();
-        if(memberService.isNicknameExists(newNickname)){
-            return new ResponseEntity<>("이미 사용 중인 닉네임입니다.", HttpStatus.CONFLICT);
-        }
-        else{
-            boolean isUpdated = memberService.updateNicknameBySocailId(socialId,memberDto.getNickName());
-            if (isUpdated) {
-                return new ResponseEntity<>("닉네임 변경 성공", HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>("닉네임 변경 실패", HttpStatus.NOT_FOUND);
-            }
-        }
+
+        memberService.updateNicknameBySocailId(socialId,memberDto.getNickName());
+
+        return ResponseEntity.ok("닉네임 변경 성공");
 
     }
 }
