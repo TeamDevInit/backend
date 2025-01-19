@@ -10,6 +10,7 @@ import com.team3.devinit_back.member.service.MemberService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -43,8 +45,10 @@ public class BoardController {
 
     // 전체 게시글 조회
     @GetMapping
-    public ResponseEntity<Page<BoardResponseDto>> getAllBoards(@PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
-        Page<BoardResponseDto> boardResponseDtoPage = boardService.getAllBoard(pageable);
+    public ResponseEntity<Page<BoardResponseDto>> getAllBoards(@PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+                                                               @RequestParam(name = "tagNames", required = false)List<String> tagNames,
+                                                               @RequestParam(name = "searchContents",required = false) String searchContents){
+        Page<BoardResponseDto> boardResponseDtoPage = boardService.getAllBoard(pageable, tagNames, searchContents);
         return  ResponseEntity.ok(boardResponseDtoPage);
 
     }
@@ -52,9 +56,11 @@ public class BoardController {
     // 카테고리별 게시글 조회
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<Page<BoardResponseDto>> getBoardsByCategory(@PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
-                                                                            @PathVariable("categoryId") Long categoryId) {
+                                                                          @RequestParam(name = "tagNames", required = false)List<String> tagNames,
+                                                                          @RequestParam(name = "searchContents",required = false) String searchContents,
+                                                                          @PathVariable("categoryId") Long categoryId) {
 
-        Page<BoardResponseDto> boardResponseDtoPage = boardService.getBoardByCategory(pageable, categoryId);
+        Page<BoardResponseDto> boardResponseDtoPage = boardService.getBoardByCategory(pageable, tagNames, searchContents, categoryId);
         return  ResponseEntity.ok(boardResponseDtoPage);
     }
 
@@ -82,7 +88,7 @@ public class BoardController {
     //게시글 삭제
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBoard(@AuthenticationPrincipal CustomOAuth2User userInfo,
-                                      @PathVariable("id") Long id) {
+                                            @PathVariable("id") Long id) {
         Member member = getMemberFromUserInfo(userInfo);
 
         boardService.deleteBoard(id,member.getId());
