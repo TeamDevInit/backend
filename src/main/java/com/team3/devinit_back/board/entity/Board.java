@@ -26,6 +26,7 @@ public class Board extends BaseEntity {
     private String title;
     @Column(nullable = false)
     private String content;
+    private String thumbnail;
 
     private int upCnt;
     private int commentCnt;
@@ -51,7 +52,7 @@ public class Board extends BaseEntity {
 
     @Builder
     public Board(String title, String content, Member member, int upCnt,
-                  int commentCnt, int viewCnt, Category category){
+                  int commentCnt, int viewCnt, Category category, String thumbnail){
         this.title = title;
         this.content = content;
         this.member = member;
@@ -59,5 +60,6 @@ public class Board extends BaseEntity {
         this.commentCnt = commentCnt;
         this.viewCnt = viewCnt;
         this.category = category;
+        this.thumbnail = thumbnail;
     }
 }
