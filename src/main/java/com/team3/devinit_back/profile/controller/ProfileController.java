@@ -3,21 +3,22 @@ package com.team3.devinit_back.profile.controller;
 import com.team3.devinit_back.member.dto.CustomOAuth2User;
 import com.team3.devinit_back.member.entity.Member;
 import com.team3.devinit_back.member.service.MemberService;
+import com.team3.devinit_back.profile.dto.BoardSummaryResponse;
 import com.team3.devinit_back.profile.dto.ProfileDetailResponse;
 import com.team3.devinit_back.profile.dto.ProfileUpdateRequest;
 import com.team3.devinit_back.profile.dto.RandomProfileResponse;
 import com.team3.devinit_back.profile.service.ProfileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.expression.AccessException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,6 +37,16 @@ public class ProfileController {
     public ResponseEntity<ProfileDetailResponse> getMyProfile(@AuthenticationPrincipal CustomOAuth2User userInfo) {
         Member member = getMemberFromUserInfo(userInfo);
         ProfileDetailResponse response = profileService.getMyProfile(member.getId());
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "내 게시물 리스트 조회")
+    @GetMapping("/me/boards")
+    public ResponseEntity<Page<BoardSummaryResponse>> getMyBoards(
+        @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+        @AuthenticationPrincipal CustomOAuth2User userInfo) {
+        Member member = getMemberFromUserInfo(userInfo);
+        Page<BoardSummaryResponse> response = profileService.getMyBoards(member.getId(), pageable);
         return ResponseEntity.ok(response);
     }
 

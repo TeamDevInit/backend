@@ -23,4 +23,25 @@ public interface BoardRepository extends JpaRepository<Board,Long> {
             "AND c.parentComment IS NULL")
     Optional<Board> findByIdWithComments(@Param("id") Long id);
 
+
+    @Query("SELECT DISTINCT b FROM Board b " +
+            "LEFT JOIN FETCH b.tagBoards tb " +
+            "LEFT JOIN FETCH tb.tag " +
+            "WHERE b.category = :category")
+    Page<Board> findAllByCategoryWithTags(@Param("category") Category category, Pageable pageable);
+
+    @Query("SELECT DISTINCT b FROM Board b " +
+            "LEFT JOIN FETCH b.tagBoards tb " +
+            "LEFT JOIN FETCH tb.tag")
+    Page<Board> findAllWithTags(Pageable pageable);
+
+    @Query("SELECT DISTINCT b FROM Board b " +
+            "LEFT JOIN FETCH b.comment c " +
+            "LEFT JOIN FETCH b.tagBoards tb " +
+            "LEFT JOIN FETCH tb.tag " +
+            "WHERE b.id = :id")
+    Optional<Board> findByIdWithCommentsAndTags(@Param("id") Long id);
+
+    @Query("SELECT b FROM Board b WHERE b.member.id = :memberId")
+    Page<Board> findByMemberId(@Param("memberId") String memberId, Pageable pageable);
 }
