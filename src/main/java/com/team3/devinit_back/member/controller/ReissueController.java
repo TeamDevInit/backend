@@ -75,7 +75,7 @@ public class ReissueController {
 
         //response
         response.addCookie(createCookie("refresh", newRefresh));
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok("RT/AT 재발급 완료");
     }
 
     private Cookie createCookie(String key, String value) {
