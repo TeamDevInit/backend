@@ -41,4 +41,7 @@ public interface BoardRepository extends JpaRepository<Board,Long> {
             "LEFT JOIN FETCH tb.tag " +
             "WHERE b.id = :id")
     Optional<Board> findByIdWithCommentsAndTags(@Param("id") Long id);
+
+    @Query("SELECT b FROM Board b WHERE b.member.id = :memberId ORDER BY b.createdAt DESC")
+    List<Board> findByMemberId(@Param("memberId") String memberId);
 }
