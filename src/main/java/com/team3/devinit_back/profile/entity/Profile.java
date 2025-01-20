@@ -30,7 +30,7 @@ public class Profile extends BaseEntity {
     @Column(name = "following_cnt", nullable = false)
     private int followingCount = 0;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
@@ -45,5 +45,9 @@ public class Profile extends BaseEntity {
 
     public void update(String about) {
         this.about = about;
+    }
+
+    public void incrementBoardCount() {
+        this.boardCount++;
     }
 }
