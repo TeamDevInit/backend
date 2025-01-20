@@ -42,6 +42,6 @@ public interface BoardRepository extends JpaRepository<Board,Long> {
             "WHERE b.id = :id")
     Optional<Board> findByIdWithCommentsAndTags(@Param("id") Long id);
 
-    @Query("SELECT b FROM Board b WHERE b.member.id = :memberId ORDER BY b.createdAt DESC")
-    List<Board> findByMemberId(@Param("memberId") String memberId);
+    @Query("SELECT b FROM Board b WHERE b.member.id = :memberId")
+    Page<Board> findByMemberId(@Param("memberId") String memberId, Pageable pageable);
 }

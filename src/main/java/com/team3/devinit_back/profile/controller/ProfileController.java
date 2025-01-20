@@ -12,6 +12,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.expression.AccessException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -38,9 +42,11 @@ public class ProfileController {
 
     @Operation(summary = "내 게시물 리스트 조회")
     @GetMapping("/me/boards")
-    public ResponseEntity<List<BoardSummaryResponse>> getMyBoards(@AuthenticationPrincipal CustomOAuth2User userInfo) {
+    public ResponseEntity<Page<BoardSummaryResponse>> getMyBoards(
+        @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+        @AuthenticationPrincipal CustomOAuth2User userInfo) {
         Member member = getMemberFromUserInfo(userInfo);
-        List<BoardSummaryResponse> response = profileService.getMyBoards(member.getId());
+        Page<BoardSummaryResponse> response = profileService.getMyBoards(member.getId(), pageable);
         return ResponseEntity.ok(response);
     }
 

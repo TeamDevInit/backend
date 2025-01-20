@@ -16,6 +16,7 @@ import com.team3.devinit_back.resume.repository.ResumeRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.expression.AccessException;
@@ -50,16 +51,14 @@ public class ProfileService {
 
     // 내 프로필에서 작성 게시물 조회
     @Transactional(readOnly = true)
-    public List<BoardSummaryResponse> getMyBoards(String memberId) {
-        List<Board> boards = boardRepository.findByMemberId(memberId);
+    public Page<BoardSummaryResponse> getMyBoards(String memberId, Pageable pageable) {
+        Page<Board> boards = boardRepository.findByMemberId(memberId, pageable);
 
         if (boards.isEmpty()) {
             log.info("회원 ID {} 에 대한 게시물이 없습니다.", memberId);
         }
 
-        return boards.stream()
-            .map(BoardSummaryResponse::fromEntity)
-            .collect(Collectors.toList());
+        return boards.map(BoardSummaryResponse::fromEntity);
     }
 
     // 상대 프로필 상세 조회
