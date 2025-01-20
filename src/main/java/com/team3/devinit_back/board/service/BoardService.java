@@ -1,6 +1,7 @@
 package com.team3.devinit_back.board.service;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.team3.devinit_back.board.dto.BoardRequestDto;
 import com.team3.devinit_back.board.dto.BoardDetailResponseDto;
@@ -63,9 +64,13 @@ public class BoardService {
         QBoard board = QBoard.board;
         QTagBoard tagBoard = QTagBoard.tagBoard;
 
-        BooleanBuilder builder = buildDynamicQuery(tagNames, contents, null);
+        BooleanBuilder builder = new BooleanBuilder();
 
-        return fetchBoards(pageable, builder);
+        if ((tagNames != null && !tagNames.isEmpty()) || (contents != null && !contents.isEmpty())) {
+            builder = buildDynamicQuery(tagNames, contents, null);
+        }
+
+        return fetchBoards(pageable, builder, tagNames);
     }
 
     // 카테고리별 게시물 조회
@@ -73,9 +78,13 @@ public class BoardService {
                                                         String contents,Long categoryId ) {
         QBoard board = QBoard.board;
         QTagBoard tagBoard = QTagBoard.tagBoard;
-        BooleanBuilder builder = buildDynamicQuery(tagNames, contents, categoryId);
+        BooleanBuilder builder = new BooleanBuilder();
 
-        return fetchBoards(pageable, builder);
+        if ((tagNames != null && !tagNames.isEmpty()) || (contents != null && !contents.isEmpty())) {
+            builder = buildDynamicQuery(tagNames, contents, categoryId);
+        }
+
+        return fetchBoards(pageable, builder,tagNames);
     }
 
     //게시물 상세 조회
@@ -175,6 +184,7 @@ public class BoardService {
         return null;
     }
 
+    //조건절 생성
     private BooleanBuilder buildDynamicQuery(List<String> tagNames, String contents, Long categoryId) {
         QBoard board = QBoard.board;
         QTagBoard tagBoard = QTagBoard.tagBoard;
@@ -223,23 +233,31 @@ public class BoardService {
         return builder;
     }
     // 빌더 적용 패치함수
-    private PageImpl<BoardResponseDto> fetchBoards(Pageable pageable, BooleanBuilder builder) {
+    private PageImpl<BoardResponseDto> fetchBoards(Pageable pageable, BooleanBuilder builder, List<String> tagNames) {
         QBoard board = QBoard.board;
         QTagBoard tagBoard = QTagBoard.tagBoard;
 
-        List<Board> boards = queryFactory
+        JPAQuery<Board> query = queryFactory
                 .selectDistinct(board)
-                .from(board)
-                .leftJoin(board.tagBoards, tagBoard)
+                .from(board);
+        if (tagNames != null && !tagNames.isEmpty()) {
+            query =query.leftJoin(board.tagBoards, tagBoard);
+        }
+        List<Board> boards = query
                 .where(builder)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        long total = queryFactory
-                .selectDistinct(board)
-                .from(board)
-                .leftJoin(board.tagBoards, tagBoard)
+        JPAQuery<Long> countQuery = queryFactory
+                .selectDistinct(board.id)
+                .from(board);
+
+        if (tagNames != null && !tagNames.isEmpty()) {
+            countQuery = countQuery.leftJoin(board.tagBoards, tagBoard);
+        }
+
+        long total = countQuery
                 .where(builder)
                 .fetchCount();
 
