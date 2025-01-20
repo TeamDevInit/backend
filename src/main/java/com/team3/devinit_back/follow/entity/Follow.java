@@ -1,6 +1,6 @@
 package com.team3.devinit_back.follow.entity;
 
-import com.team3.devinit_back.common.BaseEntity;
+import com.team3.devinit_back.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
