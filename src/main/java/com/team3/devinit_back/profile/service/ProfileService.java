@@ -9,7 +9,7 @@ import com.team3.devinit_back.member.entity.Member;
 import com.team3.devinit_back.profile.dto.BoardSummaryResponse;
 import com.team3.devinit_back.profile.dto.ProfileDetailResponse;
 import com.team3.devinit_back.profile.dto.ProfileUpdateRequest;
-import com.team3.devinit_back.profile.dto.RandomProfileResponse;
+import com.team3.devinit_back.profile.dto.ProfileResponse;
 import com.team3.devinit_back.profile.entity.Profile;
 import com.team3.devinit_back.profile.repository.ProfileRepository;
 import com.team3.devinit_back.resume.repository.ResumeRepository;
@@ -72,7 +72,7 @@ public class ProfileService {
 
     // 프로필 랜덤 조회(10개씩)
     @Transactional(readOnly = true)
-    public List<RandomProfileResponse> getRandomProfiles() {
+    public List<ProfileResponse> getRandomProfiles() {
         Pageable pageable = PageRequest.of(0, 10);
         List<Profile> randomProfiles = profileRepository.findRandomProfiles(pageable);
 
@@ -81,7 +81,7 @@ public class ProfileService {
         }
 
         return randomProfiles.stream()
-            .map(profile -> new RandomProfileResponse(
+            .map(profile -> new ProfileResponse(
                 profile.getId(),
                 profile.getMember().getNickName(),
                 profile.getAbout(),

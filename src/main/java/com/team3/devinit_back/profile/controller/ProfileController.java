@@ -6,7 +6,7 @@ import com.team3.devinit_back.member.service.MemberService;
 import com.team3.devinit_back.profile.dto.BoardSummaryResponse;
 import com.team3.devinit_back.profile.dto.ProfileDetailResponse;
 import com.team3.devinit_back.profile.dto.ProfileUpdateRequest;
-import com.team3.devinit_back.profile.dto.RandomProfileResponse;
+import com.team3.devinit_back.profile.dto.ProfileResponse;
 import com.team3.devinit_back.profile.service.ProfileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -59,8 +59,8 @@ public class ProfileController {
 
     @Operation(summary = "프로필 랜덤 조회")
     @GetMapping("/random")
-    public ResponseEntity<List<RandomProfileResponse>> getRandomProfiles() {
-        List<RandomProfileResponse> randomProfiles = profileService.getRandomProfiles();
+    public ResponseEntity<List<ProfileResponse>> getRandomProfiles() {
+        List<ProfileResponse> randomProfiles = profileService.getRandomProfiles();
         return ResponseEntity.ok(randomProfiles);
     }
 
