@@ -136,7 +136,6 @@ public class BoardService {
         }
     }
 
-
     // 게시글 추천수 조회
     public  int getRecommendationCount(Long id){
         Board board = getBoardById(id);
@@ -232,6 +231,7 @@ public class BoardService {
 
         return builder;
     }
+
     // 빌더 적용 패치함수
     private PageImpl<BoardResponseDto> fetchBoards(Pageable pageable, BooleanBuilder builder, List<String> tagNames) {
         QBoard board = QBoard.board;
