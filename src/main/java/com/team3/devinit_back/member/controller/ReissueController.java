@@ -29,6 +29,11 @@ public class ReissueController {
         //get refresh token
         String refresh = null;
         Cookie[] cookies = request.getCookies();
+
+        if(cookies == null){
+            return new ResponseEntity<>("refresh token null", HttpStatus.BAD_REQUEST);
+        }
+
         for (Cookie cookie : cookies) {
 
             if (cookie.getName().equals("refresh")) {
