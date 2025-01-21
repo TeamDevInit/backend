@@ -2,13 +2,19 @@ package com.team3.devinit_back.resume.entity;
 
 import com.team3.devinit_back.member.entity.Member;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
+@Table(name = "Resume")
 @Getter
 @Setter
-@Table(name = "Resume")
+@NoArgsConstructor
 public class Resume {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -18,15 +24,11 @@ public class Resume {
     @JoinColumn(name = "memberId", nullable = false)
     private Member member;
 
-    @Column(name = "name", length = 50)
-    private String name;
+    @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL)
+    private List<Skill> skills = new ArrayList<>();
 
-    @Column(name = "position", length = 50)
-    private String position;
-
-    @Column(name = "summary", columnDefinition = "TEXT")
-    private String summary;
-
-    @Column(name = "portfolio", length = 2000)
-    private String portfolio;
+    public Resume(String id, Member member) {
+        this.id = id;
+        this.member = member;
+    }
 }

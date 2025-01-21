@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RandomProfileResponse {
+public class ProfileResponse {
     private String id;
     private String nickname;
     private String about;
