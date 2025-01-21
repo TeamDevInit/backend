@@ -1,19 +1,22 @@
 package com.team3.devinit_back.profile.service;
 
-import com.team3.devinit_back.global.amazonS3.service.S3Service;
+import com.team3.devinit_back.board.entity.Board;
+import com.team3.devinit_back.board.repository.BoardRepository;
 import com.team3.devinit_back.follow.dto.FollowCountResponse;
 import com.team3.devinit_back.follow.service.FollowService;
+import com.team3.devinit_back.global.amazonS3.service.S3Service;
 import com.team3.devinit_back.member.entity.Member;
-import com.team3.devinit_back.member.repository.MemberRepository;
+import com.team3.devinit_back.profile.dto.BoardSummaryResponse;
 import com.team3.devinit_back.profile.dto.ProfileDetailResponse;
 import com.team3.devinit_back.profile.dto.ProfileUpdateRequest;
-import com.team3.devinit_back.profile.dto.RandomProfileResponse;
+import com.team3.devinit_back.profile.dto.ProfileResponse;
 import com.team3.devinit_back.profile.entity.Profile;
 import com.team3.devinit_back.profile.repository.ProfileRepository;
 import com.team3.devinit_back.resume.repository.ResumeRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.expression.AccessException;
@@ -30,6 +33,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProfileService {
     private final ProfileRepository profileRepository;
+    private final BoardRepository boardRepository;
     private final FollowService followService;
     private final S3Service s3Service;
     private final ResumeRepository resumeRepository;
@@ -45,6 +49,18 @@ public class ProfileService {
         return ProfileDetailResponse.fromEntity(profile, followCounts);
     }
 
+    // 내 프로필에서 작성 게시물 조회
+    @Transactional(readOnly = true)
+    public Page<BoardSummaryResponse> getMyBoards(String memberId, Pageable pageable) {
+        Page<Board> boards = boardRepository.findByMemberId(memberId, pageable);
+
+        if (boards.isEmpty()) {
+            log.info("회원 ID {} 에 대한 게시물이 없습니다.", memberId);
+        }
+
+        return boards.map(BoardSummaryResponse::fromEntity);
+    }
+
     // 상대 프로필 상세 조회
     @Transactional(readOnly = true)
     public ProfileDetailResponse getProfile(String profileId) {
@@ -56,7 +72,7 @@ public class ProfileService {
 
     // 프로필 랜덤 조회(10개씩)
     @Transactional(readOnly = true)
-    public List<RandomProfileResponse> getRandomProfiles() {
+    public List<ProfileResponse> getRandomProfiles() {
         Pageable pageable = PageRequest.of(0, 10);
         List<Profile> randomProfiles = profileRepository.findRandomProfiles(pageable);
 
@@ -65,7 +81,7 @@ public class ProfileService {
         }
 
         return randomProfiles.stream()
-            .map(profile -> new RandomProfileResponse(
+            .map(profile -> new ProfileResponse(
                 profile.getId(),
                 profile.getMember().getNickName(),
                 profile.getAbout(),

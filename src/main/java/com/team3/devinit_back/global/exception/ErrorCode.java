@@ -21,7 +21,11 @@ public enum ErrorCode {
     TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "태그를 찾을 수 없습니다."),
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "카테고리를 찾을 수 없습니다."),
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다."),
-    BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "게시물을 찾을 수 없습니다.");
+    BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "게시물을 찾을 수 없습니다."),
+    PROFILE_NOT_FOUND(HttpStatus.NOT_FOUND, "프로필을 찾을 수 없습니다."),
+    INVALID_PROFILE_IMAGE(HttpStatus.BAD_REQUEST, "유효하지 않은 프로필 이미지입니다."),
+    FOLLOW_FAILED(HttpStatus.BAD_REQUEST, "팔로우 요청에 실패했습니다."),
+    UNFOLLOW_FAILED(HttpStatus.BAD_REQUEST, "언팔로우 요청에 실패했습니다.");
 
     private final HttpStatus status;
     private final String message;

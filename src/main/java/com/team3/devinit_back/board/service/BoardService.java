@@ -14,6 +14,8 @@ import com.team3.devinit_back.comment.repository.CommentRepository;
 import com.team3.devinit_back.global.exception.CustomException;
 import com.team3.devinit_back.global.exception.ErrorCode;
 import com.team3.devinit_back.member.entity.Member;
+import com.team3.devinit_back.profile.entity.Profile;
+import com.team3.devinit_back.profile.repository.ProfileRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -36,6 +38,7 @@ public class BoardService {
     private final CategoryRepository categoryRepository;
     private final RecommendationRepository recommendationRepository;
     private final CommentRepository commentRepository;
+    private final ProfileRepository profileRepository;
     private final TagService tagService;
     private final JPAQueryFactory queryFactory;
 
@@ -55,6 +58,11 @@ public class BoardService {
         makeTag(board, boardRequestDto);
 
         Board savedBoard = boardRepository.save(board);
+
+        Profile profile = getProfileByMemberId(member.getId());
+        profile.incrementBoardCount();
+        profileRepository.save(profile);
+
         return BoardDetailResponseDto.fromEntity(savedBoard);
 
     }
@@ -140,6 +148,12 @@ public class BoardService {
     public  int getRecommendationCount(Long id){
         Board board = getBoardById(id);
         return recommendationRepository.countByBoard(board);
+    }
+
+    // profileId -> 프로필객체 조회
+    private Profile getProfileByMemberId(String memberId) {
+        return profileRepository.findByMemberId(memberId)
+            .orElseThrow(() -> new EntityNotFoundException("해당 멤버의 프로필을 찾을 수 없습니다. ID: " + memberId));
     }
 
     // boardId -> 게시글객체 조회
