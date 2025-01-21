@@ -38,19 +38,23 @@ public class BoardDetailResponseDto {
         this.title = board.getTitle();
         this.content = board.getContent();
         this.upCnt = board.getUpCnt();
+
         Member member = board.getMember();
         if(member!= null){
             this.memberId = member.getId();
             this.nickName = member.getNickName();
             this.profileImage = member.getProfileImage();
         }
+
         Category category = board.getCategory();
         this.categoryId = category.getId();
         this.categoryName = category.getName();
+
         this.comment = board.getComment() != null ? board.getComment().stream()
                 .map(CommentResponseDto::fromEntity)
                 .toList() : new ArrayList<>();
         this.commentCnt = board.getCommentCnt();
+
         this.tag = board.getTagBoards() != null ? board.getTagBoards().stream()
                 .map(tagBoard -> new TagResponseDto(tagBoard.getTag()))
                 .toList() : new ArrayList<>();
@@ -61,7 +65,5 @@ public class BoardDetailResponseDto {
 
     }
     public static BoardDetailResponseDto fromEntity(Board board){ return new BoardDetailResponseDto(board);}
-
-
 
 }
