@@ -64,7 +64,7 @@ public class ReissueController {
         String role = jwtUtil.getRole(refresh);
 
         //make new jwt
-        String newAccess = jwtUtil.createJwt("access", socialId, role, 600000L);
+        String newAccess = jwtUtil.createJwt("access", socialId, role, 86400000L);
         String newRefresh = jwtUtil.createJwt("refresh", socialId, role,86400000L); // refresh rotate
 
         //Refresh 토큰 저장
@@ -87,12 +87,12 @@ public class ReissueController {
 
         return cookie;
     }
-    private void addRefreshEntity(String socailId, String refresh, Long expiredMs) {
+    private void addRefreshEntity(String socialId, String refresh, Long expiredMs) {
 
         Date date = new Date(System.currentTimeMillis() + expiredMs);
 
         RefreshEntity refreshEntity = new RefreshEntity();
-        refreshEntity.setSocialId(socailId);
+        refreshEntity.setSocialId(socialId);
         refreshEntity.setRefresh(refresh);
         refreshEntity.setExpiration(date.toString());
 
