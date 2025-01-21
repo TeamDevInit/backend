@@ -45,14 +45,13 @@ public class SecurityConfig {
 
                         CorsConfiguration configuration = new CorsConfiguration();
 
-                        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://34.64.44.54","http://kdt-pt-1-pj-1-team03.elicecoding.com"));
+                        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://34.64.44.54","http://kdt-pt-1-pj-1-team03.elicecoding.com", "http://localhost:5173"));
                         configuration.setAllowedMethods(Collections.singletonList("*"));
                         configuration.setAllowCredentials(true);
                         configuration.setAllowedHeaders(Collections.singletonList("*"));
                         configuration.setMaxAge(3600L);
 
-                        configuration.setExposedHeaders(Collections.singletonList("Set-Cookie"));
-                        configuration.setExposedHeaders(Collections.singletonList("access"));
+                        configuration.setExposedHeaders(Arrays.asList("Set-Cookie", "access"));
 
                         return configuration;
                     }
