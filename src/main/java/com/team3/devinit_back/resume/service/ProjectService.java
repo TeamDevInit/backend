@@ -67,7 +67,6 @@ public class ProjectService {
                 .orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NOT_FOUND));
     }
 
-    // 권한 검사
     private Project isAuthorized(Long id, Member member) {
         Project project =  getProjectById(id);
         if (!project.getResume().getMember().equals(member)) {
@@ -75,6 +74,4 @@ public class ProjectService {
         }
         return project;
     }
-
-
 }

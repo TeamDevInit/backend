@@ -1,12 +1,13 @@
 package com.team3.devinit_back.resume.controller;
 
+
 import com.team3.devinit_back.member.dto.CustomOAuth2User;
 import com.team3.devinit_back.member.entity.Member;
 import com.team3.devinit_back.member.service.MemberService;
-import com.team3.devinit_back.resume.dto.ProjectRequestDto;
-import com.team3.devinit_back.resume.dto.ProjectResponseDto;
+import com.team3.devinit_back.resume.dto.LanguageRequestDto;
+import com.team3.devinit_back.resume.dto.LanguageResponseDto;
 import com.team3.devinit_back.resume.entity.Resume;
-import com.team3.devinit_back.resume.service.ProjectService;
+import com.team3.devinit_back.resume.service.LanguageService;
 import com.team3.devinit_back.resume.service.ResumeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,37 +17,36 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/projects")
+@RequestMapping("/api/languages")
 @RequiredArgsConstructor
-public class ProjectController {
-    private final ProjectService projectService;
+public class LanguageController {
+    private final LanguageService languageService;
     private final ResumeService resumeService;
     private final MemberService memberService;
 
-
     @PostMapping
-    public ResponseEntity<ProjectResponseDto> createProject(@AuthenticationPrincipal CustomOAuth2User userInfo,
-                                                            @Valid @RequestBody ProjectRequestDto projectRequestDto){
+    public ResponseEntity<LanguageResponseDto> createLanguage(@AuthenticationPrincipal CustomOAuth2User userInfo,
+                                                              @Valid @RequestBody LanguageRequestDto languageRequestDto){
         Resume resume = getResumeFromUserInfo(userInfo);
-        ProjectResponseDto projectResponseDto = projectService.createProject(resume,projectRequestDto);
+        LanguageResponseDto languageResponseDto = languageService.createLanguage(resume, languageRequestDto);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(projectResponseDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(languageResponseDto);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ProjectResponseDto> updateProject(@AuthenticationPrincipal CustomOAuth2User userInfo,
-                                                            @Valid @RequestBody ProjectRequestDto projectRequestDto,
-                                                            @PathVariable("id") Long id){
+    public ResponseEntity<LanguageResponseDto> updateLanguage(@AuthenticationPrincipal CustomOAuth2User userInfo,
+                                                              @Valid @RequestBody LanguageRequestDto languageRequestDto,
+                                                              @PathVariable("id") Long id){
         Resume resume = getResumeFromUserInfo(userInfo);
-        projectService.updateProject(resume, id, projectRequestDto);
+        languageService.updateLanguage(resume, id, languageRequestDto);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
-    public  ResponseEntity<Void> deleteProject(@AuthenticationPrincipal CustomOAuth2User userInfo,
+    public ResponseEntity<Void> deleteLanguage(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                @PathVariable("id") Long id){
         Resume resume = getResumeFromUserInfo(userInfo);
-        projectService.deleteProject(resume,id);
+        languageService.deleteLanguage(resume,id);
         return ResponseEntity.ok().build();
     }
 
