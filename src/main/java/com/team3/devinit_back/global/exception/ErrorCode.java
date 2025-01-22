@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum ErrorCode {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "알 수 없는 서버 에러가 발생했습니다."),
+    INVALID_ERROR(HttpStatus.BAD_REQUEST,"입력값이 유효하지 않습니다."),
     INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 Refresh Token 입니다."),
     EXPIRED_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 Refresh Token 입니다."),
     EMPTY_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "Refresh Token이 없습니다."),
@@ -26,7 +27,11 @@ public enum ErrorCode {
     INVALID_PROFILE_IMAGE(HttpStatus.BAD_REQUEST, "유효하지 않은 프로필 이미지입니다."),
     FOLLOW_FAILED(HttpStatus.BAD_REQUEST, "팔로우 요청에 실패했습니다."),
     UNFOLLOW_FAILED(HttpStatus.BAD_REQUEST, "언팔로우 요청에 실패했습니다."),
-    PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "프로젝트를 찾을 수 없습니다.");
+    PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "등록된 프로젝트 사항을 찾을 수 없습니다."),
+    LANGUAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "등록된 언어 사항을 찾을 수 없습니다."),
+    EDUCATION_NOT_FOUND(HttpStatus.NOT_FOUND, "등록된 교육 사항을 찾을 수 없습니다."),
+    DUPLICATE_LANGUAGE(HttpStatus.CONFLICT, "동일한 언어 이력이 존재합니다."),
+    DUPLICATE_EDUCATION(HttpStatus.CONFLICT,"동일한 교육 이력이 존재합니다.");
 
     private final HttpStatus status;
     private final String message;
