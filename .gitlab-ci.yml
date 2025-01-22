@@ -38,5 +38,4 @@ deploy_job:
         - docker run -d --name dev-container -p 8080:8080 $DOCKER_IMAGE:latest
     environment:
         name: dev
-    dependencies:
-        - job_build
+
