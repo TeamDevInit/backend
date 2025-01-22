@@ -5,13 +5,13 @@ stages:
 build_job:
     stage: build
     tags:
-        - docker
+        - build
     script:
         - echo "Build the project.."
 
 deploy_job:
     stage: deploy
     tags:
-        - docker
+        - deploy
     script:
         - echo "Deploying the project.."
