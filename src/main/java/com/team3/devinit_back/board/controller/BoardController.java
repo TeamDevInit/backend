@@ -33,7 +33,6 @@ public class BoardController {
     private final MemberService memberService;
     private final BoardService boardService;
 
-    //게시글 생성
     @PostMapping
     public ResponseEntity<BoardDetailResponseDto> createBoard(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                               @RequestBody BoardRequestDto boardRequestDto) {
@@ -43,17 +42,14 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.CREATED).body(boardResponseDto);
     }
 
-    // 전체 게시글 조회
     @GetMapping
     public ResponseEntity<Page<BoardResponseDto>> getAllBoards(@PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
                                                                @RequestParam(name = "tagNames", required = false)List<String> tagNames,
                                                                @RequestParam(name = "searchContents",required = false) String searchContents){
         Page<BoardResponseDto> boardResponseDtoPage = boardService.getAllBoard(pageable, tagNames, searchContents);
         return  ResponseEntity.ok(boardResponseDtoPage);
-
     }
 
-    // 카테고리별 게시글 조회
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<Page<BoardResponseDto>> getBoardsByCategory(@PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
                                                                           @RequestParam(name = "tagNames", required = false)List<String> tagNames,
@@ -64,7 +60,6 @@ public class BoardController {
         return  ResponseEntity.ok(boardResponseDtoPage);
     }
 
-    //게시글 상세 조회
     @GetMapping("/{id}")
     public ResponseEntity<BoardDetailResponseDto> getBoardDetail(@PathVariable("id") Long id){
         BoardDetailResponseDto boardResponseDto = boardService.getBoardDetail(id);
@@ -72,7 +67,6 @@ public class BoardController {
     }
 
 
-    // 게시글 수정
     @PatchMapping("/{id}")
     public ResponseEntity<BoardDetailResponseDto> updateBoard(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                               @RequestBody BoardRequestDto boardRequestDto,
@@ -85,7 +79,6 @@ public class BoardController {
 
     }
 
-    //게시글 삭제
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBoard(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                             @PathVariable("id") Long id) {
@@ -96,7 +89,6 @@ public class BoardController {
 
     }
 
-    //게시글 추천
     @PostMapping("/{id}/recommendation")
     public ResponseEntity<?> recommendBoard(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                             @PathVariable("id") Long id){

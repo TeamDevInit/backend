@@ -8,6 +8,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -24,7 +25,7 @@ import java.util.Iterator;
 public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JWTUtil jwtUtil;
-    private RefreshRepository refreshRepository;
+    private  RefreshRepository refreshRepository;
 
     public CustomSuccessHandler(JWTUtil jwtUtil, RefreshRepository refreshRepository){
 
@@ -54,7 +55,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         // refresh -> 쿠키, access -> 헤더? -> 하이퍼링크에서 넘어오는거라 바로 못줌
         response.addCookie(createCookie("refresh", refreshToken));
 
-        response.sendRedirect("http://localhost:3000/");
+        response.sendRedirect("http://34.64.44.54"); //  ->  http://34.64.44.54
         response.setStatus(HttpStatus.OK.value());
     }
 

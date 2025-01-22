@@ -1,7 +1,8 @@
 spring:
   application:
     name: devinit-back
-
+  redirect:
+    url: ${BASE_URL}
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
 
@@ -25,13 +26,13 @@ spring:
           naver:
             client-id: ${NAVER_CLIENT_ID}
             client-secret: ${NAVER_CLIENT_SECRET}
-            redirect-uri: http://localhost:8080/login/oauth2/code/naver
+            redirect-uri: ${BASE_URL}:8080/login/oauth2/code/naver
             authorization-grant-type: authorization_code
             scope: name
           github:
             client-id: ${GITHUB_CLIENT_ID}
             client-secret: ${GITHUB_CLIENT_SECRET}
-            redirect-uri: http://localhost:8080/login/oauth2/code/github
+            redirect-uri: ${BASE_URL}:8080/login/oauth2/code/github
             authorization-grant-type: authorization_code
             scope: read:user,user:email
         provider:

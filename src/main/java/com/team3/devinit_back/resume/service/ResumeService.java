@@ -10,5 +10,5 @@ import org.springframework.stereotype.Service;
 public class ResumeService {
     private  final ResumeRepository resumeRepository;
 
-    public Resume findIdByMemberId(String memberId){ return resumeRepository.findByMemberId(memberId);}
+    public Resume findByMemberId(String memberId){ return resumeRepository.findByMemberId(memberId);}
 }

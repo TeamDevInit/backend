@@ -2,7 +2,6 @@ package com.team3.devinit_back.board.dto;
 
 import com.team3.devinit_back.board.entity.Board;
 import com.team3.devinit_back.board.entity.Category;
-import com.team3.devinit_back.comment.dto.CommentResponseDto;
 import com.team3.devinit_back.member.entity.Member;
 import lombok.Data;
 import lombok.Getter;
