@@ -4,10 +4,14 @@ stages:
 
 build_job:
     stage: build
+    tags:
+        - docker
     script:
         - echo "Build the project..."
 
 deploy_job:
     stage: deploy
+    tags:
+        - docker
     script:
         - echo "Deploying the project.."
