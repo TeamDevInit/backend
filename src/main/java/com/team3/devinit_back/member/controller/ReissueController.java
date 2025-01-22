@@ -2,8 +2,10 @@ package com.team3.devinit_back.member.controller;
 
 import com.team3.devinit_back.member.entity.RefreshEntity;
 import com.team3.devinit_back.member.jwt.JWTUtil;
+import com.team3.devinit_back.member.repository.MemberRepository;
 import com.team3.devinit_back.member.repository.RefreshRepository;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,7 +24,9 @@ import java.util.Date;
 public class ReissueController {
     private final JWTUtil jwtUtil;
     private final RefreshRepository refreshRepository;
+    private final MemberRepository memberRepository;
 
+    @Operation(summary = "토큰 재발급",description = "refresh토큰을 확인하고  access 토큰과 refresh토큰을 재발급합니다.")
     @PostMapping("/reissue")
     public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response) {
 
@@ -67,7 +71,7 @@ public class ReissueController {
 
         String socialId = jwtUtil.getSocialId(refresh);
         String role = jwtUtil.getRole(refresh);
-
+        String memberId = memberRepository.findBySocialId(socialId).getId();
         //make new jwt
         String newAccess = jwtUtil.createJwt("access", socialId, role, 86400000L);
         String newRefresh = jwtUtil.createJwt("refresh", socialId, role,86400000L); // refresh rotate
@@ -80,7 +84,7 @@ public class ReissueController {
 
         //response
         response.addCookie(createCookie("refresh", newRefresh));
-        return ResponseEntity.ok("RT/AT 재발급 완료");
+        return ResponseEntity.ok(memberId);
     }
 
     private Cookie createCookie(String key, String value) {
