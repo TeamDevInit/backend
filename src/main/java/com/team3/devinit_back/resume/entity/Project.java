@@ -3,10 +3,7 @@ package com.team3.devinit_back.resume.entity;
 import co.elastic.clients.elasticsearch.xpack.usage.Base;
 import com.team3.devinit_back.global.common.BaseEntity;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -14,7 +11,7 @@ import java.time.LocalDateTime;
 @Table(name = "Projects")
 @Getter
 @Setter
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class Project extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

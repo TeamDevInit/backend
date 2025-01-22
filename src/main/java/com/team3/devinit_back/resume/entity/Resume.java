@@ -1,5 +1,6 @@
 package com.team3.devinit_back.resume.entity;
 
+import com.team3.devinit_back.global.common.BaseEntity;
 import com.team3.devinit_back.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -15,7 +16,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Resume {
+public class Resume extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;

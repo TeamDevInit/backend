@@ -2,7 +2,6 @@ package com.team3.devinit_back.resume.dto;
 
 import com.team3.devinit_back.resume.entity.Project;
 import com.team3.devinit_back.resume.entity.Resume;
-import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
 
@@ -18,18 +17,17 @@ public class ProjectResponseDto {
     private String organization;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
-
     private String resumeId;
-
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     public ProjectResponseDto(Project project){
-        this.projectName = this.getProjectName();
-        this.description = this.getDescription();
-        this.organization = this.getOrganization();
-        this.startDate = this.getStartDate();
-        this.endDate = this.getEndDate();
+        this.projectName = project.getProjectName();
+        this.description = project.getDescription();
+        this.organization = project.getOrganization();
+        this.startDate = project.getStartDate();
+        this.endDate = project.getEndDate();
+
         Resume resume = project.getResume();
         if(resume!=null){this.resumeId = resume.getId();}
 
