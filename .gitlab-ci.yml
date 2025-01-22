@@ -7,7 +7,7 @@ build_job:
     tags:
         - docker
     script:
-        - echo "Build the project..."
+        - echo "Build the project.."
 
 deploy_job:
     stage: deploy
