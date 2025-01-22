@@ -48,7 +48,7 @@ deploy_job:
         - deploy
     image: docker:latest
     script:
-        - echo "Deploying the project.."
+        - echo "Deploying the project..."
         - docker build -t $DOCKER_IMAGE:latest .
         - docker stop dev-container || true && docker rm dev-container || true
         - docker run -d --name dev-container -p 8080:8080 $DOCKER_IMAGE:latest
