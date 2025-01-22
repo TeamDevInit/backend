@@ -2,13 +2,11 @@ package com.team3.devinit_back.profile.dto;
 
 import com.team3.devinit_back.follow.dto.FollowCountResponse;
 import com.team3.devinit_back.profile.entity.Profile;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Builder
 public class ProfileDetailResponse {
     private String id;
     private String nickname;
@@ -17,18 +15,18 @@ public class ProfileDetailResponse {
     private int boardCount;
     private int followerCount;
     private int followingCount;
+    private boolean isFollowing;
 
-    public ProfileDetailResponse(Profile profile, FollowCountResponse followCounts) {
-        this.id = profile.getId();
-        this.nickname = profile.getMember().getNickName();
-        this.profileImage = profile.getMember().getProfileImage();
-        this.about = profile.getAbout();
-        this.boardCount = profile.getBoardCount();
-        this.followerCount = followCounts.getFollowerCount();
-        this.followingCount = followCounts.getFollowingCount();
-    }
-
-    public static ProfileDetailResponse fromEntity(Profile profile, FollowCountResponse followCounts) {
-        return new ProfileDetailResponse(profile, followCounts);
+    public static ProfileDetailResponse fromEntity(Profile profile, FollowCountResponse followCounts, boolean isFollowing) {
+        return ProfileDetailResponse.builder()
+            .id(profile.getId())
+            .nickname(profile.getMember().getNickName())
+            .about(profile.getAbout())
+            .profileImage(profile.getMember().getProfileImage())
+            .boardCount(profile.getBoardCount())
+            .followerCount(followCounts.getFollowerCount())
+            .followingCount(followCounts.getFollowingCount())
+            .isFollowing(isFollowing)
+            .build();
     }
 }

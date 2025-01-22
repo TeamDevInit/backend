@@ -50,9 +50,8 @@ spring:
       max-request-size: 10MB
 
 springdoc:
-  packages-to-scan: com.team3.devinit-back
-  default-consumes-media-type: application/json;charset=UTF-8
-  default-produces-media-type: application/json;charset=UTF-8
+  api-docs:
+    path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
     disable-swagger-default-url: true

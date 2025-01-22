@@ -31,7 +31,13 @@ public enum ErrorCode {
     LANGUAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "등록된 언어 사항을 찾을 수 없습니다."),
     EDUCATION_NOT_FOUND(HttpStatus.NOT_FOUND, "등록된 교육 사항을 찾을 수 없습니다."),
     DUPLICATE_LANGUAGE(HttpStatus.CONFLICT, "동일한 언어 이력이 존재합니다."),
-    DUPLICATE_EDUCATION(HttpStatus.CONFLICT,"동일한 교육 이력이 존재합니다.");
+    DUPLICATE_EDUCATION(HttpStatus.CONFLICT,"동일한 교육 이력이 존재합니다."),
+    SELF_FOLLOW_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "자기 자신을 팔로우할 수 없습니다."),
+    RESUME_NOT_FOUND(HttpStatus.NOT_FOUND, "이력서를 찾을 수 없습니다."),
+    SKILL_NOT_FOUND(HttpStatus.NOT_FOUND, "기술 스택을 찾을 수 없습니다."),
+    INVALID_TAG_ID(HttpStatus.BAD_REQUEST, "유효하지 않은 스킬 태그입니다.");
+
+
 
     private final HttpStatus status;
     private final String message;
