@@ -2,6 +2,7 @@ package com.team3.devinit_back.resume.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.List;
 @Table(name = "Skill_Tags")
 @Getter
 @Setter
+@NoArgsConstructor
 public class SkillTag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
