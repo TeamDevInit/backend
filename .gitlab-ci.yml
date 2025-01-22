@@ -1,5 +1,3 @@
-image: gradle:8.3-jdk17
-
 stages:
     - build
     - deploy
@@ -29,12 +27,11 @@ build_job:
     stage: build
     tags:
         - build
-
+    image: gradle:8.3-jdk17
     script:
         - echo "Build the project.."
         - echo "현재 브랜치 $CI_COMMIT_REF_NAME"
         - git clone --branch feature/24-cicd https://gitlab-ci-token:$CI_JOB_TOKEN@kdt-gitlab.elice.io/pttrack/class_01/web_project_i/team03/devinit-back.git
-
         - cd devinit-back
         - chmod +x ./gradlew
         - ./gradlew clean build -x test
@@ -42,11 +39,12 @@ build_job:
         name: ${CI_COMMIT_SHA}
         expire_in: 1 day
         paths:
-            - devint-back/build/libs/*SNAPSHOT.jar
+            - /build/libs/*SNAPSHOT.jar
 deploy_job:
     stage: deploy
     tags:
         - deploy
+    image: docker:latest
     script:
         - echo "Deploying the project.."
         - docker build -t $DOCKER_IMAGE:latest .
