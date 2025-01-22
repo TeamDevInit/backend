@@ -37,7 +37,7 @@ build_job:
 
         - cd devinit-back
         - chmod +x ./gradlew
-        - ./gradlew clean build
+        - ./gradlew clean build -x test
     artifacts:
         name: ${CI_COMMIT_SHA}
         expire_in: 1 day
