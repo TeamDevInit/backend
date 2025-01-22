@@ -38,20 +38,19 @@ public class ProfileService {
     private final S3Service s3Service;
     private final ResumeRepository resumeRepository;
 
-    // 내 프로필 상세 조회
     @Transactional(readOnly = true)
     public ProfileDetailResponse getMyProfile(String memberId) {
         Profile profile = profileRepository.findByMemberId(memberId)
             .orElseThrow(() -> new EntityNotFoundException("로그인된 사용자의 프로필을 찾을 수 없습니다. ID: " + memberId));
 
         FollowCountResponse followCounts = followService.getFollowCounts(memberId);
+        boolean isFollowing = false;
 
-        return ProfileDetailResponse.fromEntity(profile, followCounts);
+        return ProfileDetailResponse.fromEntity(profile, followCounts, isFollowing);
     }
 
-    // 내 프로필에서 작성 게시물 조회
     @Transactional(readOnly = true)
-    public Page<BoardSummaryResponse> getMyBoards(String memberId, Pageable pageable) {
+    public Page<BoardSummaryResponse> getBoardsByMemberId(String memberId, Pageable pageable) {
         Page<Board> boards = boardRepository.findByMemberId(memberId, pageable);
 
         if (boards.isEmpty()) {
@@ -61,16 +60,15 @@ public class ProfileService {
         return boards.map(BoardSummaryResponse::fromEntity);
     }
 
-    // 상대 프로필 상세 조회
     @Transactional(readOnly = true)
-    public ProfileDetailResponse getProfile(String profileId) {
+    public ProfileDetailResponse getProfile(String profileId, String viewerId) {
         Profile profile = getProfileById(profileId);
         FollowCountResponse followCounts = followService.getFollowCounts(profile.getMember().getId());
+        boolean isFollowing = viewerId != null && followService.isFollowing(viewerId, profile.getMember().getId());
 
-        return ProfileDetailResponse.fromEntity(profile, followCounts);
+        return ProfileDetailResponse.fromEntity(profile, followCounts, isFollowing);
     }
 
-    // 프로필 랜덤 조회(10개씩)
     @Transactional(readOnly = true)
     public List<ProfileResponse> getRandomProfiles() {
         Pageable pageable = PageRequest.of(0, 10);
@@ -90,11 +88,10 @@ public class ProfileService {
             .collect(Collectors.toList());
     }
 
-    // 프로필 수정
     @Transactional
-    public void updateProfile(String memberId, String profileId,
-                              ProfileUpdateRequest request, MultipartFile newProfileImage) throws AccessException {
-        Profile profile = isAuthorized(profileId, memberId);
+    public void updateProfile(String memberId, ProfileUpdateRequest request, MultipartFile newProfileImage)
+        throws AccessException {
+        Profile profile = isAuthorized(memberId);
 
         String newProfileImageUrl = handleProfileImage(profile.getMember(), newProfileImage);
 
@@ -122,19 +119,14 @@ public class ProfileService {
             ? oldProfileImageUrl : s3Service.getDefaultProfileImageUrl();
     }
 
-    // 프로필 객체 검사
     private Profile getProfileById(String profileId) {
         return profileRepository.findById(profileId)
             .orElseThrow(() -> new EntityNotFoundException("ID에 해당하는 프로필을 찾을 수 없습니다." + profileId));
     }
 
-    // 권한 검사
-    private Profile isAuthorized(String profileId, String memberId) throws AccessException {
-        Profile profile = getProfileById(profileId);
-        if (!profile.getMember().getId().equals(memberId)) {
-            throw new AccessException("해당 프로필에 대해 권한이 없습니다.");
-        }
-        return profile;
+    private Profile isAuthorized(String memberId) throws AccessException {
+        return profileRepository.findByMemberId(memberId)
+            .orElseThrow(() -> new AccessException("사용자의 프로필에 대한 권한이 없습니다. ID: " + memberId));
     }
 
     private String extractFileNameFromUrl(String fileUrl) {
