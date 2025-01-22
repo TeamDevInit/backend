@@ -3,8 +3,10 @@ stages:
     - deploy
 variables:
     DOCKER_REGISTRY: docker.io
-    DOCKER_IMAGE: $DOCKER_HUB_USERNAME/devinit-back
+    DOCKER_IMAGE: devinit-back
     DEV_SEVICE_URL: 34.64.44.54
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
     JWT_SECRET: $JWT_SECRET
     NAVER_CLIENT_ID: $NAVER_CLIENT_ID
     NAVER_CLIENT_SECRET: $NAVER_CLIENT_SECRET
