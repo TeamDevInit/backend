@@ -1,17 +1,15 @@
 package com.team3.devinit_back.resume.entity;
 
+import com.team3.devinit_back.global.common.BaseEntity;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Table(name = "Languages")
 @Getter
 @Setter
-@NoArgsConstructor
-public class Language {
+@RequiredArgsConstructor
+public class Language extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
