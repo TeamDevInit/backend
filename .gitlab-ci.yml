@@ -41,7 +41,7 @@ build_job:
         name: ${CI_COMMIT_SHA}
         expire_in: 1 day
         paths:
-            - /build/libs/*SNAPSHOT.jar
+            - /build/libs/*.jar
 deploy_job:
     stage: deploy
     tags:

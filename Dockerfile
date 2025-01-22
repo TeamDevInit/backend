@@ -1,4 +1,21 @@
-FROM openjdk:17-jdk-slim
-ARG JAR_FILE=build/libs/devinit-0.0.1-SNAPSHOT.jar
-COPY ${JAR_FILE} app.jar
-ENTRYPOINT ["java","-jar","app.jar"]
+FROM gradle:jdk17 as builder
+
+WORKDIR /build
+
+COPY . /build
+
+RUN gradle build --exclude-task test
+
+FROM openjdk:17-slim
+
+WORKDIR /app
+
+COPY --from=builder /build/libs/devinit-back-*.jar app.jar
+
+EXPOSE 8080
+
+USER nobody
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
+
+
