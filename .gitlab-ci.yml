@@ -14,10 +14,11 @@ build_job:
     stage: build
     tags:
         - build
+
     script:
         - echo "Build the project.."
         - echo "현재 브랜치 $CI_COMMIT_REF_NAME"
-        - git clone --branch feature/24-cidcd https://gitlab-ci-token:$CI_JOB_TOKEN@kdt-gitlab.elice.io/pttrack/class_01/web_project_i/team03/devinit-back.git
+        - git clone --branch feature/24-cicd https://gitlab-ci-token:$CI_JOB_TOKEN@kdt-gitlab.elice.io/pttrack/class_01/web_project_i/team03/devinit-back.git
 
         - cd devinit-back
         - chmod +x ./gradlew
