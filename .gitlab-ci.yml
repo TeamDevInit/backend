@@ -1,51 +1,25 @@
 stages:
     - build
     - deploy
-
 variables:
-    # 사용할 변수 설정
-    DOCKER_REGISTRY: docker.io          # Docker Hub를 사용
-    DOCKER_IMAGE: $DOCKER_HUB_USERNAME/devinit
-    DEV_SERVICE_URL: 34.64.44.54
-
+    DOCKER_REGISTRY: docker.io
+    DOCKER_IMAGE: $DOCKER_HUB_USERNAME/devinit-back
+    DEV_SEVICE_URL: 34.64.44.54
+services:
+    - docker:dind
 before_script:
-    # Docker 로그인을 위한 설정 (Docker Hub에 로그인)
-    - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
-
-job_build:
+    - echo "DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
+build_job:
     stage: build
     tags:
         - build
+    image: docker:latest
     script:
-        - echo "빌드 작업을 시작합니다."
-        - echo "현재 브랜치: $CI_COMMIT_REF_NAME"
-        - git clone --branch dev https://kdt-gitlab.elice.io/pttrack/class_01/web_project_i/team03/devinit-back.git
-        - cd devinit-back
-        - chmod +x ./gradlew
-        - ./gradlew clean build
-    artifacts:
-        name: ${CI_COMMIT_SHA}
-        expire_in: 1 day
-        paths:
-            - devinit-back/build/libs/*.jar
-    only:
-        - dev # dev 브랜치에서만 실행
+        - echo "Build the project.."
 
-job_deploy:
+deploy_job:
     stage: deploy
     tags:
         - deploy
     script:
-        - echo "개발 배포 작업을 시작합니다."
-        - cd devinit-back
-        - docker build -t $DOCKER_IMAGE:latest .
-        - docker push $DOCKER_IMAGE:latest
-        - docker stop dev-container || true && docker rm dev-container || true
-        - docker run -d --name dev-container -p 8080:8080 $DOCKER_IMAGE:latest
-    environment:
-        name: dev
-        url: https://${DEV_SERVICE_URL}/
-    dependencies:
-        - job_build
-    only:
-        - dev
+        - echo "Deploying the project.."
