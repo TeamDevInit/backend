@@ -40,12 +40,15 @@ build_job:
     tags:
         - build
     #image: gradle:8.3-jdk17
+    before_script:
+        - docker login -u $DOCKER_HUB_USERNAME --password-stdin < $DOCKER_HUB_PASSWORD
     script:
         - echo "Build the project..."
         - echo "현재 브랜치:$CI_COMMIT_REF_NAME"
         #- git clone --branch feature/24-cicd https://gitlab-ci-token:$CI_JOB_TOKEN@kdt-gitlab.elice.io/pttrack/class_01/web_project_i/team03/devinit-back.git
         #- cd devinit-back
         - docker build -t $DOCKER_IMAGE:latest .
+        - docker push $DOCKER_IMAGE
 
 #deploy_job:
 #    stage: deploy
