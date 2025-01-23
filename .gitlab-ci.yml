@@ -70,6 +70,4 @@ deploy_job:
     after_script:
        - docker logout
     when: on_success
-    environment:
-       name: dev
 
