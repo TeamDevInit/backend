@@ -1,22 +1,17 @@
-# 1단계: 빌드
 FROM gradle:jdk17 as builder
 
 WORKDIR /build
 
-# Gradle Wrapper와 프로젝트 소스를 복사
-COPY gradlew gradlew.bat settings.gradle build.gradle ./
-COPY .gradle .gradle
-COPY src ./src
+COPY . /build
 
-# Gradle 빌드 (테스트 제외)
-RUN ./gradlew clean build -x test
+RUN echo "Current directory1:" && pwd
 
-# 2단계: 실행 환경 생성
+RUN gradle build --exclude-task test
+
 FROM openjdk:17-slim
 
 WORKDIR /app
-
-# 빌드 아티팩트를 복사
+RUN echo "Current directory2:" && pwd
 COPY --from=builder /build/build/libs/devinit-back-*.jar app.jar
 
 EXPOSE 8080
