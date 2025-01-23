@@ -2,7 +2,7 @@ spring:
   config:
     activate:
       on-profile: dev
-
+    import: "optional:classpath:.env[.properties],optional:file:./.env"
   datasource:
     url: ${DB_URL_LOCAL}
     username: ${DB_USERNAME_LOCAL}
