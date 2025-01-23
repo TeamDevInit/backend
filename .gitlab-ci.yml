@@ -59,9 +59,12 @@ deploy_job:
        - deploy
     before_script:
        - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
-       - echo "$DB_URL_PROD"
-       - echo "$BASE_URL"
-       - echo "$SPRING_PROFILES_ACTIVE"
+      # 환경 변수로 .env 파일 생성
+       - echo "SPRING_PROFILES_ACTIVE=prod" > .env
+       - echo "DB_URL_PROD=$DB_URL_PROD" >> .env
+       - echo "DB_USERNAME_PROD=$DB_USERNAME_PROD" >> .env
+       - echo "DB_PASSWORD_PROD=$DB_PASSWORD_PROD" >> .env
+       - echo "JWT_SECRET=$JWT_SECRET" >> .env
     script:
        - echo "Deploying the project..."
        - docker stop devinit-back || true && docker rm devinit-back || true
