@@ -58,10 +58,12 @@ deploy_job:
     before_script:        
        - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
     script:
-       - echo "Deploying the project..."       
-       - docker stop devinit-back || true && docker rm devinit-back || true
-       - docker pull $DOCKER_HUB_USERNAME/$DOCKER_IMAGE:latest
-       - docker run -d --name devinit-back -p 8081:8080 $DOCKER_HUB_USERNAME/$DOCKER_IMAGE:latest
+       - ssh kdt@34.64.44.54 <<EOF
+          echo "Deploying the project..."       
+          docker stop devinit-back || true && docker rm devinit-back || true
+          docker pull $DOCKER_HUB_USERNAME/$DOCKER_IMAGE:latest
+          docker run -d --name devinit-back -p 8081:8080 $DOCKER_HUB_USERNAME/$DOCKER_IMAGE:latest
+        EOF
     after_script:
        - docker logout
     when: on_success
