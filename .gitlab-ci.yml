@@ -2,12 +2,18 @@ image: docker:latest
 
 
 before_script:
+  - apk add --no-cache git
+  - git fetch origin
   - git reset --hard origin/$CI_COMMIT_REF_NAME
 
+services:
+ - name: docker:dind
+   alias: docker
 
 stages:
     - build
     - deploy
+
 variables:
     DOCKER_REGISTRY: docker.io
     DOCKER_IMAGE: devinit-back
