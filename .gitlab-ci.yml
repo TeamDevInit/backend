@@ -60,18 +60,15 @@ deploy_job:
     before_script:
        - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
       # 환경 변수로 .env 파일 생성
-       - echo "SPRING_PROFILES_ACTIVE=prod" > .env
-       - echo "DB_URL_PROD=$DB_URL_PROD" >> .env
+       - echo "DB_URL_PROD=$DB_URL_PROD" > .env
        - echo "DB_USERNAME_PROD=$DB_USERNAME_PROD" >> .env
        - echo "DB_PASSWORD_PROD=$DB_PASSWORD_PROD" >> .env
        - echo "JWT_SECRET=$JWT_SECRET" >> .env
     script:
-       - echo "Deploying the project..."
-       - docker stop devinit-back || true && docker rm devinit-back || true
-       - docker pull $DOCKER_HUB_USERNAME/$DOCKER_IMAGE:latest
-       - docker run -d --name devinit-back -p 8081:8080 $DOCKER_HUB_USERNAME/$DOCKER_IMAGE:latest
-       - docker-compose -f docker-compose.yml up -d
+      - docker-compose -f docker-compose.yml down  # 기존 컨테이너 정리
+      - docker-compose -f docker-compose.yml pull  # 최신 이미지 가져오기
+      - docker-compose -f docker-compose.yml up -d  # 새 컨테이너 실행
     after_script:
-       - docker logout
+      - docker logout
     when: on_success
 
