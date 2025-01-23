@@ -40,9 +40,6 @@ build_job:
     #image: gradle:8.3-jdk17
     before_script:
         - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
-        - echo "$DB_URL_PROD"
-        - echo "$BASE_URL"
-        - echo "$SPRING_PROFILES_ACTIVE"
     script:
         - echo "빌드를 시작합니다..."
         #- git clone --branch feature/24-cicd https://gitlab-ci-token:$CI_JOB_TOKEN@kdt-gitlab.elice.io/pttrack/class_01/web_project_i/team03/devinit-back.git
@@ -50,6 +47,23 @@ build_job:
         - docker build -t $DOCKER_HUB_USERNAME/$DOCKER_IMAGE:latest .
         - echo "도커허브에 푸시를 시작합니다..."
         - docker push $DOCKER_HUB_USERNAME/$DOCKER_IMAGE
+        - echo JWT_SECRET=$JWT_SECRET >> .env
+        - echo NAVER_CLIENT_ID=$NAVER_CLIENT_ID >> .env
+        - echo NAVER_CLIENT_SECRET=$NAVER_CLIENT_SECRET >> .env
+        - echoGITHUB_CLIENT_ID=$GITHUB_CLIENT_ID >> .env
+        - echo GITHUB_CLIENT_SECRET=$GITHUB_CLIENT_SECRET >> .env
+        - echo AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID >> .env
+        - echo AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY >> .env
+        - echo AWS_REGION=$AWS_REGION >> .env
+        - echo S3_BUCKET=$S3_BUCKET >> .env
+        - echo SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE >> .env
+        - echo DB_URL_PROD=$DB_URL_PROD >> .env
+        - echo DB_USERNAME_PROD=$DB_USERNAME_PROD >> .env
+        - echo DB_PASSWORD_PROD=$DB_PASSWORD_PROD >> .env
+        - echo BASE_URL=$BASE_URL >> .env
+    artifacts:
+      paths:
+        - .env
     after_script:
         - docker logout
 
