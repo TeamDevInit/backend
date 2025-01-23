@@ -1,10 +1,10 @@
 image: docker:latest
 
 
-before_script:
-  - apk add --no-cache git
-  - git fetch origin
-  - git reset --hard origin/$CI_COMMIT_REF_NAME
+#before_script:
+#  - apk add --no-cache git
+#  - git fetch origin
+#  - git reset --hard origin/$CI_COMMIT_REF_NAME
 
 services:
  - name: docker:dind
@@ -33,9 +33,6 @@ variables:
     DB_USERNAME_LOCAL: $DB_USERNAME_LOCAL
     DB_PASSWORD_LOCAL: $DB_PASSWORD_LOCAL
     BASE_URL: $BASE_URL
-
-services:
-    - docker:dind
 
 build_job:
     stage: build
