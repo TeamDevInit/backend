@@ -44,7 +44,7 @@ build_job:
         - build
     #image: gradle:8.3-jdk17
     before_script:
-        - docker login -u $DOCKER_HUB_USERNAME --password-stdin < $DOCKER_HUB_PASSWORD
+        - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
     script:
         - echo "Build the project..."
         - echo "현재 브랜치:$CI_COMMIT_REF_NAME"
