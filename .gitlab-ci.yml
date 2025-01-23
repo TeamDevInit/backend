@@ -33,9 +33,6 @@ variables:
     DB_USERNAME_LOCAL: $DB_USERNAME_LOCAL
     DB_PASSWORD_LOCAL: $DB_PASSWORD_LOCAL
     BASE_URL: $BASE_URL
-    DOCKER_HUB_USERNAME: $DOCKER_HUB_USERNAME
-    DOCKER_HUB_PASSWORD: $DOCKER_HUB_PASSWORD
-    
 
 
 build_job:
@@ -43,11 +40,7 @@ build_job:
     tags:
         - build
     #image: gradle:8.3-jdk17
-    before_script:
-        - echo "도커 인증 잡업 시작..."        
-        - echo $DOCKER_HUB_USERNAME
-        - echo $DOCKER_HUB_PASSWORD
-        
+    before_script:        
         - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
     script:
         - echo "Build the project..."
@@ -59,16 +52,21 @@ build_job:
     after_script:
         - docker logout
 
-#deploy_job:
-#    stage: deploy
-#    tags:
-#        - deploy
-#    image: docker:latest
-#    script:
-#        - echo "Deploying the project..."
-#        - docker build -t $DOCKER_IMAGE:latest .
-#        - docker stop devinit-back || true && docker rm devinit-back || true
-#        - docker run -d --name devinit-back  -p 8081:8080 $DOCKER_IMAGE:latest
-#    environment:
-#        name: dev
+deploy_job:
+    stage: deploy
+    tags:
+       - deploy
+    image: docker:latest
+    variables:
+        DOCKER_IMAGE:devinit-back
+    before_script:        
+       - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
+    script:
+       - echo "Deploying the project..."
+       - docker build -t $DOCKER_IMAGE:latest .
+       - docker stop devinit-back || true && docker rm devinit-back || true
+       - docker run -d --name devinit-back  -p 8081:8080 $DOCKER_IMAGE:latest
+    
+    environment:
+       name: dev
 
