@@ -1,5 +1,10 @@
 image: docker:latest
 
+
+before_script:
+  - git reset --hard origin/$CI_COMMIT_REF_NAME
+
+
 stages:
     - build
     - deploy
