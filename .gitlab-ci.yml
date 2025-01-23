@@ -66,7 +66,8 @@ deploy_job:
        - echo "Deploying the project..."
        - docker stop devinit-back || true && docker rm devinit-back || true
        - docker pull $DOCKER_HUB_USERNAME/$DOCKER_IMAGE:latest
-       - docker run -d --name devinit-back -p 8081:8080 --env-file .env $DOCKER_HUB_USERNAME/$DOCKER_IMAGE:latest
+       - docker run -d --name devinit-back -p 8081:8080 $DOCKER_HUB_USERNAME/$DOCKER_IMAGE:latest
+       - docker-compose -f docker-compose.yml up -d
     after_script:
        - docker logout
     when: on_success
