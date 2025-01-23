@@ -28,7 +28,7 @@ build_job:
     stage: build
     tags:
         - build
-    #image: gradle:8.3-jdk17
+    image: gradle:8.3-jdk17
     script:
         - echo "Build the project.."
         - echo "현재 브랜치:$CI_COMMIT_REF_NAME"
