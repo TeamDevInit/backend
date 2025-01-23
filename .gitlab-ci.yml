@@ -66,12 +66,8 @@ deploy_job:
        - echo "Deploying the project..."
        - docker stop devinit-back || true && docker rm devinit-back || true
        - docker pull $DOCKER_HUB_USERNAME/$DOCKER_IMAGE:latest
-       - docker run -d --name devinit-back -p 8081:8080 $DOCKER_HUB_USERNAME/$DOCKER_IMAGE:latest
+       - docker run -d --name devinit-back -p 8081:8080 --env-file .env $DOCKER_HUB_USERNAME/$DOCKER_IMAGE:latest
     after_script:
        - docker logout
     when: on_success
-    environment:
-      DB_URL_PROD: $DB_URL_PROD
-      DB_USERNAME_PROD: $DB_USERNAME_PROD
-      DB_PASSWORD_PROD: $DB_PASSWORD_PROD
-      BASE_URL: $BASE_URL
+

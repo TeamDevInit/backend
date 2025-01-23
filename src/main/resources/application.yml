@@ -3,6 +3,8 @@ spring:
     name: devinit-back
   redirect:
     url: ${BASE_URL}
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:prod}
 
   config:
     import: "optional:classpath:.env[.properties],optional:file:./.env"
