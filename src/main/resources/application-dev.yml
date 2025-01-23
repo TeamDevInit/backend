@@ -2,6 +2,7 @@ spring:
   config:
     activate:
       on-profile: dev
+
   datasource:
     url: ${DB_URL_LOCAL}
     username: ${DB_USERNAME_LOCAL}
