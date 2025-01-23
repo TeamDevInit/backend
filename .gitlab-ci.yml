@@ -40,7 +40,7 @@ build_job:
     #image: gradle:8.3-jdk17
     before_script:
         - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
-        - echo "$DB_URL_LOCAL"
+        - echo "$DB_URL_PROD"
         - echo "$BASE_URL"
         - echo "$SPRING_PROFILES_ACTIVE"
     script:

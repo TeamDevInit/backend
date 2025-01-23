@@ -5,9 +5,6 @@ spring:
     url: ${BASE_URL}
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
-
-
-
   jpa:
     hibernate:
       ddl-auto: update
