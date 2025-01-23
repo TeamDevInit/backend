@@ -39,9 +39,7 @@ build_job:
     stage: build
     tags:
         - build
-    #image: gradle:8.3-jdk17
-    variables:
-        - DOCKER_IMAGE:devinit-back
+    #image: gradle:8.3-jdk17    
     before_script:        
         - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
     script:
