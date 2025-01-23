@@ -45,8 +45,8 @@ build_job:
     #image: gradle:8.3-jdk17
     before_script:
         - echo "도커 인증 잡업 시작..."        
-        - echo "$DOCKER_HUB_USERNAME"
-        - echo "$DOCKER_HUB_PASSWORD"
+        - echo $DOCKER_HUB_USERNAME
+        - echo $DOCKER_HUB_PASSWORD
         
         - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
     script:
