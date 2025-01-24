@@ -18,5 +18,4 @@ public class EducationRequestDto {
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private String status;
-    private Resume resume;
 }

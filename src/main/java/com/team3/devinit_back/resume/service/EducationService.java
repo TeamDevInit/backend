@@ -3,6 +3,8 @@ package com.team3.devinit_back.resume.service;
 import com.team3.devinit_back.global.exception.CustomException;
 import com.team3.devinit_back.global.exception.ErrorCode;
 import com.team3.devinit_back.member.entity.Member;
+import com.team3.devinit_back.resume.dto.ActivityRequestDto;
+import com.team3.devinit_back.resume.dto.ActivityResponseDto;
 import com.team3.devinit_back.resume.dto.EducationRequestDto;
 import com.team3.devinit_back.resume.dto.EducationResponseDto;
 import com.team3.devinit_back.resume.entity.Education;
@@ -59,6 +61,12 @@ public class EducationService {
         educationRepository.save(education);
     }
 
+    @Transactional
+    public void deleteEducation(Resume resume, Long id) {
+        Education education = isAuthorized(id, resume.getMember());
+        educationRepository.delete(education);
+    }
+
     private void validateDuplicateEducation(String resumeId, EducationRequestDto educationRequestDto){
         educationRepository.findByResumeIdAndOrganizationAndDegreeAndMajor(
                 resumeId,educationRequestDto.getOrganization(),educationRequestDto.getDegree(), educationRequestDto.getMajor())
@@ -76,13 +84,6 @@ public class EducationService {
                 });
     }
 
-    @Transactional
-    public void deleteEducation(Resume resume, Long id) {
-        Education education = isAuthorized(id, resume.getMember());
-        educationRepository.delete(education);
-    }
-
-
     private Education getEducationById(Long id) {
         return educationRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.EDUCATION_NOT_FOUND));
@@ -95,4 +96,5 @@ public class EducationService {
         }
         return education;
     }
+
 }

@@ -35,7 +35,8 @@ public enum ErrorCode {
     SELF_FOLLOW_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "자기 자신을 팔로우할 수 없습니다."),
     RESUME_NOT_FOUND(HttpStatus.NOT_FOUND, "이력서를 찾을 수 없습니다."),
     SKILL_NOT_FOUND(HttpStatus.NOT_FOUND, "기술 스택을 찾을 수 없습니다."),
-    INVALID_TAG_ID(HttpStatus.BAD_REQUEST, "유효하지 않은 스킬 태그입니다.");
+    INVALID_TAG_ID(HttpStatus.BAD_REQUEST, "유효하지 않은 스킬 태그입니다."),
+    ACTIVITY_NOT_FOUND(HttpStatus.BAD_REQUEST, "등록된 활동 사항을 찾을 수 없습니다.");
 
 
 
