@@ -56,7 +56,7 @@ deploy_job:
        - deploy
     before_script:
        - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
-      # 환경 변수로 .env 파일 생성a
+      # 환경 변수로 .env 파일 생성
        - echo "Deploying the project.."
        - docker stop devinit-back || true && docker rm devinit-back || true
        - docker pull $DOCKER_HUB_USERNAME/$DOCKER_IMAGE:latest
