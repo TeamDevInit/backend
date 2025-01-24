@@ -49,7 +49,7 @@ build_job:
         - docker push $DOCKER_HUB_USERNAME/$DOCKER_IMAGE
     artifacts:
       paths:
-        - .env
+        - src/main/resources/.env
     after_script:
         - docker logout
 
@@ -59,6 +59,7 @@ deploy_job:
        - deploy
     before_script:
        - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
+       - if [ -f src/main/resources/.env ]; then export $(cat src/main/resources/.env | xargs); fi
       # 환경 변수로 .env 파일 생
     script:
        - echo "Deploying the project..."
