@@ -90,6 +90,8 @@ public class BoardService {
 
         if ((tagNames != null && !tagNames.isEmpty()) || (contents != null && !contents.isEmpty())) {
             builder = buildDynamicQuery(tagNames, contents, categoryId);
+        }else if(categoryId != null){
+                builder.and(board.category.id.eq(categoryId)); //카테고리 ID와 같은 ID값만 추출
         }
 
         return fetchBoards(pageable, builder,tagNames);
