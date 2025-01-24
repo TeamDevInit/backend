@@ -7,6 +7,8 @@ import com.team3.devinit_back.board.service.BoardService;
 import com.team3.devinit_back.member.dto.CustomOAuth2User;
 import com.team3.devinit_back.member.entity.Member;
 import com.team3.devinit_back.member.service.MemberService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -42,10 +44,12 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.CREATED).body(boardResponseDto);
     }
 
+
     @GetMapping
+    @Operation(summary = "게시글 전체 조회", description = "페이지 번호/사이즈/정렬조건/태그/검색어를 입력받아 해당 페이지게시글을 조회한다.")
     public ResponseEntity<Page<BoardResponseDto>> getAllBoards(@PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
-                                                               @RequestParam(name = "tagNames", required = false)List<String> tagNames,
-                                                               @RequestParam(name = "searchContents",required = false) String searchContents){
+                                                               @Parameter(description = "검색하는 태그값") @RequestParam(name = "tagNames", required = false)List<String> tagNames,
+                                                               @Parameter(description = "검색하는 내용값") @RequestParam(name = "searchContents",required = false) String searchContents){
         Page<BoardResponseDto> boardResponseDtoPage = boardService.getAllBoard(pageable, tagNames, searchContents);
         return  ResponseEntity.ok(boardResponseDtoPage);
     }
