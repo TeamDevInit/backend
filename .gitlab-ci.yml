@@ -40,6 +40,7 @@ build_job:
     #image: gradle:8.3-jdk17
     before_script:
         - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
+        - echo -e "$ENV_FILE_CONTENT" > src/main/resources/.env
     script:
         - echo "빌드를 시작합니다...."
         #- git clone --branch feature/24-cicd https://gitlab-ci-token:$CI_JOB_TOKEN@kdt-gitlab.elice.io/pttrack/class_01/web_project_i/team03/devinit-back.git
