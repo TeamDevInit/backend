@@ -34,9 +34,6 @@ build_job:
         - docker push $DOCKER_HUB_USERNAME/$DOCKER_IMAGE
     after_script:
         - docker logout
-    rules:
-      - if: $CI_COMMIT_REF_NAME" == "dev"
-      - if: $CI_COMMIT_REF_NAME" == "feature/24-cicd
 
 deploy_job:
     stage: deploy
@@ -52,8 +49,5 @@ deploy_job:
        - docker run -d --name devinit-back -p 8081:8080 $DOCKER_HUB_USERNAME/$DOCKER_IMAGE:latest
     after_script:
        - docker logout
-    rules:
-      - if: $CI_COMMIT_REF_NAME" == "dev"
-      - if: $CI_COMMIT_REF_NAME" == "feature/24-cicd
     when: on_success
 
