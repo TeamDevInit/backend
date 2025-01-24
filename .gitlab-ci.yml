@@ -34,8 +34,6 @@ build_job:
         - docker push $DOCKER_HUB_USERNAME/$DOCKER_IMAGE
     after_script:
         - docker logout
-    only:
-        - dev
 
 deploy_job:
     stage: deploy
@@ -52,6 +50,4 @@ deploy_job:
     after_script:
        - docker logout
     when: on_success
-    only:
-       - dev
 
