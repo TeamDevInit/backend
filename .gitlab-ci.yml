@@ -28,7 +28,7 @@ build_job:
         - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
         - cat "$ENV_FILE" > src/main/resources/.env
     script:
-        - echo "빌드를 시작합니다...."
+        - echo "빌드를 시작합니다..."
         - docker build -t $DOCKER_HUB_USERNAME/$DOCKER_IMAGE:latest .
         - echo "도커허브에 푸시를 시작합니다..."
         - docker push $DOCKER_HUB_USERNAME/$DOCKER_IMAGE
