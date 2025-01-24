@@ -1,11 +1,5 @@
 image: docker:latest
 
-
-#before_script:
-#  - apk add --no-cache git
-#  - git fetch origin
-#  - git reset --hard origin/$CI_COMMIT_REF_NAME
-
 services:
  - name: docker:dind
    alias: docker
@@ -23,7 +17,6 @@ build_job:
     stage: build
     tags:
         - build
-    #image: gradle:8.3-jdk17
     before_script:
         - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
         - cat "$ENV_FILE" > src/main/resources/.env
@@ -43,7 +36,6 @@ deploy_job:
        - deploy
     before_script:
        - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
-      # 환경 변수로 .env 파일 생
     script:
        - echo "Deploying the project..."
        - docker stop devinit-back || true && docker rm devinit-back || true
