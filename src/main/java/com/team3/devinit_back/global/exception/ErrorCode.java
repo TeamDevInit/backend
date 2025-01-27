@@ -25,6 +25,7 @@ public enum ErrorCode {
     BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "게시물을 찾을 수 없습니다."),
     PROFILE_NOT_FOUND(HttpStatus.NOT_FOUND, "프로필을 찾을 수 없습니다."),
     INVALID_PROFILE_IMAGE(HttpStatus.BAD_REQUEST, "유효하지 않은 프로필 이미지입니다."),
+    IMAGE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "이미지 업로드에 실패했습니다."),
     FOLLOW_FAILED(HttpStatus.BAD_REQUEST, "팔로우 요청에 실패했습니다."),
     UNFOLLOW_FAILED(HttpStatus.BAD_REQUEST, "언팔로우 요청에 실패했습니다."),
     PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "등록된 프로젝트 사항을 찾을 수 없습니다."),
@@ -36,7 +37,9 @@ public enum ErrorCode {
     RESUME_NOT_FOUND(HttpStatus.NOT_FOUND, "이력서를 찾을 수 없습니다."),
     SKILL_NOT_FOUND(HttpStatus.NOT_FOUND, "기술 스택을 찾을 수 없습니다."),
     INVALID_TAG_ID(HttpStatus.BAD_REQUEST, "유효하지 않은 스킬 태그입니다."),
-    ACTIVITY_NOT_FOUND(HttpStatus.BAD_REQUEST, "등록된 활동 사항을 찾을 수 없습니다.");
+    ACTIVITY_NOT_FOUND(HttpStatus.BAD_REQUEST, "등록된 활동 사항을 찾을 수 없습니다."),
+    EXPERIENCE_NOT_FOUND(HttpStatus.BAD_REQUEST, "등록된 경력 사항을 찾을 수 없습니다."),
+    INFORMATION_NOT_FOUND(HttpStatus.BAD_REQUEST, "등록된 인적 사항을 찾을 수 없습니다.");
 
 
 

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,18 +21,21 @@ public class LanguageService {
     private final LanguageRepository languageRepository;
 
     @Transactional
-    public LanguageResponseDto createLanguage(Resume resume, LanguageRequestDto languageRequestDto) {
+    public List<LanguageResponseDto> createLanguages(Resume resume, List<LanguageRequestDto> languageRequestDtos) {
+        languageRequestDtos.forEach(languageRequestDto -> validateDuplicateLanguage(resume.getId(), languageRequestDto.getName()));
+        List<Language> languages = languageRequestDtos.stream()
+                .map(languageRequestDto -> Language.builder()
+                        .resume(resume)
+                        .level(languageRequestDto.getLevel())
+                        .name(languageRequestDto.getName())
+                        .build())
+                .toList();
 
-        validateDuplicateLanguage(resume.getId(), languageRequestDto.getName());
-        Language language = Language.builder()
-                .resume(resume)
-                .level(languageRequestDto.getLevel())
-                .name(languageRequestDto.getName())
-                .build();
+        List<Language> savedLanguages = languageRepository.saveAll(languages);
 
-        Language savedLanguage = languageRepository.save(language);
-
-        return LanguageResponseDto.fromEntity(savedLanguage);
+        return savedLanguages.stream()
+                .map(LanguageResponseDto::fromEntity)
+                .toList();
     }
 
     public List<LanguageResponseDto> getAllLanguage(Resume resume){
@@ -41,14 +45,19 @@ public class LanguageService {
     }
 
     @Transactional
-    public void updateLanguage(Resume resume, Long id, LanguageRequestDto languageRequestDto) {
+    public void updateLanguages(Resume resume, List<LanguageRequestDto> languageRequestDtos) {
+        languageRequestDtos.forEach(languageRequestDto -> validateDuplicateLanguage(resume.getId(), languageRequestDto.getName(), languageRequestDto.getId()));
+        List<Language> updatedLanguages = languageRequestDtos.stream()
+                .map(languageRequestDto -> {
+                    Long id = languageRequestDto.getId();
+                    Language language = isAuthorized(id, resume.getMember());
+                    language.setName(languageRequestDto.getName());
+                    language.setLevel(languageRequestDto.getLevel());
+                    return  language;
+                })
+                .toList();
 
-        validateDuplicateLanguage(resume.getId(), languageRequestDto.getName(),id);
-        Language language = isAuthorized(id, resume.getMember());
-        language.setName(languageRequestDto.getName());
-        language.setLevel(languageRequestDto.getLevel());
-
-        languageRepository.save(language);
+        languageRepository.saveAll(updatedLanguages);
     }
 
     @Transactional

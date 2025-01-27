@@ -34,13 +34,20 @@ public class Experience extends BaseEntity {
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "department")
+    private String department;
+
+    @Column(name = "employment_type")
+    private String employmentType;
+
     @ManyToOne
     @JoinColumn(name = "resume_id", nullable = false)
     private Resume resume;
 
     @Builder
     public Experience(Long id, String companyName, String position, LocalDateTime startDate,
-                      LocalDateTime endDate, String description, Resume resume) {
+                      LocalDateTime endDate, String description, Resume resume,
+                      String department, String employmentType) {
         this.id = id;
         this.companyName = companyName;
         this.position = position;
@@ -48,5 +55,7 @@ public class Experience extends BaseEntity {
         this.endDate = endDate;
         this.description = description;
         this.resume = resume;
+        this.department = department;
+        this.employmentType = employmentType;
     }
 }

@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class EducationRequestDto {
+    private Long id;
     @NotBlank(message = "학교/기관명을 입력해주세요")
     private String organization;
     @NotBlank(message = "학위를 입력해주세요")
