@@ -6,12 +6,14 @@ import com.team3.devinit_back.member.entity.Member;
 import com.team3.devinit_back.resume.dto.ActivityRequestDto;
 import com.team3.devinit_back.resume.dto.ActivityResponseDto;
 import com.team3.devinit_back.resume.entity.Activity;
-import com.team3.devinit_back.resume.entity.Education;
 import com.team3.devinit_back.resume.entity.Resume;
 import com.team3.devinit_back.resume.repository.ActivityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,31 +21,47 @@ public class ActivityService {
     private final ActivityRepository activityRepository;
 
     @Transactional
-    public ActivityResponseDto createActivity(Resume resume, ActivityRequestDto activityRequestDto) {
-        Activity activity = Activity.builder()
-                .resume(resume)
-                .organization(activityRequestDto.getOrganization())
-                .activityName(activityRequestDto.getActivityName())
-                .description(activityRequestDto.getDescription())
-                .startDate(activityRequestDto.getStartDate())
-                .endDate(activityRequestDto.getEndDate())
-                .build();
-        Activity savedActivity = activityRepository.save(activity);
+    public List<ActivityResponseDto> createActivities(Resume resume, List<ActivityRequestDto> activityRequestDtos) {
+        List<Activity> activities = activityRequestDtos.stream()
+                .map(dto -> Activity.builder()
+                        .resume(resume)
+                        .organization(dto.getOrganization())
+                        .activityName(dto.getActivityName())
+                        .description(dto.getDescription())
+                        .startDate(dto.getStartDate())
+                        .endDate(dto.getEndDate())
+                        .build())
+                .toList();
 
-        return  ActivityResponseDto.fromEntity(savedActivity);
+        List<Activity> savedActivities = activityRepository.saveAll(activities);
+
+        return savedActivities.stream()
+                .map(ActivityResponseDto::fromEntity)
+                .toList();
+    }
+
+    public List<ActivityResponseDto> getAllActivity(Resume resume){
+        return activityRepository.findAllByResumeId(resume.getId()).stream()
+                .map(ActivityResponseDto::fromEntity)
+                .toList();
     }
 
     @Transactional
-    public void updateActivity(Resume resume, Long id, ActivityRequestDto activityRequestDto) {
+    public void updateActivities(Resume resume, List<ActivityRequestDto> activityRequestDtos) {
+        List<Activity> updatedActivities = activityRequestDtos.stream()
+                .map(activityRequestDto -> {
+                    Long id = activityRequestDto.getId();
+                    Activity activity = isAuthorized(id, resume.getMember());
+                    activity.setActivityName(activityRequestDto.getActivityName());
+                    activity.setOrganization(activityRequestDto.getOrganization());
+                    activity.setDescription(activityRequestDto.getDescription());
+                    activity.setStartDate(activityRequestDto.getStartDate());
+                    activity.setEndDate(activityRequestDto.getEndDate());
+                    return activity;
+                })
+                .toList();
 
-        Activity activity = isAuthorized(id , resume.getMember());
-        activity.setActivityName(activityRequestDto.getActivityName());
-        activity.setOrganization(activityRequestDto.getOrganization());
-        activity.setDescription(activityRequestDto.getDescription());
-        activity.setStartDate(activityRequestDto.getStartDate());
-        activity.setEndDate(activityRequestDto.getEndDate());
-
-        activityRepository.save(activity);
+        activityRepository.saveAll(updatedActivities);
     }
 
     @Transactional
