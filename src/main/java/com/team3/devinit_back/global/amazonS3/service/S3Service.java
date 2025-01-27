@@ -7,8 +7,6 @@ import com.team3.devinit_back.global.exception.ErrorCode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -27,12 +25,10 @@ public class S3Service {
         this.amazonS3 = amazonS3;
     }
 
-    // 프로필 기본 이미지 가져오기
     public String getDefaultProfileImageUrl() {
         return defaultProfileImageUrl;
     }
 
-    // 파일 업로드
     public String uploadFile(MultipartFile file) {
         try {
             String fileName = generateFileName(file.getOriginalFilename());
@@ -49,7 +45,6 @@ public class S3Service {
         }
     }
 
-    //다중 파일 업로드
     public List<String> uploadFiles(List<MultipartFile> files) {
         try {
             List<String> fileUrls = new ArrayList<>();
@@ -62,7 +57,6 @@ public class S3Service {
         }
     }
 
-    // 파일 삭제
     public void deleteFile(String fileName) {
         amazonS3.deleteObject(bucketName, fileName);
     }
