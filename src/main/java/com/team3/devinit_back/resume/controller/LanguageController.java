@@ -16,8 +16,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/api/languages")
+@RequestMapping("/api/resume/languages")
 @RequiredArgsConstructor
 public class LanguageController {
     private final LanguageService languageService;
@@ -25,20 +27,19 @@ public class LanguageController {
     private final MemberService memberService;
 
     @PostMapping
-    public ResponseEntity<LanguageResponseDto> createLanguage(@AuthenticationPrincipal CustomOAuth2User userInfo,
-                                                              @Valid @RequestBody LanguageRequestDto languageRequestDto){
+    public ResponseEntity<List<LanguageResponseDto>> createLanguages(@AuthenticationPrincipal CustomOAuth2User userInfo,
+                                                                     @Valid @RequestBody List<LanguageRequestDto> languageRequestDtos){
         Resume resume = getResumeFromUserInfo(userInfo);
-        LanguageResponseDto languageResponseDto = languageService.createLanguage(resume, languageRequestDto);
+        List<LanguageResponseDto> languageResponseDtos = languageService.createLanguages(resume, languageRequestDtos);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(languageResponseDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(languageResponseDtos);
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<LanguageResponseDto> updateLanguage(@AuthenticationPrincipal CustomOAuth2User userInfo,
-                                                              @Valid @RequestBody LanguageRequestDto languageRequestDto,
-                                                              @PathVariable("id") Long id){
+    @PatchMapping
+    public ResponseEntity<LanguageResponseDto> updateLanguages(@AuthenticationPrincipal CustomOAuth2User userInfo,
+                                                               @Valid @RequestBody List<LanguageRequestDto> languageRequestDtos){
         Resume resume = getResumeFromUserInfo(userInfo);
-        languageService.updateLanguage(resume, id, languageRequestDto);
+        languageService.updateLanguages(resume, languageRequestDtos);
         return ResponseEntity.ok().build();
     }
 

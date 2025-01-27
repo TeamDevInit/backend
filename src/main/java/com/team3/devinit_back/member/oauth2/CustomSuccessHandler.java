@@ -55,7 +55,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         // refresh -> 쿠키, access -> 헤더? -> 하이퍼링크에서 넘어오는거라 바로 못줌
         response.addCookie(createCookie("refresh", refreshToken));
 
-        response.sendRedirect("http://34.64.44.54"); //  ->  http://34.64.44.54
+        response.sendRedirect("http://34.64.72.48"); //  ->  http://34.64.44.54
         response.setStatus(HttpStatus.OK.value());
     }
 

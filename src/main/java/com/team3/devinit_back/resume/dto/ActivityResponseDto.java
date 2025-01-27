@@ -22,6 +22,7 @@ public class ActivityResponseDto {
     private LocalDateTime updatedAt;
 
     public ActivityResponseDto(Activity activity){
+        this.id = activity.getId();
         this.activityName = activity.getActivityName();
         this.organization = activity.getOrganization();
         this.description = activity.getDescription();

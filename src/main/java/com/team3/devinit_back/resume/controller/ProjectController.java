@@ -15,8 +15,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/api/projects")
+@RequestMapping("/api/resume/projects")
 @RequiredArgsConstructor
 public class ProjectController {
     private final ProjectService projectService;
@@ -25,20 +27,19 @@ public class ProjectController {
 
 
     @PostMapping
-    public ResponseEntity<ProjectResponseDto> createProject(@AuthenticationPrincipal CustomOAuth2User userInfo,
-                                                            @Valid @RequestBody ProjectRequestDto projectRequestDto){
+    public ResponseEntity<List<ProjectResponseDto>> createProject(@AuthenticationPrincipal CustomOAuth2User userInfo,
+                                                                  @Valid @RequestBody List<ProjectRequestDto> projectRequestDtos){
         Resume resume = getResumeFromUserInfo(userInfo);
-        ProjectResponseDto projectResponseDto = projectService.createProject(resume,projectRequestDto);
+        List<ProjectResponseDto> projectResponseDtos = projectService.createProjects(resume,projectRequestDtos);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(projectResponseDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(projectResponseDtos);
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping
     public ResponseEntity<ProjectResponseDto> updateProject(@AuthenticationPrincipal CustomOAuth2User userInfo,
-                                                            @Valid @RequestBody ProjectRequestDto projectRequestDto,
-                                                            @PathVariable("id") Long id){
+                                                            @Valid @RequestBody List<ProjectRequestDto> projectRequestDtos){
         Resume resume = getResumeFromUserInfo(userInfo);
-        projectService.updateProject(resume, id, projectRequestDto);
+        projectService.updateProjects(resume, projectRequestDtos);
         return ResponseEntity.ok().build();
     }
 

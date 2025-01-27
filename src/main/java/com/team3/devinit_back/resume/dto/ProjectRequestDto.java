@@ -6,6 +6,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 @Data
 public class ProjectRequestDto {
+    private Long id;
     @NotBlank(message = "프로젝트명을 입력해주세요")
     private String projectName;
     @NotBlank(message = "프로젝트 설명을 입력해주세요")

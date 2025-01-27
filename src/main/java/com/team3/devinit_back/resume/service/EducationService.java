@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,22 +23,26 @@ public class EducationService {
     private final EducationRepository educationRepository;
 
     @Transactional
-    public EducationResponseDto createEducation(Resume resume, EducationRequestDto educationRequestDto) {
+    public List<EducationResponseDto> createEducations(Resume resume, List<EducationRequestDto> educationRequestDtos) {
+        educationRequestDtos.forEach(educationRequestDto -> validateDuplicateEducation(resume.getId(), educationRequestDto));
 
-        validateDuplicateEducation(resume.getId(), educationRequestDto);
-        Education education = Education.builder()
-                .resume(resume)
-                .organization(educationRequestDto.getOrganization())
-                .degree(educationRequestDto.getDegree())
-                .major(educationRequestDto.getMajor())
-                .startDate(educationRequestDto.getStartDate())
-                .endDate(educationRequestDto.getEndDate())
-                .status(educationRequestDto.getStatus())
-                .build();
+        List<Education> educations = educationRequestDtos.stream()
+                .map(educationRequestDto -> Education.builder()
+                        .resume(resume)
+                        .organization(educationRequestDto.getOrganization())
+                        .degree(educationRequestDto.getDegree())
+                        .major(educationRequestDto.getMajor())
+                        .startDate(educationRequestDto.getStartDate())
+                        .endDate(educationRequestDto.getEndDate())
+                        .status(educationRequestDto.getStatus())
+                        .build())
+                .toList();
 
-        Education savedEducation = educationRepository.save(education);
+        List<Education> savedEducations = educationRepository.saveAll(educations);
 
-        return EducationResponseDto.fromEntity(savedEducation);
+        return savedEducations.stream()
+                .map(EducationResponseDto::fromEntity)
+                .toList();
     }
 
     public List<EducationResponseDto> getAllEducation(Resume resume){
@@ -47,18 +52,25 @@ public class EducationService {
     }
 
     @Transactional
-    public void updateEducation(Resume resume, Long id, EducationRequestDto educationRequestDto) {
+    public void updateEducations(Resume resume, List<EducationRequestDto> educationRequestDtos) {
 
-        validateDuplicateEducation(resume.getId(), educationRequestDto,id);
-        Education education = isAuthorized(id, resume.getMember());
-        education.setOrganization(educationRequestDto.getOrganization());
-        education.setDegree(educationRequestDto.getDegree());
-        education.setMajor(educationRequestDto.getMajor());
-        education.setStartDate(educationRequestDto.getStartDate());
-        education.setEndDate(educationRequestDto.getEndDate());
-        education.setStatus(educationRequestDto.getStatus());
+        educationRequestDtos.forEach(dto -> validateDuplicateEducation(resume.getId(), dto));
 
-        educationRepository.save(education);
+        List<Education> updatedEducations = educationRequestDtos.stream()
+                .map(educationRequestDto -> {
+                    Long id = educationRequestDto.getId();
+                    Education education = isAuthorized(id, resume.getMember());
+                    education.setOrganization(educationRequestDto.getOrganization());
+                    education.setDegree(educationRequestDto.getDegree());
+                    education.setMajor(educationRequestDto.getMajor());
+                    education.setStartDate(educationRequestDto.getStartDate());
+                    education.setEndDate(educationRequestDto.getEndDate());
+                    education.setStatus(educationRequestDto.getStatus());
+                    return education;
+                })
+                .toList();
+
+        educationRepository.saveAll(updatedEducations);
     }
 
     @Transactional
