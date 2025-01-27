@@ -21,8 +21,8 @@ import java.util.Objects;
 @Slf4j
 public class LogAspect {
 
-    // 프로젝트의 모든 컨트롤러를 대상으로 지정
-    @Pointcut("within(com.team3.devinit_back.*.controller..*)")
+    // 프로젝트의 모든 컨트롤러(WebSocket 제외)를 대상으로 지정
+    @Pointcut("within(com.team3.devinit_back.*.controller..*) && !execution(* com.team3.devinit_back.websocket.controller.*.*(..))")
     public void controller() {}
 
     // 프로젝트의 모든 ResponseEntity 대상 지정
@@ -32,6 +32,13 @@ public class LogAspect {
     @Before("controller()")
     public void beforeRequest(JoinPoint joinPoint) {
         log.info("========== 클라이언트 요청 ==========");
+
+        //WebSocket 요청인지 확인
+        if (RequestContextHolder.getRequestAttributes() == null) {
+            log.info("WebSocket 요청으로 HttpServletRequest가 없습니다.");
+            return;
+        }
+
         // 요청한 경로 로깅
         HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
         String requestUrl = request.getRequestURL().toString();
