@@ -40,7 +40,7 @@ public class LanguageController {
                                                                @Valid @RequestBody List<LanguageRequestDto> languageRequestDtos){
         Resume resume = getResumeFromUserInfo(userInfo);
         languageService.updateLanguages(resume, languageRequestDtos);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @DeleteMapping("/{id}")
@@ -48,7 +48,7 @@ public class LanguageController {
                                                @PathVariable("id") Long id){
         Resume resume = getResumeFromUserInfo(userInfo);
         languageService.deleteLanguage(resume,id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     private Resume getResumeFromUserInfo(CustomOAuth2User userInfo){

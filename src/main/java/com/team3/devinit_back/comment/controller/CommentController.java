@@ -18,15 +18,13 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/comment")
+@RequestMapping("/api/comments")
 @RequiredArgsConstructor
 public class CommentController {
     private final CommentService commentService;
     private final BoardService boardService;
     private final MemberService memberService;
 
-
-    //댓글 작성
     @PostMapping
     public ResponseEntity<CommentResponseDto> createComment(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                             @RequestBody CommentRequestDto commentRequestDto){
@@ -36,34 +34,30 @@ public class CommentController {
         return  ResponseEntity.status(HttpStatus.CREATED).body(commentResponseDto);
     }
 
-    //대댓글 조회
     @GetMapping("/{id}")
     public ResponseEntity<List<CommentResponseDto>> getRecomments(@PathVariable("id") Long id){
         List<CommentResponseDto> commentResponseDto = commentService.getRecommentById(id);
         return ResponseEntity.ok(commentResponseDto);
     }
 
-    //댓글 수정
     @PatchMapping("/{id}")
-    public ResponseEntity<CommentResponseDto> updateComment(@AuthenticationPrincipal CustomOAuth2User userInfo,
+    public ResponseEntity<Void> updateComment(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                             @RequestBody CommentRequestDto commentRequestDto,
                                                             @PathVariable("id") Long id){
         Member member = getMemberFromUserInfo(userInfo);
         commentService.updateComment(member.getId(), commentRequestDto, id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
     }
 
-    //댓글 삭제
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteComment(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                               @RequestBody CommentRequestDto commentRequestDto,
                                               @PathVariable("id") Long id){
         Member member = getMemberFromUserInfo(userInfo);
         commentService.deleteComment(member.getId(), commentRequestDto, id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
-
 
     private Member getMemberFromUserInfo(CustomOAuth2User userInfo) {
         String socialId = userInfo.getName();

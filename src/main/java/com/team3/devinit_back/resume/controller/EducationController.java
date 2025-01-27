@@ -40,7 +40,7 @@ public class EducationController {
                                                                  @Valid @RequestBody List<EducationRequestDto> educationRequestDtos){
         Resume resume = getResumeFromUserInfo(userInfo);
         educationService.updateEducations(resume, educationRequestDtos);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @DeleteMapping("/{id}")
@@ -48,7 +48,7 @@ public class EducationController {
                                                  @PathVariable("id") Long id){
         Resume resume = getResumeFromUserInfo(userInfo);
         educationService.deleteEducation(resume,id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     private Resume getResumeFromUserInfo(CustomOAuth2User userInfo){

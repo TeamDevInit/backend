@@ -39,7 +39,7 @@ public class InformationController {
                                                                     @PathVariable("id") Long id){
         Resume resume = getResumeFromUserInfo(userInfo);
         informationService.updateInformation(resume, id, informationRequestDto);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @DeleteMapping("/{id}")
@@ -47,7 +47,7 @@ public class InformationController {
                                                    @PathVariable("id") Long id){
         Resume resume = getResumeFromUserInfo(userInfo);
         informationService.deleteInformation(resume,id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     private Resume getResumeFromUserInfo(CustomOAuth2User userInfo){

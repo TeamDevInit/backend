@@ -12,10 +12,8 @@ import org.springframework.stereotype.Service;
 public class MemberService {
     private final MemberRepository memberRepository;
 
-    //중복 닉네임 검증
     public boolean isNicknameExists(String nickname) { return memberRepository.existsByNickName(nickname);}
 
-    //닉네임 변경
     public boolean updateNicknameBySocailId(String socialId, String nickname){
         if(isNicknameExists(nickname)){ throw new CustomException(ErrorCode.DUPLICATED_NAME); }
 
@@ -27,6 +25,5 @@ public class MemberService {
         return true;
     }
 
-    // 회원찾기(SocialId)
     public Member findMemberBySocialId(String socialId){ return memberRepository.findBySocialId(socialId); }
 }

@@ -62,7 +62,6 @@ public class BoardDetailResponseDto {
 
         this.createdAt = board.getCreatedAt();
         this.updatedAt = board.getUpdatedAt();
-
     }
     public static BoardDetailResponseDto fromEntity(Board board){ return new BoardDetailResponseDto(board);}
 

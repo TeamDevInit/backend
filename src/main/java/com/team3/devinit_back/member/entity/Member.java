@@ -6,6 +6,7 @@ import com.team3.devinit_back.global.common.BaseEntity;
 import com.team3.devinit_back.profile.entity.Profile;
 import com.team3.devinit_back.resume.entity.Resume;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,7 +21,6 @@ public class Member extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    //private String name;
 
     @Column(nullable = false, unique = true)
     private String nickName;
@@ -51,5 +51,14 @@ public class Member extends BaseEntity {
     public void updateProfile(String nickName, String profileImage) {
         this.nickName = nickName;
         this.profileImage = profileImage;
+    }
+
+    @Builder
+    public Member(String nickName, String socialId, String socialProvider,String role, String profileImage){
+        this.nickName = nickName;
+        this.socialId = socialId;
+        this.profileImage = profileImage;
+        this.role = role;
+        this.socialProvider = socialProvider;
     }
 }

@@ -39,7 +39,7 @@ public class ActivityController {
                                                               @Valid @RequestBody List<ActivityRequestDto> activityRequestDtos){
         Resume resume = getResumeFromUserInfo(userInfo);
         activityService.updateActivities(resume, activityRequestDtos);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @DeleteMapping("/{id}")
@@ -47,7 +47,7 @@ public class ActivityController {
                                                  @PathVariable("id") Long id){
         Resume resume = getResumeFromUserInfo(userInfo);
         activityService.deleteActivity(resume,id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     private Resume getResumeFromUserInfo(CustomOAuth2User userInfo){
