@@ -9,6 +9,7 @@ import lombok.Data;
 @Builder
 public class ProfileDetailResponse {
     private String id;
+    private String memberId;
     private String nickname;
     private String profileImage;
     private String about;
@@ -20,6 +21,7 @@ public class ProfileDetailResponse {
     public static ProfileDetailResponse fromEntity(Profile profile, FollowCountResponse followCounts, boolean isFollowing) {
         return ProfileDetailResponse.builder()
             .id(profile.getId())
+            .memberId(profile.getMember().getId())
             .nickname(profile.getMember().getNickName())
             .about(profile.getAbout())
             .profileImage(profile.getMember().getProfileImage())
