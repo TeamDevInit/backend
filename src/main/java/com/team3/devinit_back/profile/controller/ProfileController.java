@@ -16,13 +16,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.expression.AccessException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
@@ -78,7 +74,7 @@ public class ProfileController {
     public ResponseEntity<ProfileDetailResponse> updateProfile
         (@AuthenticationPrincipal CustomOAuth2User userInfo,
          @RequestPart(value = "profile") ProfileUpdateRequest request,
-         @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) throws AccessException {
+         @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
         String memberId = getMemberFromUserInfo(userInfo).getId();
         profileService.updateProfile(memberId, request, profileImage);
         ProfileDetailResponse updateProfile = profileService.getMyProfile(memberId);
