@@ -21,5 +21,4 @@ public class CorsMvcConfig implements WebMvcConfigurer {
          .addResourceLocations("classpath:/META-INF/resources/webjars/");
          }
 
-
 }

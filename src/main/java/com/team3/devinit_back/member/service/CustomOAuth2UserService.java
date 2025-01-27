@@ -30,7 +30,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         System.out.println(oAuth2User);
 
-        //어디서온 요청인지 확인후 양식에 맞게 변수에 저장
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         OAuth2Response oAuth2Response = null;
         if (registrationId.equals("naver")) {
@@ -46,16 +45,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             return null;
         }
 
-        //유저 정보확인 및 기존 회원 여부 판별
         String socialId = oAuth2Response.getProviderId();
         String socialProvider = oAuth2Response.getProvider();
         Member existData = memberRepository.findBySocialId(socialId);
 
-        if(existData == null){ // 없으면 생성
+        if(existData == null){
             Member member = new Member();
             member.setSocialId(socialId);
             member.setSocialProvider(socialProvider);
-            //memberEntity.setName(oAuth2Response.getName());
             member.setRole("ROLE_USER");
             member.setProfileImage(s3Service.getDefaultProfileImageUrl());
             String nickname;
@@ -65,8 +62,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             member.setNickName(nickname);
 
             memberRepository.save(member);
-
-            // 프로필 자동 생성
             Profile profile = Profile.builder()
                     .member(member)
                     .about("")
@@ -76,19 +71,16 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
             MemberDto memberDto = new MemberDto();
             memberDto.setName(socialId);
-            //memberDto.setName(oAuth2Response.getName());
             memberDto.setRole("ROLE_USER");
 
             return new CustomOAuth2User(memberDto);
         }
-        else{ // 있으면 변경가능한 값만 재세팅 하고 저장
-            //existData.setName(oAuth2Response.getName());
+        else{
 
             memberRepository.save(existData);
 
             MemberDto memberDto = new MemberDto();
             memberDto.setName(existData.getSocialId());
-            //memberDto.setName(oAuth2Response.getName());
             memberDto.setRole(existData.getRole());
 
             return new CustomOAuth2User(memberDto);

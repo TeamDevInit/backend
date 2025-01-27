@@ -42,7 +42,6 @@ public class BoardService {
     private final TagService tagService;
     private final JPAQueryFactory queryFactory;
 
-    // 게시글 생성
     @Transactional
     public BoardDetailResponseDto createBoard(Member member, BoardRequestDto boardRequestDto) {
 
@@ -67,7 +66,6 @@ public class BoardService {
 
     }
 
-    // 전체 게시물 조회
     public Page<BoardResponseDto> getAllBoard(Pageable pageable, List<String> tagNames, String contents) {
         QBoard board = QBoard.board;
         QTagBoard tagBoard = QTagBoard.tagBoard;
@@ -81,7 +79,6 @@ public class BoardService {
         return fetchBoards(pageable, builder, tagNames);
     }
 
-    // 카테고리별 게시물 조회
     public Page<BoardResponseDto> getBoardByCategory(Pageable pageable, List<String> tagNames,
                                                         String contents,Long categoryId ) {
         QBoard board = QBoard.board;
@@ -97,7 +94,6 @@ public class BoardService {
         return fetchBoards(pageable, builder,tagNames);
     }
 
-    //게시물 상세 조회
     public BoardDetailResponseDto getBoardDetail(Long id){
         Board board = getBoardByIdWithComment(id);
         return BoardDetailResponseDto.fromEntity(board);
@@ -117,14 +113,12 @@ public class BoardService {
         boardRepository.save(board);
     }
 
-    //게시글 삭제
     @Transactional
     public void deleteBoard(Long id, String memberId) {
         Board board = isAuthorized(id, memberId);
         boardRepository.deleteById(board.getId());
     }
 
-    // 게시글 추천 토글
     @Transactional
     public boolean toggleRecommend(Long id, Member member) {
         Board board = getBoardById(id);
@@ -146,37 +140,31 @@ public class BoardService {
         }
     }
 
-    // 게시글 추천수 조회
     public  int getRecommendationCount(Long id){
         Board board = getBoardById(id);
         return recommendationRepository.countByBoard(board);
     }
 
-    // profileId -> 프로필객체 조회
     private Profile getProfileByMemberId(String memberId) {
         return profileRepository.findByMemberId(memberId)
             .orElseThrow(() -> new EntityNotFoundException("해당 멤버의 프로필을 찾을 수 없습니다. ID: " + memberId));
     }
 
-    // boardId -> 게시글객체 조회
     private Board getBoardById(Long id) {
         return boardRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
     }
 
-    // boardId -> 게시글객체 조회 + 댓글포함
     private Board getBoardByIdWithComment(Long id){
         return boardRepository.findByIdWithComments(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
     }
 
-    //CategoryId -> 카테고리객체 조회
     private Category getCategoryById(Long categoryId) {
         return categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
     }
 
-    //태그설정
     private void makeTag(Board board, BoardRequestDto boardRequestDto){
         if (boardRequestDto.getTags() != null) {
             board.getTagBoards().clear();
@@ -188,10 +176,9 @@ public class BoardService {
         }
     }
 
-    //컨텐츠(마크다운) 첫번째 이미지(썸네일) 추출
     private String extractImageUrl(String content){
         String imageUrl;
-        String regex = "!\\[.*?\\]\\((.*?)\\)";  // !\[로 시작하고, ] 뒤에 (와 )로 감싸인 URL을 추출.
+        String regex = "!\\[.*?\\]\\((.*?)\\)";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(content);
 
@@ -199,34 +186,23 @@ public class BoardService {
         return null;
     }
 
-    //조건절 생성
     private BooleanBuilder buildDynamicQuery(List<String> tagNames, String contents, Long categoryId) {
         QBoard board = QBoard.board;
         QTagBoard tagBoard = QTagBoard.tagBoard;
         QTag tag = QTag.tag;
         BooleanBuilder builder = new BooleanBuilder();
 
-        // 카테고리 조건
         if (categoryId != null) {
-            builder.and(board.category.id.eq(categoryId)); //카테고리 ID와 같은 ID값만 추출
+            builder.and(board.category.id.eq(categoryId));
         }
 
-        // 태그 조건 : 각 태그를 모두(AND)를 포함한 게시글
-        // select board_id from tag_board
-        //where tag_id in(select id from tag where name in("a","b"))
-        //GROUP BY board_id HAVING COUNT(tag_id) = {입력받은 태그 사이즈};  ->  태그 개수 확인
-
-        // 태그이름 리스트 -> ID변환
         if (tagNames != null && !tagNames.isEmpty()) {
-            // 태그 이름을 기반으로 태그 ID 조회
             List<Long> tagIds = queryFactory
                     .select(tag.id)
                     .from(tag)
                     .where(tag.name.in(tagNames))
                     .fetch();
 
-
-            // 태그가 모두 포함된 게시글 필터링
             builder.and(board.id.in(
                     queryFactory
                             .select(tagBoard.board.id)
@@ -238,17 +214,13 @@ public class BoardService {
             ));
         }
 
-        // 검색어(게시글 내용) 조건 : 해당 내용이 포함된 게시글(대소문자 구분X)
-        // select board_id from board
-        // where Lower(board.content) like concat('%',LOWER(:contents,'%')
         if (contents != null && !contents.isEmpty()) {
-            builder.and(board.content.containsIgnoreCase(contents)); // = Like %LOWER{contents}%
+            builder.and(board.content.containsIgnoreCase(contents));
         }
 
         return builder;
     }
 
-    // 빌더 적용 패치함수
     private PageImpl<BoardResponseDto> fetchBoards(Pageable pageable, BooleanBuilder builder, List<String> tagNames) {
         QBoard board = QBoard.board;
         QTagBoard tagBoard = QTagBoard.tagBoard;
@@ -284,7 +256,6 @@ public class BoardService {
         return new PageImpl<>(content, pageable, total);
     }
 
-    // 권한 검사
     private Board isAuthorized(Long id, String memberId) {
         Board board = getBoardById(id);
         if (!board.getMember().getId().equals(memberId)) {
