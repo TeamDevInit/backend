@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/board")
+@RequestMapping("/api/boards")
 @RequiredArgsConstructor
 
 public class BoardController {
@@ -72,14 +72,14 @@ public class BoardController {
 
 
     @PatchMapping("/{id}")
-    public ResponseEntity<BoardDetailResponseDto> updateBoard(@AuthenticationPrincipal CustomOAuth2User userInfo,
+    public ResponseEntity<Void> updateBoard(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                               @RequestBody BoardRequestDto boardRequestDto,
                                                               @PathVariable("id") Long id){
 
         Member member = getMemberFromUserInfo(userInfo);
 
         boardService.updateBoard(member.getId(),id, boardRequestDto);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
     }
 
@@ -89,7 +89,7 @@ public class BoardController {
         Member member = getMemberFromUserInfo(userInfo);
 
         boardService.deleteBoard(id,member.getId());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
     }
 

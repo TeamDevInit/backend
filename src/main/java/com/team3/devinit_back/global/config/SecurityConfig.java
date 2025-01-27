@@ -36,7 +36,6 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        //CORS 설정
         http
                 .cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
 
@@ -57,23 +56,20 @@ public class SecurityConfig {
                         return configuration;
                     }
                 }));
-        //disable 설정
-        //csrf disable
+
         http
                 .csrf((auth) -> auth.disable());
-        //From 로그인 방식 disable
+
         http
                 .formLogin((auth) -> auth.disable());
-        //HTTP Basic 인증 방식 disable
+
         http
                 .httpBasic((auth) -> auth.disable());
 
-        //JWTFilter 추가
         http
                 .addFilterBefore(new JWTFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRepository), LogoutFilter.class);;
 
-        //oauth2
         http
                 .oauth2Login((oauth2) -> oauth2
                         .defaultSuccessUrl("/",true)
@@ -82,13 +78,11 @@ public class SecurityConfig {
                         .successHandler(customSuccessHandler)
                         .failureHandler(customFailureHandler));
 
-        //경로별 인가 작업
         http
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/**","/ws-stomp/**", "/chat/**", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
                         .anyRequest().authenticated());
 
-        //세션 설정 : STATELESS
         http
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));

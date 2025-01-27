@@ -40,7 +40,7 @@ public class ExperienceController {
                                                                   @Valid @RequestBody List<ExperienceRequestDto> experienceRequestDtos){
         Resume resume = getResumeFromUserInfo(userInfo);
         experienceService.updateExperiences(resume, experienceRequestDtos);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @DeleteMapping("/{id}")
@@ -48,7 +48,7 @@ public class ExperienceController {
                                                   @PathVariable("id") Long id){
         Resume resume = getResumeFromUserInfo(userInfo);
         experienceService.deleteExperience(resume,id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     private Resume getResumeFromUserInfo(CustomOAuth2User userInfo){

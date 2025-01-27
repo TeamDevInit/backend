@@ -24,7 +24,6 @@ public class CommentService {
     private final BoardRepository boardRepository;
     private final CommentRepository commentRepository;
 
-    //댓글 생성
     @Transactional
     public CommentResponseDto createComment(Member member, CommentRequestDto commentRequestDto){
         Board board = getBoardById(commentRequestDto.getBoardId());
@@ -49,7 +48,6 @@ public class CommentService {
 
     }
 
-    //댓글 수정
     @Transactional
     public void updateComment(String memberId, CommentRequestDto commentRequestDto, Long commentId){
         Comment comment = isAuthorizedForComment(commentId, memberId);
@@ -57,7 +55,6 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
-    //댓글 삭제
     @Transactional
     public void deleteComment(String memberId, CommentRequestDto commentRequestDto, Long commentId) {
         Comment comment = isAuthorizedForComment(commentId, memberId, commentRequestDto.getBoardId());
@@ -73,7 +70,6 @@ public class CommentService {
         boardRepository.save(board);
     }
 
-    //대댓글 조회
     public List<CommentResponseDto> getRecommentById(Long id){
         Comment parentComment  = getCommentById(id);
         return commentRepository.findAllByParentComment(parentComment).stream()
@@ -81,27 +77,21 @@ public class CommentService {
                 .toList();
     }
 
-    //--헬퍼 메소드--//
-
-    // boardId -> 게시글객체 조회
     private Board getBoardById(Long id) {
         return boardRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
     }
 
-    // commentId -> 댓글객체 조회
     private Comment getCommentById(Long id){
         return commentRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
     }
 
-    //게시글 댓글수 조회
     public  int getCommentCount(Long id){
         Board board = getBoardById(id);
         return commentRepository.countByBoard(board);
     }
 
-    // 권한 검사(댓글 수정)
     private Comment isAuthorizedForComment(Long commentId, String memberId){
         Comment comment = getCommentById(commentId);
         if ( !comment.getMember().getId().equals(memberId)) {
@@ -110,7 +100,6 @@ public class CommentService {
         return comment;
     }
 
-    // 권한 검사(댓글 삭제)
     private Comment isAuthorizedForComment(Long commentId, String memberId, Long boardId){
         Board board = getBoardById(boardId);
         Comment comment = getCommentById(commentId);

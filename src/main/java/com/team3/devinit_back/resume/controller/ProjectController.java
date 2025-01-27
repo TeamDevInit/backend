@@ -40,7 +40,7 @@ public class ProjectController {
                                                             @Valid @RequestBody List<ProjectRequestDto> projectRequestDtos){
         Resume resume = getResumeFromUserInfo(userInfo);
         projectService.updateProjects(resume, projectRequestDtos);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @DeleteMapping("/{id}")
@@ -48,7 +48,7 @@ public class ProjectController {
                                                @PathVariable("id") Long id){
         Resume resume = getResumeFromUserInfo(userInfo);
         projectService.deleteProject(resume,id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     private Resume getResumeFromUserInfo(CustomOAuth2User userInfo){
