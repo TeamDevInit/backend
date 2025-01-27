@@ -2,6 +2,8 @@ package com.team3.devinit_back.global.amazonS3.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.team3.devinit_back.global.exception.CustomException;
+import com.team3.devinit_back.global.exception.ErrorCode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,32 +33,38 @@ public class S3Service {
     }
 
     // 파일 업로드
-    public String uploadFile(MultipartFile file) throws IOException {
-        String fileName = generateFileName(file.getOriginalFilename());
-        ObjectMetadata metadata = new ObjectMetadata();
+    public String uploadFile(MultipartFile file) {
+        try {
+            String fileName = generateFileName(file.getOriginalFilename());
+            ObjectMetadata metadata = new ObjectMetadata();
 
-        metadata.setContentLength(file.getSize());
-        metadata.setContentType(file.getContentType());
+            metadata.setContentLength(file.getSize());
+            metadata.setContentType(file.getContentType());
 
-        amazonS3.putObject(bucketName, fileName, file.getInputStream(), metadata);
+            amazonS3.putObject(bucketName, fileName, file.getInputStream(), metadata);
 
-        System.out.println("Uploaded file: " + fileName);
-        return amazonS3.getUrl(bucketName, fileName).toString();
+            return amazonS3.getUrl(bucketName, fileName).toString();
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.IMAGE_UPLOAD_FAILED);
+        }
     }
 
     //다중 파일 업로드
-    public List<String> uploadFiles(List<MultipartFile> files) throws IOException {
-        List<String> fileUrls = new ArrayList<>();
-        for (MultipartFile file : files) {
-            fileUrls.add(uploadFile(file));
+    public List<String> uploadFiles(List<MultipartFile> files) {
+        try {
+            List<String> fileUrls = new ArrayList<>();
+            for (MultipartFile file : files) {
+                fileUrls.add(uploadFile(file));
+            }
+            return fileUrls;
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.IMAGE_UPLOAD_FAILED);
         }
-        return fileUrls;
     }
 
     // 파일 삭제
     public void deleteFile(String fileName) {
         amazonS3.deleteObject(bucketName, fileName);
-        System.out.println("Deleting file: " + fileName);
     }
 
     private String generateFileName(String originalFilename) {

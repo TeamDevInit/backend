@@ -5,6 +5,8 @@ import com.team3.devinit_back.board.repository.BoardRepository;
 import com.team3.devinit_back.follow.dto.FollowCountResponse;
 import com.team3.devinit_back.follow.service.FollowService;
 import com.team3.devinit_back.global.amazonS3.service.S3Service;
+import com.team3.devinit_back.global.exception.CustomException;
+import com.team3.devinit_back.global.exception.ErrorCode;
 import com.team3.devinit_back.member.entity.Member;
 import com.team3.devinit_back.profile.dto.BoardSummaryResponse;
 import com.team3.devinit_back.profile.dto.ProfileDetailResponse;
@@ -13,7 +15,7 @@ import com.team3.devinit_back.profile.dto.ProfileResponse;
 import com.team3.devinit_back.profile.entity.Profile;
 import com.team3.devinit_back.profile.repository.ProfileRepository;
 import com.team3.devinit_back.resume.repository.ResumeRepository;
-import jakarta.persistence.EntityNotFoundException;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -23,8 +25,6 @@ import org.springframework.expression.AccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,7 +41,7 @@ public class ProfileService {
     @Transactional(readOnly = true)
     public ProfileDetailResponse getMyProfile(String memberId) {
         Profile profile = profileRepository.findByMemberId(memberId)
-            .orElseThrow(() -> new EntityNotFoundException("로그인된 사용자의 프로필을 찾을 수 없습니다. ID: " + memberId));
+            .orElseThrow(() -> new CustomException(ErrorCode.INVALID_USER));
 
         FollowCountResponse followCounts = followService.getFollowCounts(memberId);
         boolean isFollowing = false;
@@ -89,8 +89,7 @@ public class ProfileService {
     }
 
     @Transactional
-    public void updateProfile(String memberId, ProfileUpdateRequest request, MultipartFile newProfileImage)
-        throws AccessException {
+    public void updateProfile(String memberId, ProfileUpdateRequest request, MultipartFile newProfileImage) {
         Profile profile = isAuthorized(memberId);
 
         String newProfileImageUrl = handleProfileImage(profile.getMember(), newProfileImage);
@@ -110,8 +109,8 @@ public class ProfileService {
         if (newProfileImage != null) {
             try {
                 return s3Service.uploadFile(newProfileImage);
-            } catch (IOException e) {
-                throw new RuntimeException("프로필 이미지 업로드 실패: " + e.getMessage(), e);
+            } catch (Exception e) {
+                throw new CustomException(ErrorCode.IMAGE_UPLOAD_FAILED);
             }
         }
 
@@ -121,12 +120,12 @@ public class ProfileService {
 
     private Profile getProfileById(String profileId) {
         return profileRepository.findById(profileId)
-            .orElseThrow(() -> new EntityNotFoundException("ID에 해당하는 프로필을 찾을 수 없습니다." + profileId));
+            .orElseThrow(() -> new CustomException(ErrorCode.PROFILE_NOT_FOUND));
     }
 
-    private Profile isAuthorized(String memberId) throws AccessException {
+    private Profile isAuthorized(String memberId) {
         return profileRepository.findByMemberId(memberId)
-            .orElseThrow(() -> new AccessException("사용자의 프로필에 대한 권한이 없습니다. ID: " + memberId));
+            .orElseThrow(() -> new CustomException(ErrorCode.ACCESS_DENIED));
     }
 
     private String extractFileNameFromUrl(String fileUrl) {

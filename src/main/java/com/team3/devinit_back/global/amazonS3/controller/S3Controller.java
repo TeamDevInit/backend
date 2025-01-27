@@ -23,34 +23,19 @@ public class S3Controller {
     // 단일 파일 업로드
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
-        try {
-            String fileUrl = s3Service.uploadFile(file);
-            return ResponseEntity.ok(fileUrl);
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("파일 업로드 실패: " + e.getMessage());
-        }
+        String fileUrl = s3Service.uploadFile(file);
+        return ResponseEntity.ok(fileUrl);
     }
 
     @PostMapping("/upload-multiple")
     public ResponseEntity<List<String>> uploadFiles(@RequestParam("files") List<MultipartFile> files) {
-        try {
-            List<String> fileUrls = s3Service.uploadFiles(files);
-            return ResponseEntity.ok(fileUrls);
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Collections.emptyList());
-        }
+        List<String> fileUrls = s3Service.uploadFiles(files);
+        return ResponseEntity.ok(fileUrls);
     }
 
     @DeleteMapping
     public ResponseEntity<String> deleteFile(@RequestParam("fileName") String fileName) {
-        try {
-            s3Service.deleteFile(fileName);
-            return ResponseEntity.ok("파일 삭제 성공");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("파일 삭제 실패: " + e.getMessage());
-        }
+        s3Service.deleteFile(fileName);
+        return ResponseEntity.ok("파일 삭제 성공");
     }
 }
