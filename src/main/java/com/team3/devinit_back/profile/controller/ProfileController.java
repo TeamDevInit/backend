@@ -31,7 +31,10 @@ public class ProfileController {
     private final ProfileService profileService;
     private final MemberService memberService;
 
-    @Operation(summary = "내 프로필 상세 조회")
+    @Operation(
+        summary = "내 프로필 상세 조회",
+        description = "로그인한 사용자의 프로필 정보를 상세히 조회합니다."
+    )
     @GetMapping("/me")
     public ResponseEntity<ProfileDetailResponse> getMyProfile(@AuthenticationPrincipal CustomOAuth2User userInfo) {
         Member member = getMemberFromUserInfo(userInfo);
@@ -39,16 +42,11 @@ public class ProfileController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "사용자의 작성 게시물 리스트 조회")
-    @GetMapping("/boards/{memberId}")
-    public ResponseEntity<Page<BoardSummaryResponse>> getBoardsByMemberId(
-        @PathVariable("memberId") String memberId,
-        @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<BoardSummaryResponse> response = profileService.getBoardsByMemberId(memberId, pageable);
-        return ResponseEntity.ok(response);
-    }
-
-    @Operation(summary = "상대 프로필 상세 조회")
+    @Operation(
+        summary = "상대 프로필 상세 조회",
+        description = "특정 사용자의 프로필 정보를 상세히 조회합니다. "
+                    + "로그인한 사용자는 상대 사용자를 팔로우 중인지 여부를 확인할 수 있습니다."
+    )
     @GetMapping("/{profileId}")
     public ResponseEntity<ProfileDetailResponse> getProfile(
         @PathVariable("profileId") String profileId,
@@ -58,7 +56,23 @@ public class ProfileController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "프로필 랜덤 조회")
+    @Operation(
+        summary = "사용자의 작성 게시물 리스트 조회",
+        description = "특정 사용자가 작성한 게시물의 목록을 페이지네이션으로 조회합니다. "
+                    + "정렬 기준은 기본적으로 작성일(desc)입니다."
+    )
+    @GetMapping("/boards/{memberId}")
+    public ResponseEntity<Page<BoardSummaryResponse>> getBoardsByMemberId(
+        @PathVariable("memberId") String memberId,
+        @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<BoardSummaryResponse> response = profileService.getBoardsByMemberId(memberId, pageable);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+        summary = "프로필 랜덤 조회",
+        description = "회원들 중 랜덤하게 10개의 프로필 정보를 조회합니다."
+    )
     @GetMapping("/random")
     public ResponseEntity<List<ProfileResponse>> getRandomProfiles() {
         List<ProfileResponse> randomProfiles = profileService.getRandomProfiles();
@@ -67,6 +81,8 @@ public class ProfileController {
 
     @Operation(
         summary = "프로필 정보 수정",
+        description = "로그인한 사용자가 자신의 프로필 정보를 수정합니다. "
+                    + "닉네임, 한 줄 소개, 프로필 이미지를 업데이트할 수 있습니다.",
         security = @SecurityRequirement(name = "bearerAuth")
     )
     @PatchMapping(consumes = {MediaType.APPLICATION_JSON_VALUE,
