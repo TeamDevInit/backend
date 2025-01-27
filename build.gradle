@@ -80,6 +80,9 @@ dependencies {
 
 	//elasticsearch
 	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+
+	//validation
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 }
 
 def querydslSrcDir = 'src/main/generated'
@@ -89,7 +92,6 @@ clean {
 tasks.withType(JavaCompile) {
 	options.generatedSourceOutputDirectory = file(querydslSrcDir)
 }
-
 
 tasks.named('test') {
 	useJUnitPlatform()

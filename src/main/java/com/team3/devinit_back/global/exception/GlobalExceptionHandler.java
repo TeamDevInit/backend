@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -38,4 +39,18 @@ public class GlobalExceptionHandler {
                 .status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
                 .body(errorDetails);
     }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        Map<String, String> errorDetails = new HashMap<>();
+        errorDetails.put("error", "Validation error");
+        errorDetails.put("message", ex.getFieldError().getDefaultMessage());
+
+        log.error("validation Exception: ", ex);
+        return ResponseEntity
+                .status(ErrorCode.INVALID_ERROR.getStatus())
+                .body(errorDetails);
+    }
+
+
 }
