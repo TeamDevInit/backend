@@ -32,8 +32,6 @@ dependencies {
 
 	// WebSocket
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
-	implementation 'org.webjars:sockjs-client'
-	implementation 'org.webjars:stomp-websocket'
 
 	//lombok
 	compileOnly 'org.projectlombok:lombok'
