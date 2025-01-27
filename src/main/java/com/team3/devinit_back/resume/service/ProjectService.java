@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,20 +22,24 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
 
     @Transactional
-    public ProjectResponseDto createProject(Resume resume, ProjectRequestDto projectRequestDto) {
+    public List<ProjectResponseDto> createProjects(Resume resume, List<ProjectRequestDto> projectRequestDtos) {
 
-        Project project = Project.builder()
-                .resume(resume)
-                .projectName(projectRequestDto.getProjectName())
-                .description(projectRequestDto.getDescription())
-                .organization(projectRequestDto.getOrganization())
-                .endDate(projectRequestDto.getEndDate())
-                .startDate(projectRequestDto.getStartDate())
-                .build();
+        List<Project> projects = projectRequestDtos.stream()
+                .map(projectRequestDto -> Project.builder()
+                    .resume(resume)
+                    .projectName(projectRequestDto.getProjectName())
+                    .description(projectRequestDto.getDescription())
+                    .organization(projectRequestDto.getOrganization())
+                    .endDate(projectRequestDto.getEndDate())
+                    .startDate(projectRequestDto.getStartDate())
+                    .build())
+                .toList();
 
-        Project savedProject = projectRepository.save(project);
+        List<Project> savedProjects = projectRepository.saveAll(projects);
 
-        return ProjectResponseDto.fromEntity(savedProject);
+        return savedProjects.stream()
+                .map(ProjectResponseDto::fromEntity)
+                .toList();
     }
 
     public List<ProjectResponseDto> getAllProject(Resume resume){
@@ -43,23 +48,29 @@ public class ProjectService {
                 .toList();
     }
 
-    public void updateProject(Resume resume, Long id, ProjectRequestDto projectRequestDto) {
+    @Transactional
+    public void updateProjects(Resume resume, List<ProjectRequestDto> projectRequestDtos) {
 
-        Project project = isAuthorized(id, resume.getMember());
-        project.setProjectName(projectRequestDto.getProjectName());
-        project.setDescription(projectRequestDto.getDescription());
-        project.setOrganization(projectRequestDto.getOrganization());
-        project.setStartDate(projectRequestDto.getStartDate());
-        project.setStartDate(projectRequestDto.getEndDate());
+        List<Project> updatedProjects = projectRequestDtos.stream()
+                .map(projectRequestDto -> {
+                    Long id = projectRequestDto.getId();
+                    Project project = isAuthorized(id, resume.getMember());
+                    project.setProjectName(projectRequestDto.getProjectName());
+                    project.setDescription(projectRequestDto.getDescription());
+                    project.setOrganization(projectRequestDto.getOrganization());
+                    project.setStartDate(projectRequestDto.getStartDate());
+                    project.setStartDate(projectRequestDto.getEndDate());
+                    return project;
+                })
+                .toList();
 
-        projectRepository.save(project);
+        projectRepository.saveAll(updatedProjects);
     }
 
     @Transactional
     public void deleteProject(Resume resume, Long id) {
         Project project = isAuthorized(id, resume.getMember());
         projectRepository.delete(project);
-
     }
 
     private Project getProjectById(Long id) {

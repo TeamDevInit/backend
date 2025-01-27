@@ -16,8 +16,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/api/educations")
+@RequestMapping("/api/resume/educations")
 @RequiredArgsConstructor
 public class EducationController {
     private final ResumeService resumeService;
@@ -25,20 +27,19 @@ public class EducationController {
     private final EducationService educationService;
 
     @PostMapping
-    public ResponseEntity<EducationResponseDto> createEducation(@AuthenticationPrincipal CustomOAuth2User userInfo,
-                                                                 @Valid @RequestBody EducationRequestDto educationRequestDto){
+    public ResponseEntity<List<EducationResponseDto>>createEducations(@AuthenticationPrincipal CustomOAuth2User userInfo,
+                                                                      @Valid @RequestBody List<EducationRequestDto> educationRequestDtos){
         Resume resume = getResumeFromUserInfo(userInfo);
-        EducationResponseDto educationResponseDto = educationService.createEducation(resume, educationRequestDto);
+        List<EducationResponseDto> educationResponseDtos = educationService.createEducations(resume, educationRequestDtos);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(educationResponseDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(educationResponseDtos);
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<EducationResponseDto> updateProject(@AuthenticationPrincipal CustomOAuth2User userInfo,
-                                                              @Valid @RequestBody EducationRequestDto educationRequestDto,
-                                                              @PathVariable("id") Long id){
+    @PatchMapping
+    public ResponseEntity<EducationResponseDto> updateEducations(@AuthenticationPrincipal CustomOAuth2User userInfo,
+                                                                 @Valid @RequestBody List<EducationRequestDto> educationRequestDtos){
         Resume resume = getResumeFromUserInfo(userInfo);
-        educationService.updateEducation(resume, id, educationRequestDto);
+        educationService.updateEducations(resume, educationRequestDtos);
         return ResponseEntity.ok().build();
     }
 
