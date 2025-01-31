@@ -3,6 +3,8 @@ package com.team3.devinit_back.resume.controller;
 import com.team3.devinit_back.member.dto.CustomOAuth2User;
 import com.team3.devinit_back.member.entity.Member;
 import com.team3.devinit_back.member.service.MemberService;
+import com.team3.devinit_back.resume.dto.ActivityRequestDto;
+import com.team3.devinit_back.resume.dto.ActivityResponseDto;
 import com.team3.devinit_back.resume.dto.ProjectRequestDto;
 import com.team3.devinit_back.resume.dto.ProjectResponseDto;
 import com.team3.devinit_back.resume.entity.Resume;
@@ -41,6 +43,15 @@ public class ProjectController {
         Resume resume = getResumeFromUserInfo(userInfo);
         projectService.updateProjects(resume, projectRequestDtos);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PutMapping
+    public ResponseEntity<List<ProjectResponseDto>> saveOrUpdateProjects(@AuthenticationPrincipal CustomOAuth2User userInfo,
+                                                                            @Valid @RequestBody List<ProjectRequestDto> projectRequestDtos){
+        Resume resume = getResumeFromUserInfo(userInfo);
+        List<ProjectResponseDto> projectResponseDtos =  projectService.saveOrUpdateProjects(resume,projectRequestDtos);
+
+        return ResponseEntity.ok(projectResponseDtos);
     }
 
     @DeleteMapping("/{id}")

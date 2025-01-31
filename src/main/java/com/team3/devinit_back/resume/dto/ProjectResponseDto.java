@@ -4,11 +4,13 @@ import com.team3.devinit_back.resume.entity.Project;
 import com.team3.devinit_back.resume.entity.Resume;
 import lombok.Data;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
 @Getter
+@RequiredArgsConstructor
 public class ProjectResponseDto {
 
     private Long id;
@@ -22,6 +24,7 @@ public class ProjectResponseDto {
     private LocalDateTime updatedAt;
 
     public ProjectResponseDto(Project project){
+        this.id = project.getId();
         this.projectName = project.getProjectName();
         this.description = project.getDescription();
         this.organization = project.getOrganization();

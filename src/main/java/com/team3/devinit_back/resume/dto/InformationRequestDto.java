@@ -10,8 +10,8 @@ public class InformationRequestDto {
     private String name;
     @NotBlank(message = "포지션을 입력해주세요")
     private String position;
+    @NotBlank(message = "경력기간을 입력해주세요")
+    private String employmentPeriod;
     private String summary;
     private String portfolio;
-    private Resume resume;
-    private String resumeId;
 }
