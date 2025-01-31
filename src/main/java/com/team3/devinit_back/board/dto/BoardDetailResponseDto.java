@@ -38,6 +38,7 @@ public class BoardDetailResponseDto {
         this.title = board.getTitle();
         this.content = board.getContent();
         this.upCnt = board.getUpCnt();
+        this.viewCnt = board.getViewCnt();
 
         Member member = board.getMember();
         if(member!= null){
