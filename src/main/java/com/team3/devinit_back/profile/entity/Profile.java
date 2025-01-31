@@ -3,10 +3,7 @@ package com.team3.devinit_back.profile.entity;
 import com.team3.devinit_back.global.common.BaseEntity;
 import com.team3.devinit_back.member.entity.Member;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
@@ -45,6 +42,25 @@ public class Profile extends BaseEntity {
 
     public void update(String about) {
         this.about = about;
+    }
+
+    public void incrementFollowerCount() {
+        this.followerCount++;
+    }
+    public void decrementFollowerCount() {
+        if (this.followerCount > 0) {
+            this.followerCount--;
+        }
+    }
+
+    public void incrementFollowingCount() {
+        this.followingCount++;
+    }
+
+    public void decrementFollowingCount() {
+        if (this.followingCount > 0) {
+            this.followingCount--;
+        }
     }
 
     public void incrementBoardCount() {
