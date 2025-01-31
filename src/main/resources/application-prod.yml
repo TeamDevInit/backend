@@ -13,3 +13,8 @@ spring:
       ddl-auto: update
     properties:
       hibernate.dialect: org.hibernate.dialect.MySQL8Dialect
+
+  data:
+    redis:
+      host: ${REDIS_HOST_PROD}
+      port: ${REDIS_PORT_PROD}
