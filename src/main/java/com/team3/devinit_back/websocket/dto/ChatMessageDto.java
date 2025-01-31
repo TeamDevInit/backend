@@ -1,10 +1,12 @@
 package com.team3.devinit_back.websocket.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ChatMessageDto {
     public enum MessageType {
         ENTER, TALK, EXIT // 메시지 타입: 입장, 채팅, 퇴장

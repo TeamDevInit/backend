@@ -2,10 +2,12 @@ package com.team3.devinit_back.websocket.dto;
 
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 @Getter
-public class ChatRoomDto {
+public class ChatRoomDto implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String roomId;
     private String name; // 채팅방 이름
 
