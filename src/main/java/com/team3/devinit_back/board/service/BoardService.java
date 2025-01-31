@@ -11,6 +11,7 @@ import com.team3.devinit_back.board.repository.BoardRepository;
 import com.team3.devinit_back.board.repository.CategoryRepository;
 import com.team3.devinit_back.board.repository.RecommendationRepository;
 import com.team3.devinit_back.comment.repository.CommentRepository;
+import com.team3.devinit_back.follow.repository.FollowRepository;
 import com.team3.devinit_back.global.exception.CustomException;
 import com.team3.devinit_back.global.exception.ErrorCode;
 import com.team3.devinit_back.member.entity.Member;
@@ -38,6 +39,7 @@ public class BoardService {
     private final CategoryRepository categoryRepository;
     private final RecommendationRepository recommendationRepository;
     private final CommentRepository commentRepository;
+    private final FollowRepository followRepository;
     private final ProfileRepository profileRepository;
     private final TagService tagService;
     private final JPAQueryFactory queryFactory;
@@ -96,6 +98,8 @@ public class BoardService {
 
     public BoardDetailResponseDto getBoardDetail(Long id){
         Board board = getBoardByIdWithComment(id);
+        board.setViewCnt(board.getViewCnt() + 1);
+        boardRepository.save(board);
         return BoardDetailResponseDto.fromEntity(board);
     }
 

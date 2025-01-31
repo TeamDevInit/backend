@@ -3,9 +3,8 @@ package com.team3.devinit_back.resume.service;
 import com.team3.devinit_back.global.exception.CustomException;
 import com.team3.devinit_back.global.exception.ErrorCode;
 import com.team3.devinit_back.member.entity.Member;
-import com.team3.devinit_back.resume.dto.ExperienceRequestDto;
-import com.team3.devinit_back.resume.dto.ExperienceResponseDto;
-import com.team3.devinit_back.resume.dto.ProjectRequestDto;
+import com.team3.devinit_back.resume.dto.*;
+import com.team3.devinit_back.resume.entity.Activity;
 import com.team3.devinit_back.resume.entity.Experience;
 import com.team3.devinit_back.resume.entity.Project;
 import com.team3.devinit_back.resume.entity.Resume;
@@ -70,7 +69,45 @@ public class ExperienceService {
 
         experienceRepository.saveAll(updatedExperiences);
     }
+    @Transactional
+    public List<ExperienceResponseDto> saveOrUpdateExperiences(Resume resume, List<ExperienceRequestDto> experienceRequestDtos) {
+        List<Experience> experiences = experienceRequestDtos.stream()
+                .map(dto -> {
+                    if (dto.getId() == null) {
+                        return Experience.builder()
+                                .resume(resume)
+                                .companyName(dto.getCompanyName())
+                                .department(dto.getDepartment())
+                                .description(dto.getDescription())
+                                .employmentType(dto.getEmploymentType())
+                                .position(dto.getPosition())
+                                .startDate(dto.getStartDate())
+                                .endDate(dto.getEndDate())
+                                .build();
+                    } else {
+                        return experienceRepository.findById(dto.getId())
+                                .map(experience -> {
+                                    experience.setCompanyName(dto.getCompanyName());
+                                    experience.setDepartment(dto.getDepartment());
+                                    experience.setDescription(dto.getDescription());
+                                    experience.setEmploymentType(dto.getEmploymentType());
+                                    experience.setPosition(dto.getPosition());
+                                    experience.setStartDate(dto.getStartDate());
+                                    experience.setEndDate(dto.getEndDate());
+                                    return experience;
+                                }).orElseThrow(() -> new CustomException(ErrorCode.EXPERIENCE_NOT_FOUND));
+                    }
+                })
+                .toList();
 
+        // DB에 저장
+        List<Experience> savedExperiences = experienceRepository.saveAll(experiences);
+
+        // DTO 변환 후 반환
+        return savedExperiences.stream()
+                .map(ExperienceResponseDto::fromEntity)
+                .toList();
+    }
     @Transactional
     public void deleteExperience(Resume resume, Long id){
         Experience experience = isAuthorized(id, resume.getMember());

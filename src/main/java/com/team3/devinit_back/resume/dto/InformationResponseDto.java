@@ -5,11 +5,13 @@ import com.team3.devinit_back.resume.entity.Resume;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.Data;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
 @Getter
+@RequiredArgsConstructor
 public class InformationResponseDto {
     private Long id;
     private String name;
@@ -21,6 +23,7 @@ public class InformationResponseDto {
     private LocalDateTime updatedAt;
 
     public InformationResponseDto(Information information){
+        this.id = information.getId();
         this.name = information.getName();
         this.position = information.getPosition();
         this.portfolio = information.getPortfolio();
