@@ -4,11 +4,13 @@ import com.team3.devinit_back.resume.entity.Education;
 import com.team3.devinit_back.resume.entity.Resume;
 import lombok.Data;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
 @Getter
+@RequiredArgsConstructor
 public class EducationResponseDto {
 
     private Long id;
@@ -23,6 +25,7 @@ public class EducationResponseDto {
     private LocalDateTime updatedAt;
 
     public EducationResponseDto(Education education){
+        this.id = education.getId();
         this.organization = education.getOrganization();
         this.degree = education.getDegree();
         this.major = education.getMajor();

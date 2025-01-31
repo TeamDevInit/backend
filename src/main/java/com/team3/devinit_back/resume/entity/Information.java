@@ -29,17 +29,21 @@ public class Information extends BaseEntity {
     @Column(name = "portfolio", length = 2000)
     private String portfolio;
 
+    @Column(name = "employment_period")
+    private String employmentPeriod;
+
     @OneToOne
     @JoinColumn(name = "resume_id", nullable = false)
     private Resume resume;
 
     @Builder
-    public Information(Long id, String name, String position, String summary, String portfolio, Resume resume) {
+    public Information(Long id, String name, String position, String summary, String portfolio,String employmentPeriod, Resume resume) {
         this.id = id;
         this.name = name;
         this.position = position;
         this.summary = summary;
         this.portfolio = portfolio;
+        this.employmentPeriod = employmentPeriod;
         this.resume = resume;
     }
 }
