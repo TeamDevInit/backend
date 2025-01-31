@@ -73,14 +73,13 @@ public class BoardController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<Void> updateBoard(@AuthenticationPrincipal CustomOAuth2User userInfo,
-                                                              @RequestBody BoardRequestDto boardRequestDto,
-                                                              @PathVariable("id") Long id){
+                                            @RequestBody BoardRequestDto boardRequestDto,
+                                            @PathVariable("id") Long id){
 
         Member member = getMemberFromUserInfo(userInfo);
 
         boardService.updateBoard(member.getId(),id, boardRequestDto);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-
     }
 
     @DeleteMapping("/{id}")

@@ -4,6 +4,8 @@ package com.team3.devinit_back.resume.controller;
 import com.team3.devinit_back.member.dto.CustomOAuth2User;
 import com.team3.devinit_back.member.entity.Member;
 import com.team3.devinit_back.member.service.MemberService;
+import com.team3.devinit_back.resume.dto.ActivityRequestDto;
+import com.team3.devinit_back.resume.dto.ActivityResponseDto;
 import com.team3.devinit_back.resume.dto.LanguageRequestDto;
 import com.team3.devinit_back.resume.dto.LanguageResponseDto;
 import com.team3.devinit_back.resume.entity.Resume;
@@ -41,6 +43,15 @@ public class LanguageController {
         Resume resume = getResumeFromUserInfo(userInfo);
         languageService.updateLanguages(resume, languageRequestDtos);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PutMapping
+    public ResponseEntity<List<LanguageResponseDto>> saveOrUpdateLanguages(@AuthenticationPrincipal CustomOAuth2User userInfo,
+                                                                            @Valid @RequestBody List<LanguageRequestDto> languageRequestDtos){
+        Resume resume = getResumeFromUserInfo(userInfo);
+        List<LanguageResponseDto> languageResponseDtos =  languageService.saveOrUpdateLanguages(resume,languageRequestDtos);
+
+        return ResponseEntity.ok(languageResponseDtos);
     }
 
     @DeleteMapping("/{id}")

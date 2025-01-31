@@ -27,7 +27,7 @@ public class ActivityController {
 
     @PostMapping
     public ResponseEntity<List<ActivityResponseDto>> createActivities(@AuthenticationPrincipal CustomOAuth2User userInfo,
-                                                                    @Valid @RequestBody List<ActivityRequestDto> activityRequestDtos){
+                                                                      @Valid @RequestBody List<ActivityRequestDto> activityRequestDtos){
         Resume resume = getResumeFromUserInfo(userInfo);
         List<ActivityResponseDto> activityResponseDtos = activityService.createActivities(resume, activityRequestDtos);
 
@@ -36,10 +36,18 @@ public class ActivityController {
 
     @PatchMapping
     public ResponseEntity<ActivityResponseDto> updateActivities(@AuthenticationPrincipal CustomOAuth2User userInfo,
-                                                              @Valid @RequestBody List<ActivityRequestDto> activityRequestDtos){
+                                                                @Valid @RequestBody List<ActivityRequestDto> activityRequestDtos){
         Resume resume = getResumeFromUserInfo(userInfo);
         activityService.updateActivities(resume, activityRequestDtos);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+    @PutMapping
+    public ResponseEntity<List<ActivityResponseDto>> saveOrUpdateActivities(@AuthenticationPrincipal CustomOAuth2User userInfo,
+                                                                            @Valid @RequestBody List<ActivityRequestDto> activityRequestDtos){
+        Resume resume = getResumeFromUserInfo(userInfo);
+        List<ActivityResponseDto> activityResponseDtos =  activityService.saveOrUpdateActivities(resume,activityRequestDtos);
+
+        return ResponseEntity.ok(activityResponseDtos);
     }
 
     @DeleteMapping("/{id}")

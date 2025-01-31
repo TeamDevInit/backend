@@ -1,6 +1,6 @@
 package com.team3.devinit_back.resume.service;
 
-import com.team3.devinit_back.board.entity.Board;
+
 import com.team3.devinit_back.global.exception.CustomException;
 import com.team3.devinit_back.global.exception.ErrorCode;
 import com.team3.devinit_back.member.entity.Member;
@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -65,6 +64,42 @@ public class ProjectService {
                 .toList();
 
         projectRepository.saveAll(updatedProjects);
+    }
+
+    @Transactional
+    public List<ProjectResponseDto> saveOrUpdateProjects(Resume resume,  List<ProjectRequestDto> projectRequestDtos) {
+        List<Project> projects = projectRequestDtos.stream()
+                .map(dto -> {
+                    if (dto.getId() == null) {
+                        return Project.builder()
+                                .resume(resume)
+                                .projectName(dto.getProjectName())
+                                .description(dto.getDescription())
+                                .organization(dto.getOrganization())
+                                .endDate(dto.getEndDate())
+                                .startDate(dto.getStartDate())
+                                .build();
+                    } else {
+                        return projectRepository.findById(dto.getId())
+                                .map(project -> {
+                                    project.setProjectName(dto.getProjectName());
+                                    project.setDescription(dto.getDescription());
+                                    project.setOrganization(dto.getOrganization());
+                                    project.setStartDate(dto.getStartDate());
+                                    project.setStartDate(dto.getEndDate());
+                                    return project;
+                                }).orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NOT_FOUND));
+                    }
+                })
+                .toList();
+
+        // DB에 저장
+        List<Project> savedProjects = projectRepository.saveAll(projects);
+
+        // DTO 변환 후 반환
+        return savedProjects.stream()
+                .map(ProjectResponseDto::fromEntity)
+                .toList();
     }
 
     @Transactional

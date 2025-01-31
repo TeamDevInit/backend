@@ -3,8 +3,11 @@ package com.team3.devinit_back.resume.service;
 import com.team3.devinit_back.global.exception.CustomException;
 import com.team3.devinit_back.global.exception.ErrorCode;
 import com.team3.devinit_back.member.entity.Member;
+import com.team3.devinit_back.resume.dto.ActivityRequestDto;
+import com.team3.devinit_back.resume.dto.ActivityResponseDto;
 import com.team3.devinit_back.resume.dto.LanguageRequestDto;
 import com.team3.devinit_back.resume.dto.LanguageResponseDto;
+import com.team3.devinit_back.resume.entity.Activity;
 import com.team3.devinit_back.resume.entity.Language;
 import com.team3.devinit_back.resume.entity.Resume;
 import com.team3.devinit_back.resume.repository.LanguageRepository;
@@ -58,6 +61,34 @@ public class LanguageService {
                 .toList();
 
         languageRepository.saveAll(updatedLanguages);
+    }
+
+    @Transactional
+    public List<LanguageResponseDto> saveOrUpdateLanguages(Resume resume,List<LanguageRequestDto> languageRequestDtos) {
+        List<Language> languages = languageRequestDtos.stream()
+                .map(dto -> {
+                    if (dto.getId() == null) {
+                        return Language.builder()
+                                .resume(resume)
+                                .level(dto.getLevel())
+                                .name(dto.getName())
+                                .build();
+                    } else {
+                        return languageRepository.findById(dto.getId())
+                                .map(language -> {
+                                    language.setName(dto.getName());
+                                    language.setLevel(dto.getLevel());;
+                                    return language;
+                                }).orElseThrow(() -> new CustomException(ErrorCode.LANGUAGE_NOT_FOUND));
+                    }
+                })
+                .toList();
+
+        List<Language> savedLanguages = languageRepository.saveAll(languages);
+
+        return savedLanguages.stream()
+                .map(LanguageResponseDto::fromEntity)
+                .toList();
     }
 
     @Transactional

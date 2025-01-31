@@ -4,11 +4,13 @@ import com.team3.devinit_back.resume.entity.Activity;
 import com.team3.devinit_back.resume.entity.Resume;
 import lombok.Data;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
 @Getter
+@RequiredArgsConstructor
 public class ActivityResponseDto {
 
     private Long id;

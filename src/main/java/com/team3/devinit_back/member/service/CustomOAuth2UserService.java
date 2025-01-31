@@ -7,6 +7,8 @@ import com.team3.devinit_back.member.entity.Member;
 import com.team3.devinit_back.member.repository.MemberRepository;
 import com.team3.devinit_back.profile.entity.Profile;
 import com.team3.devinit_back.profile.repository.ProfileRepository;
+import com.team3.devinit_back.resume.entity.Resume;
+import com.team3.devinit_back.resume.repository.ResumeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -21,6 +23,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final MemberRepository memberRepository;
     private final ProfileRepository profileRepository;
     private final RandomNickname randomNickname;
+    private final ResumeRepository resumeRepository;
     private final S3Service s3Service;
 
     @Override
@@ -62,12 +65,17 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             member.setNickName(nickname);
 
             memberRepository.save(member);
+
+
             Profile profile = Profile.builder()
                     .member(member)
                     .about("")
                     .build();
-
             profileRepository.save(profile);
+
+            Resume resume = new Resume();
+            resume.setMember(member);
+            resumeRepository.save(resume);
 
             MemberDto memberDto = new MemberDto();
             memberDto.setName(socialId);

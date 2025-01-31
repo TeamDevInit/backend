@@ -4,11 +4,13 @@ import com.team3.devinit_back.resume.entity.Language;
 import com.team3.devinit_back.resume.entity.Resume;
 import lombok.Data;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
 @Getter
+@RequiredArgsConstructor
 public class LanguageResponseDto {
 
     private Long id;
@@ -19,6 +21,7 @@ public class LanguageResponseDto {
     private LocalDateTime updatedAt;
 
     public LanguageResponseDto(Language language){
+        this.id = language.getId();
         this.name = language.getName();
         this.level = language.getLevel();
         Resume resume = language.getResume();

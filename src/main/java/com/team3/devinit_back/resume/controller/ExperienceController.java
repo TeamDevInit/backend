@@ -3,6 +3,8 @@ package com.team3.devinit_back.resume.controller;
 import com.team3.devinit_back.member.dto.CustomOAuth2User;
 import com.team3.devinit_back.member.entity.Member;
 import com.team3.devinit_back.member.service.MemberService;
+import com.team3.devinit_back.resume.dto.ActivityRequestDto;
+import com.team3.devinit_back.resume.dto.ActivityResponseDto;
 import com.team3.devinit_back.resume.dto.ExperienceRequestDto;
 import com.team3.devinit_back.resume.dto.ExperienceResponseDto;
 import com.team3.devinit_back.resume.entity.Resume;
@@ -41,6 +43,15 @@ public class ExperienceController {
         Resume resume = getResumeFromUserInfo(userInfo);
         experienceService.updateExperiences(resume, experienceRequestDtos);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PutMapping
+    public ResponseEntity<List<ExperienceResponseDto>> saveOrUpdateExperiences(@AuthenticationPrincipal CustomOAuth2User userInfo,
+                                                                               @Valid @RequestBody List<ExperienceRequestDto> experienceRequestDtos){
+        Resume resume = getResumeFromUserInfo(userInfo);
+        List<ExperienceResponseDto> experienceResponseDtos =  experienceService.saveOrUpdateExperiences(resume,experienceRequestDtos);
+
+        return ResponseEntity.ok(experienceResponseDtos);
     }
 
     @DeleteMapping("/{id}")
