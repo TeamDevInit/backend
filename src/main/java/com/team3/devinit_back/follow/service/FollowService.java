@@ -5,6 +5,8 @@ import com.team3.devinit_back.follow.entity.Follow;
 import com.team3.devinit_back.follow.repository.FollowRepository;
 import com.team3.devinit_back.global.exception.CustomException;
 import com.team3.devinit_back.global.exception.ErrorCode;
+import com.team3.devinit_back.member.repository.MemberRepository;
+import com.team3.devinit_back.profile.entity.Profile;
 import com.team3.devinit_back.profile.repository.ProfileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class FollowService {
     private final FollowRepository followRepository;
+    private final MemberRepository memberRepository;
     private final ProfileRepository profileRepository;
 
     @Transactional
@@ -27,6 +30,12 @@ public class FollowService {
         follow.setSenderId(senderId);
         follow.setReceiverId(receiverId);
         followRepository.save(follow);
+
+        Profile receiverProfile = getProfileByMemberId(receiverId);
+        receiverProfile.incrementFollowerCount();
+
+        Profile senderProfile = getProfileByMemberId(senderId);
+        senderProfile.incrementFollowingCount();
     }
 
     @Transactional
@@ -35,6 +44,12 @@ public class FollowService {
         validateFollowRelation(senderId, receiverId, false);
 
         followRepository.deleteBySenderIdAndReceiverId(senderId, receiverId);
+
+        Profile receiverProfile = getProfileByMemberId(receiverId);
+        receiverProfile.decrementFollowerCount();
+
+        Profile senderProfile = getProfileByMemberId(senderId);
+        senderProfile.decrementFollowingCount();
     }
 
     @Transactional(readOnly = true)
@@ -50,8 +65,8 @@ public class FollowService {
     }
 
     private void validateFollowRequest(String senderId, String receiverId) {
-        if (!profileRepository.existsById(receiverId)) {
-            throw new CustomException(ErrorCode.PROFILE_NOT_FOUND);
+        if (!memberRepository.existsById(receiverId)) {
+            throw new CustomException(ErrorCode.INVALID_USER);
         }
 
         if (senderId.equals(receiverId)) {
@@ -67,5 +82,10 @@ public class FollowService {
         if (!isFollowRequest && !followRepository.existsBySenderIdAndReceiverId(senderId, receiverId)) {
             throw new CustomException(ErrorCode.FOLLOW_FAILED);
         }
+    }
+
+    public Profile getProfileByMemberId(String memberId) {
+        return profileRepository.findByMemberId(memberId)
+            .orElseThrow(() -> new CustomException(ErrorCode.PROFILE_NOT_FOUND));
     }
 }
