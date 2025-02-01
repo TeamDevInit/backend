@@ -65,8 +65,13 @@ public class BoardController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BoardDetailResponseDto> getBoardDetail(@PathVariable("id") Long id){
-        BoardDetailResponseDto boardResponseDto = boardService.getBoardDetail(id);
+    public ResponseEntity<BoardDetailResponseDto> getBoardDetail(@AuthenticationPrincipal CustomOAuth2User userInfo,
+                                                                 @PathVariable("id") Long id){
+        Member member =  null;
+        if(userInfo!=null){
+            member = getMemberFromUserInfo(userInfo);
+        }
+        BoardDetailResponseDto boardResponseDto = boardService.getBoardDetail(id, member);
         return ResponseEntity.ok(boardResponseDto);
     }
 

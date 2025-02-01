@@ -32,7 +32,7 @@ public class CommentService {
         Long parentId = commentRequestDto.getParentCommentId();
         if(parentId != null){
             parentComment = getCommentById(parentId);
-            parentComment.setCommentCnt(parentComment.getCommentCnt() + 1);
+            parentComment.setCommentCnt(parentComment.getCommentCnt() + 1);//분리
         }
         Comment comment = Comment.builder()
                 .content(commentRequestDto.getContent())
@@ -42,7 +42,7 @@ public class CommentService {
                 .build();
         Comment savedComment = commentRepository.save(comment);
 
-        board.setCommentCnt(board.getCommentCnt() + 1);
+        board.setCommentCnt(board.getCommentCnt() + 1); //분리
         boardRepository.save(board);
         return  CommentResponseDto.fromEntity(savedComment);
 
@@ -60,7 +60,7 @@ public class CommentService {
         Comment comment = isAuthorizedForComment(commentId, memberId, commentRequestDto.getBoardId());
         if (comment.getParentComment() != null) {
             Comment parentComment = comment.getParentComment();
-            parentComment.setCommentCnt(parentComment.getCommentCnt() - 1);
+            parentComment.setCommentCnt(parentComment.getCommentCnt() - 1); //분리
             commentRepository.save(parentComment);
         }
         commentRepository.delete(comment);
