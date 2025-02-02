@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,58 +28,22 @@ public class SkillService {
     private final SkillRepository skillRepository;
     private final SkillTagRepository skillTagRepository;
 
-    public List<SkillResponseDto> addSkill(Member member, SkillRequestDto skillRequestDto) {
-        Resume resume = getResumeById(skillRequestDto.getResumeId());
-        isAuthorizedForResume(resume, member);
+    public List<SkillResponseDto> createSkill(Resume resume, SkillRequestDto skillRequestDto) {
+        addSkills(resume, skillRequestDto.getSkillNames(), false);
+        Resume savedResume = resumeRepository.save(resume);
 
-        List<SkillResponseDto> responseDto =new ArrayList<>();
-
-        for (Long skillTagId : skillRequestDto.getSkillTagIds()) {
-            SkillTag skillTag = getSkillTagById(skillTagId);
-            Skill skill = new Skill(resume, skillTag);
-            Skill savedSkill = skillRepository.save(skill);
-
-            responseDto.add(new SkillResponseDto(
-                savedSkill.getId(),
-                resume.getId(),
-                List.of(skillTag.getName())
-            ));
-        }
-
-        return responseDto;
+        return savedResume.getSkills().stream()
+                .map(SkillResponseDto::fromEntity)
+                .collect(Collectors.toList());
     }
 
-    public List<SkillResponseDto> updateSkill(Member member, SkillRequestDto skillRequestDto) {
-        Resume resume = getResumeById(skillRequestDto.getResumeId());
-        isAuthorizedForResume(resume, member);
+    public List<SkillResponseDto> updateSkill(Resume resume, SkillRequestDto skillRequestDto) {
+        addSkills(resume, skillRequestDto.getSkillNames(), true);
+        Resume updatedResume = resumeRepository.save(resume);
 
-        List<SkillResponseDto> responseDto = new ArrayList<>();
-        List<Skill> updatedSkill = new ArrayList<>();
-
-        for (Map.Entry<Long, Long> entry : skillRequestDto.getSkillTagMap().entrySet()) {
-            Long skillId = entry.getKey();
-            Long newSkillTagId = entry.getValue();
-
-            Skill skill = getSkillById(skillId);
-            isAuthorizedForSkill(skill, member);
-
-            if (skill.getSkillTag().getId().equals(newSkillTagId)) {
-                continue;
-            }
-
-            SkillTag newSkillTag = getSkillTagById(newSkillTagId);
-            skill.setSkillTag(newSkillTag);
-            updatedSkill.add(skill);
-
-            responseDto.add(new SkillResponseDto(
-                skill.getId(),
-                resume.getId(),
-                List.of(newSkillTag.getName())
-            ));
-        }
-        skillRepository.saveAll(updatedSkill);
-
-        return responseDto;
+        return updatedResume.getSkills().stream()
+                .map(SkillResponseDto::fromEntity)
+                .collect(Collectors.toList());
     }
 
     public void deleteSkill(Member member, Long skillId) {
@@ -88,9 +53,14 @@ public class SkillService {
         skillRepository.delete(skill);
     }
 
-    private Resume getResumeById(String resumeId) {
-        return resumeRepository.findById(resumeId)
-            .orElseThrow(() -> new CustomException(ErrorCode.RESUME_NOT_FOUND));
+    private void addSkills(Resume resume, List<String> skillNames, boolean isClear){
+        if(isClear) {resume.getSkills().clear();}
+
+        skillNames.forEach(skillName -> {
+            SkillTag skillTag = getSkillTagByName(skillName);
+            Skill skill = new Skill(resume, skillTag);
+            resume.getSkills().add(skill);
+        });
     }
 
     private Skill getSkillById(Long skillId) {
@@ -98,8 +68,8 @@ public class SkillService {
             .orElseThrow(() -> new CustomException(ErrorCode.SKILL_NOT_FOUND));
     }
 
-    private SkillTag getSkillTagById(Long skillTagId) {
-        return skillTagRepository.findById(skillTagId)
+    private SkillTag getSkillTagByName(String skillName) {
+        return skillTagRepository.findByName(skillName)
             .orElseThrow(() -> new CustomException(ErrorCode.INVALID_TAG_ID));
     }
 
@@ -114,4 +84,5 @@ public class SkillService {
             throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
     }
+
 }
