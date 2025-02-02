@@ -14,4 +14,5 @@ public class ResumeRequestDto {
     private Set<ExperienceResponseDto> experiences = new LinkedHashSet<>();
     private Set<LanguageResponseDto> languages = new LinkedHashSet<>();
     private Set<ProjectResponseDto> projects = new LinkedHashSet<>();
+    private Set<SkillRequestDto> skills = new LinkedHashSet<>();
 }

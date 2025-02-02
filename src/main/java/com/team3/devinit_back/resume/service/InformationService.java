@@ -25,6 +25,7 @@ public class InformationService {
                 .name(informationRequestDto.getName())
                 .position(informationRequestDto.getPosition())
                 .summary(informationRequestDto.getSummary())
+                .employmentPeriod(informationRequestDto.getEmploymentPeriod())
                 .portfolio(informationRequestDto.getPortfolio())
                 .build();
 
@@ -47,6 +48,7 @@ public class InformationService {
         information.setName(informationRequestDto.getName());
         information.setPosition(informationRequestDto.getPosition());
         information.setSummary(informationRequestDto.getSummary());
+        information.setEmploymentPeriod(informationRequestDto.getEmploymentPeriod());
         information.setPortfolio(informationRequestDto.getPortfolio());
 
         informationRepository.save(information);

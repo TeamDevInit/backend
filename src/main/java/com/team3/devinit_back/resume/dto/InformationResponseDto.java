@@ -19,6 +19,7 @@ public class InformationResponseDto {
     private String summary;
     private String portfolio;
     private String resumeId;
+    private String employmentPeriod;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -28,7 +29,7 @@ public class InformationResponseDto {
         this.position = information.getPosition();
         this.portfolio = information.getPortfolio();
         this.summary = information.getSummary();
-
+        this.employmentPeriod = information.getEmploymentPeriod();
         Resume resume = information.getResume();
         if(resume != null) {this.resumeId = resume.getId();}
 

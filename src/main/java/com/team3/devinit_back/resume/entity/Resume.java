@@ -24,8 +24,8 @@ public class Resume extends BaseEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL)
-    private List<Skill> skills = new ArrayList<>();
+    @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Skill> skills = new LinkedHashSet<>();
 
     @OneToOne(mappedBy = "resume", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Information information;
