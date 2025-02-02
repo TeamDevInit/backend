@@ -4,13 +4,14 @@ import com.team3.devinit_back.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "Skills")
 @Getter
 @Setter
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class Skill extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
