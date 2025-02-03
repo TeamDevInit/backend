@@ -20,6 +20,7 @@ build_job:
     tags:
         - build
     before_script:
+        - unset DOCKER_HOST
         - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
         - cat "$ENV_FILE" > src/main/resources/.env
     script:
