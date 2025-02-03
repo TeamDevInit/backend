@@ -1,11 +1,20 @@
 package com.team3.devinit_back.websocket.controller;
 
-import com.team3.devinit_back.websocket.dto.ChatRoomDto;
-import com.team3.devinit_back.websocket.repository.ChatRepository;
+import com.team3.devinit_back.global.exception.CustomException;
+import com.team3.devinit_back.global.exception.ErrorCode;
+import com.team3.devinit_back.member.dto.CustomOAuth2User;
+import com.team3.devinit_back.member.entity.Member;
+import com.team3.devinit_back.member.service.MemberService;
+import com.team3.devinit_back.websocket.dto.ChatRoomDetailDto;
+import com.team3.devinit_back.websocket.dto.ChatRoomListDto;
+import com.team3.devinit_back.websocket.entity.ChatRoom;
+import com.team3.devinit_back.websocket.service.ChatRoomService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,40 +22,59 @@ import java.util.Map;
 @RestController
 @RequestMapping("/chat")
 public class ChatRoomController {
-    private final ChatRepository chatRepository;
+    private final ChatRoomService chatRoomService;
+    private final MemberService memberService;
 
-    // 채팅 리스트 화면
-    @GetMapping("/room")
-    public String rooms(Model model) {
-        return "/chat/room";
-    }
-
-    // 모든 채팅방 목록 반환
     @GetMapping("/rooms")
-    @ResponseBody
-    public List<ChatRoomDto> room() {
-        return chatRepository.findAllRoom();
+    public List<ChatRoomListDto> getAllRooms() {
+        return chatRoomService.getAllChatRooms();
     }
 
-    // 채팅방 생성
-    @PostMapping("/room")
-    @ResponseBody
-    public ChatRoomDto createRoom(@RequestBody Map<String, String> request) {
-        String name = request.get("name");
-        return chatRepository.createChatRoom(name);
+    @GetMapping("/my-rooms")
+    public ResponseEntity<List<ChatRoomListDto>> getMyRooms(@AuthenticationPrincipal CustomOAuth2User userInfo) {
+        Member member = getMemberFromUserInfo(userInfo);
+        List<ChatRoomListDto> myChatRooms = chatRoomService.getMyChatRooms(member);
+        return ResponseEntity.ok(myChatRooms);
     }
 
-    // 채팅방 입장 화면
-    @GetMapping("/room/enter/{roomId}")
-    public String roomDetail(Model model, @PathVariable String roomId) {
-        model.addAttribute("roomId", roomId);
-        return "/chat/roomdetail";
-    }
-
-    // 특정 채팅방 조회
     @GetMapping("/room/{roomId}")
-    @ResponseBody
-    public ChatRoomDto roomInfo(@PathVariable String roomId) {
-        return chatRepository.findRoomById(roomId);
+    public ResponseEntity<ChatRoomDetailDto> getRoom(
+            @AuthenticationPrincipal CustomOAuth2User userInfo,
+            @PathVariable String roomId) {
+        Member member = getMemberFromUserInfo(userInfo);
+        ChatRoomDetailDto chatRoomDetail = chatRoomService.getChatRoomById(roomId, member);
+        return ResponseEntity.ok(chatRoomDetail);
+    }
+
+    @PostMapping("/room")
+    public ResponseEntity<Map<String, String>> createRoom(
+            @AuthenticationPrincipal CustomOAuth2User userInfo,
+            @RequestBody Map<String, String> request) {
+        Member member = getMemberFromUserInfo(userInfo);
+        String name = request.get("name");
+
+        ChatRoom chatRoom = chatRoomService.createChatRoom(name, member);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("roomId", chatRoom.getId());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/room/{roomId}")
+    public ResponseEntity<Void> leaveChatRoom(@AuthenticationPrincipal CustomOAuth2User userInfo,
+                                              @PathVariable String roomId) {
+        Member member = getMemberFromUserInfo(userInfo);
+        chatRoomService.leaveChatRoom(roomId, member);
+        return ResponseEntity.noContent().build();
+    }
+
+    private Member getMemberFromUserInfo(CustomOAuth2User userInfo) {
+        if (userInfo == null) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        }
+
+        String socialId = userInfo.getName();
+        return memberService.findMemberBySocialId(socialId);
     }
 }
