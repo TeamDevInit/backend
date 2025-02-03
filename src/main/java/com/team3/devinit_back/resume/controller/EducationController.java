@@ -43,6 +43,15 @@ public class EducationController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    @PutMapping
+    public ResponseEntity<List<EducationResponseDto>> saveOrUpdateActivities(@AuthenticationPrincipal CustomOAuth2User userInfo,
+                                                                            @Valid @RequestBody List<EducationRequestDto> educationRequestDtos){
+        Resume resume = getResumeFromUserInfo(userInfo);
+        List<EducationResponseDto> educationResponseDtos =  educationService.saveOrUpdateEducations(resume,educationRequestDtos);
+
+        return ResponseEntity.ok(educationResponseDtos);
+    }
+
     @DeleteMapping("/{id}")
     public  ResponseEntity<Void> deleteEducation(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                  @PathVariable("id") Long id){

@@ -65,6 +65,42 @@ public class ActivityService {
     }
 
     @Transactional
+    public List<ActivityResponseDto> saveOrUpdateActivities(Resume resume, List<ActivityRequestDto> activityRequestDtos) {
+        List<Activity> activities = activityRequestDtos.stream()
+                .map(dto -> {
+                    if (dto.getId() == null) {
+                        return Activity.builder()
+                                .resume(resume)
+                                .organization(dto.getOrganization())
+                                .activityName(dto.getActivityName())
+                                .description(dto.getDescription())
+                                .startDate(dto.getStartDate())
+                                .endDate(dto.getEndDate())
+                                .build();
+                    } else {
+                        return activityRepository.findById(dto.getId())
+                                .map(activity -> {
+                                    activity.setActivityName(dto.getActivityName());
+                                    activity.setOrganization(dto.getOrganization());
+                                    activity.setDescription(dto.getDescription());
+                                    activity.setStartDate(dto.getStartDate());
+                                    activity.setEndDate(dto.getEndDate());
+                                    return activity;
+                                }).orElseThrow(() -> new CustomException(ErrorCode.ACTIVITY_NOT_FOUND));
+                    }
+                })
+                .toList();
+
+        // DB에 저장
+        List<Activity> savedActivities = activityRepository.saveAll(activities);
+
+        // DTO 변환 후 반환
+        return savedActivities.stream()
+                .map(ActivityResponseDto::fromEntity)
+                .toList();
+    }
+
+    @Transactional
     public void deleteActivity(Resume resume, Long id) {
         Activity activity = isAuthorized(id, resume.getMember());
         activityRepository.delete(activity);

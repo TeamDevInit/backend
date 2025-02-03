@@ -1,18 +1,24 @@
 package com.team3.devinit_back.resume.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.team3.devinit_back.resume.entity.Resume;
+import com.team3.devinit_back.resume.entity.Skill;
+import lombok.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
-@NoArgsConstructor
+@RequiredArgsConstructor
 @AllArgsConstructor
 public class SkillResponseDto {
+
     private Long id;
-    private String resumeId;
-    private List<String> skillTagNames;
+    private String name;
+
+    public SkillResponseDto(Skill skill){
+        this.id = skill.getId();
+        this.name = skill.getSkillTag().getName();
+    }
+    public static SkillResponseDto fromEntity(Skill skill){ return new SkillResponseDto(skill);}
 }

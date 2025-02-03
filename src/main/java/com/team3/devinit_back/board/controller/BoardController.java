@@ -65,22 +65,26 @@ public class BoardController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BoardDetailResponseDto> getBoardDetail(@PathVariable("id") Long id){
-        BoardDetailResponseDto boardResponseDto = boardService.getBoardDetail(id);
+    public ResponseEntity<BoardDetailResponseDto> getBoardDetail(@AuthenticationPrincipal CustomOAuth2User userInfo,
+                                                                 @PathVariable("id") Long id){
+        Member member =  null;
+        if(userInfo!=null){
+            member = getMemberFromUserInfo(userInfo);
+        }
+        BoardDetailResponseDto boardResponseDto = boardService.getBoardDetail(id, member);
         return ResponseEntity.ok(boardResponseDto);
     }
 
 
     @PatchMapping("/{id}")
     public ResponseEntity<Void> updateBoard(@AuthenticationPrincipal CustomOAuth2User userInfo,
-                                                              @RequestBody BoardRequestDto boardRequestDto,
-                                                              @PathVariable("id") Long id){
+                                            @RequestBody BoardRequestDto boardRequestDto,
+                                            @PathVariable("id") Long id){
 
         Member member = getMemberFromUserInfo(userInfo);
 
         boardService.updateBoard(member.getId(),id, boardRequestDto);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-
     }
 
     @DeleteMapping("/{id}")

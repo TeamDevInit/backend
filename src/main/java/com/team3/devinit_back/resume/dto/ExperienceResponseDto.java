@@ -4,11 +4,13 @@ import com.team3.devinit_back.resume.entity.Experience;
 import com.team3.devinit_back.resume.entity.Resume;
 import lombok.Data;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
 @Getter
+@RequiredArgsConstructor
 public class ExperienceResponseDto {
 
     private Long id;
@@ -24,6 +26,7 @@ public class ExperienceResponseDto {
     private LocalDateTime updatedAt;
 
     public ExperienceResponseDto(Experience experience){
+        this.id = experience.getId();
         this.companyName = experience.getCompanyName();
         this.employmentType = experience.getEmploymentType();
         this.description = experience.getDescription();

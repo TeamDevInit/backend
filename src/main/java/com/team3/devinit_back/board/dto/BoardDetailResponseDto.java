@@ -31,6 +31,9 @@ public class BoardDetailResponseDto {
     private List<CommentResponseDto> comment;
     private List<TagResponseDto> tag;
 
+    private boolean isRecommended;
+    private boolean isFollowing;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     public BoardDetailResponseDto(Board board){
@@ -38,6 +41,7 @@ public class BoardDetailResponseDto {
         this.title = board.getTitle();
         this.content = board.getContent();
         this.upCnt = board.getUpCnt();
+        this.viewCnt = board.getViewCnt();
 
         Member member = board.getMember();
         if(member!= null){
@@ -64,5 +68,10 @@ public class BoardDetailResponseDto {
         this.updatedAt = board.getUpdatedAt();
     }
     public static BoardDetailResponseDto fromEntity(Board board){ return new BoardDetailResponseDto(board);}
-
+    public void setRecommended(boolean isRecommended) {
+        this.isRecommended = isRecommended;
+    }
+    public void setFollowing(boolean isFollowing){
+        this.isFollowing = isFollowing;
+    }
 }

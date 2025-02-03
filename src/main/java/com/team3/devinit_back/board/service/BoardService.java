@@ -11,6 +11,7 @@ import com.team3.devinit_back.board.repository.BoardRepository;
 import com.team3.devinit_back.board.repository.CategoryRepository;
 import com.team3.devinit_back.board.repository.RecommendationRepository;
 import com.team3.devinit_back.comment.repository.CommentRepository;
+import com.team3.devinit_back.follow.repository.FollowRepository;
 import com.team3.devinit_back.global.exception.CustomException;
 import com.team3.devinit_back.global.exception.ErrorCode;
 import com.team3.devinit_back.member.entity.Member;
@@ -38,6 +39,7 @@ public class BoardService {
     private final CategoryRepository categoryRepository;
     private final RecommendationRepository recommendationRepository;
     private final CommentRepository commentRepository;
+    private final FollowRepository followRepository;
     private final ProfileRepository profileRepository;
     private final TagService tagService;
     private final JPAQueryFactory queryFactory;
@@ -88,18 +90,27 @@ public class BoardService {
         if ((tagNames != null && !tagNames.isEmpty()) || (contents != null && !contents.isEmpty())) {
             builder = buildDynamicQuery(tagNames, contents, categoryId);
         }else if(categoryId != null){
-                builder.and(board.category.id.eq(categoryId)); //카테고리 ID와 같은 ID값만 추출
+                builder.and(board.category.id.eq(categoryId));
         }
 
         return fetchBoards(pageable, builder,tagNames);
     }
 
-    public BoardDetailResponseDto getBoardDetail(Long id){
+    public BoardDetailResponseDto getBoardDetail(Long id, Member member){
         Board board = getBoardByIdWithComment(id);
-        return BoardDetailResponseDto.fromEntity(board);
+        board.setViewCnt(board.getViewCnt() + 1);
+        boardRepository.save(board);
+
+        boolean isFollowing = checkFollowingStatus(board, member);
+        boolean isRecommended = checkRecommendationStatus(board, member);
+
+        BoardDetailResponseDto responseDto = BoardDetailResponseDto.fromEntity(board);
+
+        responseDto.setRecommended(isRecommended);
+        responseDto.setFollowing(isFollowing);
+        return responseDto;
     }
 
-    // 게시글 수정
     @Transactional
     public void updateBoard(String memberId, Long id,BoardRequestDto boardRequestDto){
         Category category = getCategoryById(boardRequestDto.getCategoryId());
@@ -138,6 +149,20 @@ public class BoardService {
             boardRepository.save(board);
             return true;
         }
+    }
+
+    private boolean checkRecommendationStatus(Board board, Member member) {
+        if (member != null) {
+            return recommendationRepository.existsByBoardAndMember(board, member);
+        }
+        return false;
+    }
+
+    private boolean checkFollowingStatus(Board board, Member member){
+        if (member != null) {
+            return followRepository.existsBySenderIdAndReceiverId(member.getId(), board.getMember().getId());
+        }
+        return false;
     }
 
     public  int getRecommendationCount(Long id){

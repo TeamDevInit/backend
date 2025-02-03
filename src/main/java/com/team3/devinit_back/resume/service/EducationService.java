@@ -72,6 +72,40 @@ public class EducationService {
 
         educationRepository.saveAll(updatedEducations);
     }
+    @Transactional
+    public List<EducationResponseDto> saveOrUpdateEducations(Resume resume,List<EducationRequestDto> educationRequestDtos){
+        List<Education> educations = educationRequestDtos.stream()
+                .map(dto -> {
+                    if (dto.getId() == null) {
+                        return Education.builder()
+                                .resume(resume)
+                                .organization(dto.getOrganization())
+                                .degree(dto.getDegree())
+                                .major(dto.getMajor())
+                                .status(dto.getStatus())
+                                .startDate(dto.getStartDate())
+                                .endDate(dto.getEndDate())
+                                .build();
+                    } else {
+                        return educationRepository.findById(dto.getId())
+                                .map(education -> {
+                                    education.setOrganization(dto.getOrganization());
+                                    education.setDegree(dto.getDegree());
+                                    education.setMajor(dto.getMajor());
+                                    education.setStartDate(dto.getStartDate());
+                                    education.setEndDate(dto.getEndDate());
+                                    education.setStatus(dto.getStatus());
+                                    return education;
+                                }).orElseThrow(() -> new CustomException(ErrorCode.EDUCATION_NOT_FOUND));
+                    }
+                })
+                .toList();
+        List<Education> savedEducations = educationRepository.saveAll(educations);
+
+        return savedEducations.stream()
+                .map(EducationResponseDto::fromEntity)
+                .toList();
+    }
 
     @Transactional
     public void deleteEducation(Resume resume, Long id) {
