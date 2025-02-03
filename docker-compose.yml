@@ -31,7 +31,7 @@ services:
 
   redis:
     image: redis:latest
-    container_name: devinit-redis
+    container_name: redis
     ports:
       - "6379:6379"
     restart: always
