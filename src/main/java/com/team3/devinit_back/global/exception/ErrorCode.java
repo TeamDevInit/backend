@@ -39,7 +39,8 @@ public enum ErrorCode {
     INVALID_TAG_ID(HttpStatus.BAD_REQUEST, "유효하지 않은 스킬 태그입니다."),
     ACTIVITY_NOT_FOUND(HttpStatus.BAD_REQUEST, "등록된 활동 사항을 찾을 수 없습니다."),
     EXPERIENCE_NOT_FOUND(HttpStatus.BAD_REQUEST, "등록된 경력 사항을 찾을 수 없습니다."),
-    INFORMATION_NOT_FOUND(HttpStatus.BAD_REQUEST, "등록된 인적 사항을 찾을 수 없습니다.");
+    INFORMATION_NOT_FOUND(HttpStatus.BAD_REQUEST, "등록된 인적 사항을 찾을 수 없습니다."),
+    INVALID_OAUTH2_PROVIDER(HttpStatus.BAD_REQUEST, "지원하지 않는 OAuth2 제공자입니다.");
 
 
 
