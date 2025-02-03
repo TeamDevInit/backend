@@ -13,15 +13,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatPart extends BaseEntity {
-    @Id
-    @ManyToOne
+    @EmbeddedId
+    private ChatPartId id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("memberId")
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @Id
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("roomId")
     @JoinColumn(name = "room_id", nullable = false)
-    private Chatroom chatroom;
+    private ChatRoom chatRoom;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
