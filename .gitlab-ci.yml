@@ -3,6 +3,8 @@ image: docker:latest
 services:
  - name: docker:dind
    alias: docker
+   command:
+     - "--tls=false"
 
 stages:
     - build
