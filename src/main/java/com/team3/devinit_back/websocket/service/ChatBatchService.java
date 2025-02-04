@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -37,12 +38,22 @@ public class ChatBatchService {
             List<ChatMessageDto> messages = redisChatMessageRepository.getMessages(chatRoom.getId());
             if (!messages.isEmpty()) {
                 List<ChatMessage> entities = messages.stream()
-                        .map(dto -> ChatMessage.builder()
-                                .chatRoom(chatRoom)
-                                .sender(findMemberById(dto.getSender()))
-                                .msgType(ChatMessage.MessageType.valueOf(dto.getType().name()))
-                                .content(dto.getMessage())
-                                .build())
+                        .map(dto -> {
+                            try {
+                                ChatRoom room = chatRoom;
+                                Member sender = findMemberById(dto.getSender());
+                                return ChatMessage.builder()
+                                        .chatRoom(room)
+                                        .sender(sender)
+                                        .msgType(ChatMessage.MessageType.valueOf(dto.getType().name()))
+                                        .content(dto.getMessage())
+                                        .build();
+                            } catch (CustomException e) {
+                                log.error("Sender ID {} not found: {}", dto.getSender(), e.getMessage());
+                                return null;
+                            }
+                        })
+                        .filter(Objects::nonNull)
                         .collect(Collectors.toList());
 
                 chatMessageRepository.saveAll(entities);
