@@ -1,7 +1,9 @@
 package com.team3.devinit_back.member.controller;
 
 import com.team3.devinit_back.member.dto.CustomOAuth2User;
+import com.team3.devinit_back.member.dto.DailyBoardCountDto;
 import com.team3.devinit_back.member.dto.MemberDto;
+import com.team3.devinit_back.member.repository.DailyBoardCountRepository;
 import com.team3.devinit_back.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -9,19 +11,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.SocketAddress;
+import java.util.List;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/members")
 public class MemberController{
-    private  final MemberService memberService;
+    private final MemberService memberService;
 
     @PatchMapping("/nickname")
     @Operation(
@@ -36,5 +36,12 @@ public class MemberController{
 
         return ResponseEntity.ok("닉네임 변경 성공");
 
+    }
+
+    @GetMapping("/stats/{memberId}/{year}")
+    public ResponseEntity<List<DailyBoardCountDto>> getYearlyStats(@PathVariable("memberId") String id,
+                                                                   @PathVariable("year") int year) {
+        List<DailyBoardCountDto> stats = memberService.getYearlyStats(id, year);
+        return ResponseEntity.ok(stats);
     }
 }
