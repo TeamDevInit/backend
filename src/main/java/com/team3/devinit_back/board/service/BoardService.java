@@ -14,11 +14,14 @@ import com.team3.devinit_back.comment.repository.CommentRepository;
 import com.team3.devinit_back.follow.repository.FollowRepository;
 import com.team3.devinit_back.global.exception.CustomException;
 import com.team3.devinit_back.global.exception.ErrorCode;
+import com.team3.devinit_back.member.entity.DailyBoardCount;
 import com.team3.devinit_back.member.entity.Member;
+import com.team3.devinit_back.member.repository.DailyBoardCountRepository;
 import com.team3.devinit_back.profile.entity.Profile;
 import com.team3.devinit_back.profile.repository.ProfileRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.AccessDeniedException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -43,6 +47,7 @@ public class BoardService {
     private final ProfileRepository profileRepository;
     private final TagService tagService;
     private final JPAQueryFactory queryFactory;
+    private final DailyBoardCountRepository dailyBoardCountRepository;
 
     @Transactional
     public BoardDetailResponseDto createBoard(Member member, BoardRequestDto boardRequestDto) {
@@ -64,6 +69,7 @@ public class BoardService {
         profile.incrementBoardCount();
         profileRepository.save(profile);
 
+        updateDailyBoardCount(member.getId(), LocalDate.now());
         return BoardDetailResponseDto.fromEntity(savedBoard);
 
     }
@@ -279,6 +285,16 @@ public class BoardService {
                 .collect(Collectors.toList());
 
         return new PageImpl<>(content, pageable, total);
+    }
+    public void updateDailyBoardCount(String memberId, LocalDate date) {
+        DailyBoardCount dailyBoardCount = dailyBoardCountRepository.findByMemberIdAndDate(memberId, date)
+                .map(existing -> {
+                    existing.setBoardCount(existing.getBoardCount() + 1);
+                    return existing;
+                })
+                .orElse(new DailyBoardCount(memberId, date, 1));
+
+        dailyBoardCountRepository.save(dailyBoardCount);
     }
 
     private Board isAuthorized(Long id, String memberId) {
