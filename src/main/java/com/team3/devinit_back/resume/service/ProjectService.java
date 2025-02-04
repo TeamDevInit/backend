@@ -25,13 +25,14 @@ public class ProjectService {
 
         List<Project> projects = projectRequestDtos.stream()
                 .map(projectRequestDto -> Project.builder()
-                    .resume(resume)
-                    .projectName(projectRequestDto.getProjectName())
-                    .description(projectRequestDto.getDescription())
-                    .organization(projectRequestDto.getOrganization())
-                    .endDate(projectRequestDto.getEndDate())
-                    .startDate(projectRequestDto.getStartDate())
-                    .build())
+                        .resume(resume)
+                        .projectName(projectRequestDto.getProjectName())
+                        .description(projectRequestDto.getDescription())
+                        .organization(projectRequestDto.getOrganization())
+                        .link(projectRequestDto.getLink())
+                        .endDate(projectRequestDto.getEndDate())
+                        .startDate(projectRequestDto.getStartDate())
+                        .build())
                 .toList();
 
         List<Project> savedProjects = projectRepository.saveAll(projects);
@@ -57,6 +58,7 @@ public class ProjectService {
                     project.setProjectName(projectRequestDto.getProjectName());
                     project.setDescription(projectRequestDto.getDescription());
                     project.setOrganization(projectRequestDto.getOrganization());
+                    project.setLink(projectRequestDto.getLink());
                     project.setStartDate(projectRequestDto.getStartDate());
                     project.setStartDate(projectRequestDto.getEndDate());
                     return project;
@@ -76,6 +78,7 @@ public class ProjectService {
                                 .projectName(dto.getProjectName())
                                 .description(dto.getDescription())
                                 .organization(dto.getOrganization())
+                                .link(dto.getLink())
                                 .endDate(dto.getEndDate())
                                 .startDate(dto.getStartDate())
                                 .build();
@@ -85,6 +88,7 @@ public class ProjectService {
                                     project.setProjectName(dto.getProjectName());
                                     project.setDescription(dto.getDescription());
                                     project.setOrganization(dto.getOrganization());
+                                    project.setLink(dto.getLink());
                                     project.setStartDate(dto.getStartDate());
                                     project.setStartDate(dto.getEndDate());
                                     return project;
