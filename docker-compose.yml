@@ -4,8 +4,6 @@ services:
   app:
     image: moonsunmean/devinit-back
     container_name: devinit-back
-    depends_on:
-      - redis
     ports:
       - "8080:8080"
     env_file:
@@ -24,14 +22,5 @@ services:
       DB_URL_PROD: ${DB_URL_PROD}
       DB_USERNAME_PROD: ${DB_USERNAME_PROD}
       DB_PASSWORD_PROD: ${DB_PASSWORD_PROD}
-      REDIS_HOST_PROD: redis
-      REDIS_PORT_PROD: 6379
       BASE_URL: ${BASE_URL}
-    restart: always
-
-  redis:
-    image: redis:latest
-    container_name: devinit-redis
-    ports:
-      - "6379:6379"
     restart: always
