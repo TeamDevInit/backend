@@ -17,6 +17,7 @@ public class ProjectResponseDto {
     private String projectName;
     private String description;
     private String organization;
+    private String link;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private String resumeId;
@@ -30,6 +31,7 @@ public class ProjectResponseDto {
         this.organization = project.getOrganization();
         this.startDate = project.getStartDate();
         this.endDate = project.getEndDate();
+        this.link = project.getLink();
 
         Resume resume = project.getResume();
         if(resume!=null){this.resumeId = resume.getId();}

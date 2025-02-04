@@ -32,13 +32,16 @@ public class Project extends BaseEntity {
     @Column(name = "end_date")
     private LocalDateTime endDate;
 
+    @Column(name ="link", length = 2000)
+    private String link;
+
     @ManyToOne
     @JoinColumn(name = "resume_id", nullable = false)
     private Resume resume;
 
     @Builder
     public Project(Long id, String projectName, String description, String organization,
-                   LocalDateTime startDate, LocalDateTime endDate, Resume resume) {
+                   LocalDateTime startDate, LocalDateTime endDate, String link, Resume resume) {
         this.id = id;
         this.projectName = projectName;
         this.description = description;
@@ -46,5 +49,6 @@ public class Project extends BaseEntity {
         this.startDate = startDate;
         this.endDate = endDate;
         this.resume = resume;
+        this.link = link;
     }
 }
