@@ -19,11 +19,11 @@ public class ChatMessage extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id", nullable = false)
-    private Chatroom chatroom;
+    private ChatRoom chatRoom;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id", nullable = false)
     private Member sender;
 
@@ -31,8 +31,7 @@ public class ChatMessage extends BaseEntity {
     @Column(name = "msgType", nullable = false)
     private MessageType msgType;
 
-    @Lob
-    @Column(name = "content", nullable = true)
+    @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
     @Enumerated(EnumType.STRING)

@@ -11,6 +11,8 @@ stages:
 variables:
     DOCKER_REGISTRY: docker.io
     DOCKER_IMAGE: devinit-back
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
 
 build_job:
@@ -18,6 +20,7 @@ build_job:
     tags:
         - build
     before_script:
+        - unset DOCKER_HOST
         - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
         - cat "$ENV_FILE" > src/main/resources/.env
     script:
@@ -35,6 +38,7 @@ deploy_job:
     tags:
        - deploy
     before_script:
+       - unset DOCKER_HOST
        - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
     script:
        - echo "Deploying the project..."
@@ -46,4 +50,3 @@ deploy_job:
     when: on_success
     only:
        - dev
-

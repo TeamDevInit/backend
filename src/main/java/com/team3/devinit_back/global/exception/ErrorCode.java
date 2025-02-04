@@ -12,6 +12,9 @@ public enum ErrorCode {
     INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 Refresh Token 입니다."),
     EXPIRED_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 Refresh Token 입니다."),
     EMPTY_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "Refresh Token이 없습니다."),
+    EMPTY_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "Access Token이 없습니다."),
+    EXPIRED_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "Access Token이 만료되었습니다."),
+    INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 Access Token 입니다."),
     ENTITY_NOT_FOUND(HttpStatus.NOT_FOUND, "요청하신 리소스를 찾을 수 없습니다."),
     ACCESS_DENIED(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "유효하지 않은 입력 값입니다."),
@@ -40,7 +43,9 @@ public enum ErrorCode {
     ACTIVITY_NOT_FOUND(HttpStatus.BAD_REQUEST, "등록된 활동 사항을 찾을 수 없습니다."),
     EXPERIENCE_NOT_FOUND(HttpStatus.BAD_REQUEST, "등록된 경력 사항을 찾을 수 없습니다."),
     INFORMATION_NOT_FOUND(HttpStatus.BAD_REQUEST, "등록된 인적 사항을 찾을 수 없습니다."),
-    INVALID_OAUTH2_PROVIDER(HttpStatus.BAD_REQUEST, "지원하지 않는 OAuth2 제공자입니다.");
+    INVALID_OAUTH2_PROVIDER(HttpStatus.BAD_REQUEST, "지원하지 않는 OAuth2 제공자입니다."),
+    CHATROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 채팅방을 찾을 수 없습니다."),
+    CHATROOM_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "채팅방 저장 중 오류가 발생했습니다.");
 
 
 
