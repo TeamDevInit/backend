@@ -17,7 +17,7 @@ public class MemberService {
     public boolean updateNicknameBySocailId(String socialId, String nickname){
         if(isNicknameExists(nickname)){ throw new CustomException(ErrorCode.DUPLICATED_NAME); }
 
-        Member member =  memberRepository.findBySocialId(socialId);
+        Member member =  findMemberBySocialId(socialId);
         if (member == null) { throw new CustomException(ErrorCode.INVALID_USER); }
 
         member.setNickName(nickname);
@@ -25,5 +25,8 @@ public class MemberService {
         return true;
     }
 
-    public Member findMemberBySocialId(String socialId){ return memberRepository.findBySocialId(socialId); }
+    public Member findMemberBySocialId(String socialId){
+        return memberRepository.findBySocialId(socialId)
+                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_USER));
+    }
 }

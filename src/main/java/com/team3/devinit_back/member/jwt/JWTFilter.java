@@ -1,12 +1,16 @@
 package com.team3.devinit_back.member.jwt;
 
+import com.team3.devinit_back.global.exception.CustomException;
+import com.team3.devinit_back.global.exception.ErrorCode;
 import com.team3.devinit_back.member.dto.CustomOAuth2User;
 import com.team3.devinit_back.member.dto.MemberDto;
+import com.team3.devinit_back.member.service.RedisTokenService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,11 +21,11 @@ import java.io.PrintWriter;
 
 //스프링 시큐리티 filter chain에 요청에 담긴 JWT를 검증하기 위한 필터클래스
 //요청 쿠키에 JWT존재하면 검증후 강제로 시큐리티 컨테스트 홀더 세션(임시) 생성
+@RequiredArgsConstructor
 public class JWTFilter extends OncePerRequestFilter {
     private final JWTUtil jwtUtil;
-    public  JWTFilter(JWTUtil jwtUtil){
-        this.jwtUtil= jwtUtil;
-    }
+    private final RedisTokenService redisTokenService;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authorization = null;
@@ -29,6 +33,12 @@ public class JWTFilter extends OncePerRequestFilter {
         //토큰이 없으면 다음 필터로 넘김
         if(accessToken == null){
             filterChain.doFilter(request, response);
+            return;
+        }
+
+        if (redisTokenService.isBlacklisted(accessToken)) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Token is blacklisted");
             return;
         }
         // 토큰 만료 여부 확인, 만료시 다음 필터로 넘기지 않음

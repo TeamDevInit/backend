@@ -15,4 +15,5 @@ public class ProjectRequestDto {
     private String organization;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
+    private String link;
 }
