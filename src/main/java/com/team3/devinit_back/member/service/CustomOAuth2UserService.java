@@ -4,6 +4,7 @@ package com.team3.devinit_back.member.service;
 import com.team3.devinit_back.global.amazonS3.service.S3Service;
 import com.team3.devinit_back.member.dto.*;
 import com.team3.devinit_back.member.entity.Member;
+import com.team3.devinit_back.member.oauth2.OAuth2ResponseFactory;
 import com.team3.devinit_back.member.repository.MemberRepository;
 import com.team3.devinit_back.profile.entity.Profile;
 import com.team3.devinit_back.profile.repository.ProfileRepository;
@@ -25,74 +26,64 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final RandomNickname randomNickname;
     private final ResumeRepository resumeRepository;
     private final S3Service s3Service;
+    private final OAuth2ResponseFactory oAuth2ResponseFactory;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 
         OAuth2User oAuth2User = super.loadUser(userRequest);
-
-        System.out.println(oAuth2User);
-
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
-        OAuth2Response oAuth2Response = null;
-        if (registrationId.equals("naver")) {
 
-            oAuth2Response = new NaverResponse(oAuth2User.getAttributes());
-        }
-        else if (registrationId.equals("github")) {
-
-            oAuth2Response = new GithubResponse(oAuth2User.getAttributes());
-        }
-        else {
-
-            return null;
-        }
+        OAuth2Response oAuth2Response = oAuth2ResponseFactory.getOAuth2Response(registrationId, oAuth2User.getAttributes());
 
         String socialId = oAuth2Response.getProviderId();
         String socialProvider = oAuth2Response.getProvider();
-        Member existData = memberRepository.findBySocialId(socialId);
+        return getOrCreateMember(socialId, socialProvider);
+    }
+    private OAuth2User getOrCreateMember(String socialId, String socialProvider) {
+        return memberRepository.findBySocialId(socialId)
+                .map(this::toCustomOAuth2User)
+                .orElseGet(() -> createMember(socialId, socialProvider));
+    }
 
-        if(existData == null){
-            Member member = new Member();
-            member.setSocialId(socialId);
-            member.setSocialProvider(socialProvider);
-            member.setRole("ROLE_USER");
-            member.setProfileImage(s3Service.getDefaultProfileImageUrl());
-            String nickname;
-            do{
-                nickname = randomNickname.generate();
-            } while (memberRepository.existsByNickName(nickname));
-            member.setNickName(nickname);
+    private OAuth2User createMember(String socialId, String socialProvider) {
+        Member member = Member.builder()
+                .socialId(socialId)
+                .socialProvider(socialProvider)
+                .role("ROLE_USER")
+                .profileImage(s3Service.getDefaultProfileImageUrl())
+                .nickName(makeUniqueNickname())
+                .build();
 
-            memberRepository.save(member);
+        memberRepository.save(member);
+        createProfileAndResume(member);
+        return toCustomOAuth2User(member);
+    }
 
+    private void createProfileAndResume(Member member) {
+        Profile profile = Profile.builder()
+                .member(member)
+                .about("")
+                .build();
+        profileRepository.save(profile);
 
-            Profile profile = Profile.builder()
-                    .member(member)
-                    .about("")
-                    .build();
-            profileRepository.save(profile);
+        Resume resume = new Resume();
+        resume.setMember(member);
+        resumeRepository.save(resume);
+    }
 
-            Resume resume = new Resume();
-            resume.setMember(member);
-            resumeRepository.save(resume);
+    private String makeUniqueNickname() {
+        String nickname;
+        do {
+            nickname = randomNickname.generate();
+        } while (memberRepository.existsByNickName(nickname));
+        return nickname;
+    }
 
-            MemberDto memberDto = new MemberDto();
-            memberDto.setName(socialId);
-            memberDto.setRole("ROLE_USER");
-
-            return new CustomOAuth2User(memberDto);
-        }
-        else{
-
-            memberRepository.save(existData);
-
-            MemberDto memberDto = new MemberDto();
-            memberDto.setName(existData.getSocialId());
-            memberDto.setRole(existData.getRole());
-
-            return new CustomOAuth2User(memberDto);
-        }
-
+    private OAuth2User toCustomOAuth2User(Member member) {
+        MemberDto memberDto = new MemberDto();
+        memberDto.setName(member.getSocialId());
+        memberDto.setRole(member.getRole());
+        return new CustomOAuth2User(memberDto);
     }
 }

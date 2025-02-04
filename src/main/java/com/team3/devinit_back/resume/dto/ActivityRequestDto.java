@@ -13,6 +13,7 @@ public class ActivityRequestDto {
     private String organization;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
+    @NotBlank(message =  "설명을 입력해주세요")
     private String description;
 
 }

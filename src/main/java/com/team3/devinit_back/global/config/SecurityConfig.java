@@ -7,6 +7,7 @@ import com.team3.devinit_back.member.oauth2.CustomLogoutFilter;
 import com.team3.devinit_back.member.oauth2.CustomSuccessHandler;
 import com.team3.devinit_back.member.repository.RefreshRepository;
 import com.team3.devinit_back.member.service.CustomOAuth2UserService;
+import com.team3.devinit_back.member.service.RedisTokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -31,7 +32,7 @@ public class SecurityConfig {
     private final CustomSuccessHandler customSuccessHandler;
     private final CustomFailureHandler customFailureHandler;
     private final JWTUtil jwtUtil;
-    private final RefreshRepository refreshRepository;
+    private final RedisTokenService redisTokenService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -67,8 +68,8 @@ public class SecurityConfig {
                 .httpBasic((auth) -> auth.disable());
 
         http
-                .addFilterBefore(new JWTFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRepository), LogoutFilter.class);;
+                .addFilterBefore(new JWTFilter(jwtUtil,redisTokenService), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new CustomLogoutFilter(jwtUtil, redisTokenService), LogoutFilter.class);
 
         http
                 .oauth2Login((oauth2) -> oauth2
