@@ -39,12 +39,17 @@ public class JWTUtil {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
     }
 
+    public Long getExpiration(String token){
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("expiration", Long.class);
+    }
+
     //토큰 발급
     public String createJwt(String category, String socialId, String role, Long expiredMs){
         return Jwts.builder()
                 .claim("category",category)
                 .claim("socialId", socialId)
                 .claim("role", role)
+                .claim("expiration",expiredMs)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))
                 .signWith(secretKey)
