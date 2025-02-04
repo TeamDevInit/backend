@@ -205,6 +205,7 @@ public class ResumeService {
                                 .description(projDto.getDescription())
                                 .startDate(projDto.getStartDate())
                                 .endDate(projDto.getEndDate())
+                                .link(projDto.getLink())
                                 .build();
                     } else {
                         return projectRepository.findById(projDto.getId())
@@ -213,6 +214,7 @@ public class ResumeService {
                                     proj.setDescription(projDto.getDescription());
                                     proj.setStartDate(projDto.getStartDate());
                                     proj.setEndDate(projDto.getEndDate());
+                                    proj.setLink(projDto.getLink());
                                     return proj;
                                 }).orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NOT_FOUND));
                     }
