@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class CustomLogoutFilter extends GenericFilterBean {
@@ -37,6 +38,9 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
         String refresh = extractRefreshTokenFromCookies(request.getCookies());
         validateRefreshToken(refresh);
+
+        Optional<String> accessToken = Optional.ofNullable(request.getHeader("access"));
+        accessToken.ifPresent(token -> redisTokenService.createBlacklist(token, jwtUtil.getExpiration(token)));
 
         String socialId = jwtUtil.getSocialId(refresh);
         redisTokenService.deleteRefreshToken(socialId);

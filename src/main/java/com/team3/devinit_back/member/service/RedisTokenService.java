@@ -29,4 +29,16 @@ public class RedisTokenService {
         redisTemplate.delete("refreshToken:" + socialId);
     }
 
+    public void createBlacklist(String accessToken, long expirationMs){
+        redisTemplate.opsForValue().set(
+                "blacklist:" + accessToken,
+                "BLOCKED",
+                expirationMs,
+                TimeUnit.MILLISECONDS
+        );
+    }
+    public boolean isBlacklisted(String accessToken) {
+        return redisTemplate.hasKey("blacklist:" + accessToken);
+    }
+
 }
