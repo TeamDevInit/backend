@@ -39,6 +39,7 @@ public class SkillService {
 
     public List<SkillResponseDto> updateSkill(Resume resume, SkillRequestDto skillRequestDto) {
         addSkills(resume, skillRequestDto.getSkillNames(), true);
+
         Resume updatedResume = resumeRepository.save(resume);
 
         return updatedResume.getSkills().stream()
@@ -55,6 +56,10 @@ public class SkillService {
 
     private void addSkills(Resume resume, List<String> skillNames, boolean isClear){
         if(isClear) {resume.getSkills().clear();}
+
+        if (skillNames == null || skillNames.isEmpty()) {
+            return;
+        }
 
         skillNames.forEach(skillName -> {
             SkillTag skillTag = getSkillTagByName(skillName);
