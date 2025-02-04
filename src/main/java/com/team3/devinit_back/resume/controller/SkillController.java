@@ -27,9 +27,9 @@ public class SkillController {
 
 
     @Operation(
-            summary = "스킬 수정",
-            description = "로그인한 사용자가 자신의 스킬 정보를 생성합니다. "
-                    + "요청 본문에는 스킬이름이 포함되어야 합니다."
+            summary = "스킬 생성",
+            description = "로그인한 사용자가 자신의 기술스택 정보를 생성합니다. "
+                    + "요청 본문에는 기술스택 이름이 포함되어야 합니다."
     )
     @PostMapping
     public ResponseEntity<List<SkillResponseDto>> createSkill(@AuthenticationPrincipal CustomOAuth2User userInfo,
@@ -40,8 +40,8 @@ public class SkillController {
     }
     @Operation(
             summary = "스킬 수정",
-            description = "로그인한 사용자가 자신의 스킬 정보를 수정합니다. "
-                    + "요청 본문에는 스킬이름이 포함되어야 합니다."
+            description = "로그인한 사용자가 자신의 기술스택 정보를 수정하고 수정된 기술스택을 반환합니다.. "
+                    + "요청 본문에는 기술스택 이름이 포함되어야 합니다."
     )
     @PatchMapping
     public ResponseEntity<List<SkillResponseDto>> updateSkill(@AuthenticationPrincipal CustomOAuth2User userInfo,
@@ -53,8 +53,8 @@ public class SkillController {
 
     @Operation(
         summary = "스킬 삭제",
-        description = "로그인한 사용자가 자신의 특정 스킬을 삭제합니다. "
-            + "삭제할 스킬의 ID를 경로 변수로 전달해야 합니다."
+        description = "로그인한 사용자가 자신의 특정 기술스택을 삭제합니다. "
+            + "삭제할 기술스택의 ID를 경로 변수로 전달해야 합니다."
     )
     @DeleteMapping("/{skillId}")
     public ResponseEntity<Void> deleteSkill(@AuthenticationPrincipal CustomOAuth2User userInfo,

@@ -9,6 +9,7 @@ import com.team3.devinit_back.resume.dto.InformationResponseDto;
 import com.team3.devinit_back.resume.entity.Resume;
 import com.team3.devinit_back.resume.service.InformationService;
 import com.team3.devinit_back.resume.service.ResumeService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,9 @@ public class InformationController {
     private final InformationService informationService;
 
     @PostMapping
+    @Operation(
+            summary = "기본 정보 생성",
+            description = "사용자의 기본 정보을 받아 저장하고 내용을 반환 합니다.")
     public ResponseEntity<InformationResponseDto> createInformation(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                                     @Valid @RequestBody InformationRequestDto informationRequestDto){
         Resume resume = getResumeFromUserInfo(userInfo);
@@ -34,6 +38,9 @@ public class InformationController {
     }
 
     @PatchMapping("/{id}")
+    @Operation(
+            summary = "기본 정보 수정",
+            description = "사용자의 수정된 기본 정보을 받아 수정하고 내용을 반환 합니다.")
     public ResponseEntity<InformationResponseDto> updateInformation(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                                     @Valid @RequestBody InformationRequestDto informationRequestDto,
                                                                     @PathVariable("id") Long id){
@@ -43,6 +50,10 @@ public class InformationController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(
+            summary = "기본 정보 삭제",
+            description = "사용자의 기본 정보를 삭제합니다."
+                    + "삭제할 기본정보의 ID를 경로 변수로 전달해야 합니다.")
     public  ResponseEntity<Void> deleteInformation(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                    @PathVariable("id") Long id){
         Resume resume = getResumeFromUserInfo(userInfo);

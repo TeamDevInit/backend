@@ -25,8 +25,9 @@ public class ReissueController {
     private final MemberService memberService;
     private final RedisTokenService redisTokenService;
 
-    @Operation(summary = "토큰 재발급",description = "refresh토큰을 확인하고  access 토큰과 refresh토큰을 재발급합니다.")
+
     @PostMapping("/reissue")
+    @Operation(summary = "토큰 재발급",description = "refresh토큰을 확인하고  access 토큰과 refresh토큰을 재발급합니다.")
     public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response) {
         String refresh = extractRefreshTokenFromCookies(request.getCookies());
         validateRefreshToken(refresh);

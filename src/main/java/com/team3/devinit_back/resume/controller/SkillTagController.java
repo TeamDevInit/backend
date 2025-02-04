@@ -18,8 +18,8 @@ public class SkillTagController {
     private final SkillTagService skillTagService;
 
     @Operation(
-        summary = "스킬 태그 조회",
-        description = "시스템에 등록된 모든 스킬 태그를 조회합니다. "
+        summary = "기술스택 태그 조회",
+        description = "시스템에 등록된 모든 기술스택 태그를 조회합니다. "
             + "태그는 검색이나 추천 용도로 사용될 수 있습니다."
     )
     @GetMapping

@@ -35,7 +35,11 @@ public class BoardController {
     private final MemberService memberService;
     private final BoardService boardService;
 
+
     @PostMapping
+    @Operation(
+            summary = "게시물 생성",
+            description = "로그인한 사용자가 본인의 게시물을 생성합니다.")
     public ResponseEntity<BoardDetailResponseDto> createBoard(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                               @RequestBody BoardRequestDto boardRequestDto) {
         Member member = getMemberFromUserInfo(userInfo);
@@ -43,6 +47,7 @@ public class BoardController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(boardResponseDto);
     }
+
 
 
     @GetMapping
@@ -55,6 +60,9 @@ public class BoardController {
     }
 
     @GetMapping("/category/{categoryId}")
+    @Operation(
+            summary = "카테고리 별 게시물 조회",
+            description = "카테고리 ID를 통해 카테고리별 페이지 번호/사이즈/정렬조건/태그/검색어를 입력받아 해당 페이지게시글을 조회한다.")
     public ResponseEntity<Page<BoardResponseDto>> getBoardsByCategory(@PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
                                                                           @RequestParam(name = "tagNames", required = false)List<String> tagNames,
                                                                           @RequestParam(name = "searchContents",required = false) String searchContents,
@@ -65,6 +73,9 @@ public class BoardController {
     }
 
     @GetMapping("/{id}")
+    @Operation(
+            summary = "게시물 상세조회",
+            description = "게시물 상세 내용 및 게시물 추천여부, 작성자 팔로우 여부를 반환합니다.")
     public ResponseEntity<BoardDetailResponseDto> getBoardDetail(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                                  @PathVariable("id") Long id){
         Member member =  null;
@@ -77,6 +88,9 @@ public class BoardController {
 
 
     @PatchMapping("/{id}")
+    @Operation(
+            summary = "게시물 수정",
+            description = "로그인한 사용자가 본인이 작성한 게시물을 수정합니다.")
     public ResponseEntity<Void> updateBoard(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                             @RequestBody BoardRequestDto boardRequestDto,
                                             @PathVariable("id") Long id){
@@ -88,6 +102,9 @@ public class BoardController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(
+            summary = "게시물 삭제",
+            description = "로그인한 사용자가 본인이 작성한 게시물을 삭제합니다.")
     public ResponseEntity<Void> deleteBoard(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                             @PathVariable("id") Long id) {
         Member member = getMemberFromUserInfo(userInfo);
@@ -98,6 +115,9 @@ public class BoardController {
     }
 
     @PostMapping("/{id}/recommendation")
+    @Operation(
+            summary = "게시물 추천",
+            description = "로그인한 사용자가 게시물을 추천하고 추천/취소 여부를 반환합니다.")
     public ResponseEntity<?> recommendBoard(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                             @PathVariable("id") Long id){
         Member member = getMemberFromUserInfo(userInfo);
