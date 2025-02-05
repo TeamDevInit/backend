@@ -3,8 +3,11 @@ package com.team3.devinit_back.websocket.repository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team3.devinit_back.websocket.dto.ChatMessageDto;
+import com.team3.devinit_back.websocket.entity.ChatMessage;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -14,21 +17,27 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Repository
 public class RedisChatMessageRepository {
     private static final String CHAT_MESSAGES = "CHAT_MESSAGES:";
-    private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
+    @Qualifier("chatMessageRedisTemplate")
+    private final RedisTemplate<String, ChatMessage> chatMessageRedisTemplate;
 
     public void saveMessage(ChatMessageDto message) {
         String roomKey = CHAT_MESSAGES + message.getRoomId();
+
+        if (message.getId() == null) {
+            message.setId(chatMessageRedisTemplate.opsForValue().increment("CHAT_MESSAGE_ID"));
+        }
+
         try {
             String jsonMessage = objectMapper.writeValueAsString(message);
-            redisTemplate.opsForHash().put(roomKey, message.getSender(), jsonMessage);
-            redisTemplate.expire(roomKey, Duration.ofHours(25));
-            log.info("[RedisChatMessageRepository] 저장 완료 - Room ID: {}, Sender: {}, 메시지: {}",
-                    message.getRoomId(), message.getSender(), jsonMessage);
+            chatMessageRedisTemplate.opsForHash().put(roomKey, message.getId(), jsonMessage);
+            chatMessageRedisTemplate.expire(roomKey, Duration.ofHours(25));
+            log.info("[RedisChatMessageRepository] 저장 완료 - Room ID: {}, Message Id: {}, 메시지: {}",
+                    message.getRoomId(), message.getId(), jsonMessage);
         } catch (JsonProcessingException e) {
             log.error("[RedisChatMessageRepository] 메시지 직렬화 실패", e);
         }
@@ -36,7 +45,7 @@ public class RedisChatMessageRepository {
 
     public List<ChatMessageDto> getMessages(String roomId) {
         String roomKey = CHAT_MESSAGES + roomId;
-        Map<Object, Object> messagesMap = redisTemplate.opsForHash().entries(roomKey);
+        Map<Object, Object> messagesMap = chatMessageRedisTemplate.opsForHash().entries(roomKey);
         List<ChatMessageDto> messages = new ArrayList<>();
 
         for (Object key : messagesMap.keySet()) {
@@ -54,13 +63,13 @@ public class RedisChatMessageRepository {
 
     public void clearUserMessages(String roomId, String sender) {
         String roomKey = CHAT_MESSAGES + roomId;
-        redisTemplate.opsForHash().delete(roomKey, sender);
+        chatMessageRedisTemplate.opsForHash().delete(roomKey, sender);
         log.info("[RedisChatMessageRepository] 특정 사용자 메시지 삭제 완료 - Room ID: {}, Sender: {}", roomId, sender);
     }
 
     public void clearMessages(String roomId) {
         String roomKey = CHAT_MESSAGES + roomId;
-        redisTemplate.delete(roomKey);
+        chatMessageRedisTemplate.delete(roomKey);
         log.info("[RedisChatMessageRepository] 삭제 완료 - Room ID: {}", roomId);
     }
 

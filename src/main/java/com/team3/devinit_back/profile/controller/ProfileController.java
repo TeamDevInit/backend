@@ -3,10 +3,7 @@ package com.team3.devinit_back.profile.controller;
 import com.team3.devinit_back.member.dto.CustomOAuth2User;
 import com.team3.devinit_back.member.entity.Member;
 import com.team3.devinit_back.member.service.MemberService;
-import com.team3.devinit_back.profile.dto.BoardSummaryResponse;
-import com.team3.devinit_back.profile.dto.ProfileDetailResponse;
-import com.team3.devinit_back.profile.dto.ProfileUpdateRequest;
-import com.team3.devinit_back.profile.dto.ProfileResponse;
+import com.team3.devinit_back.profile.dto.*;
 import com.team3.devinit_back.profile.service.ProfileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -42,6 +39,15 @@ public class ProfileController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "프로필 이미지 조회", description = "로그인한 사용자의 프로필 이미지를 반환합니다.")
+    @GetMapping("/profile/image")
+    public ResponseEntity<ProfileImageResponseDto> getProfileImage(@AuthenticationPrincipal CustomOAuth2User userInfo) {
+        String memberId = getMemberFromUserInfo(userInfo).getId();
+        String profileImageUrl = profileService.getProfileImage(memberId);
+        return ResponseEntity.ok(new ProfileImageResponseDto(profileImageUrl));
+    }
+
+
     @Operation(
         summary = "상대 프로필 상세 조회",
         description = "특정 사용자의 프로필 정보를 상세히 조회합니다. "
@@ -64,7 +70,7 @@ public class ProfileController {
     @GetMapping("/boards/{memberId}")
     public ResponseEntity<Page<BoardSummaryResponse>> getBoardsByMemberId(
         @PathVariable("memberId") String memberId,
-        @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<BoardSummaryResponse> response = profileService.getBoardsByMemberId(memberId, pageable);
         return ResponseEntity.ok(response);
     }
