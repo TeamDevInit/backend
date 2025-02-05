@@ -3,6 +3,7 @@ package com.team3.devinit_back.websocket.service;
 import com.team3.devinit_back.global.exception.CustomException;
 import com.team3.devinit_back.global.exception.ErrorCode;
 import com.team3.devinit_back.websocket.dto.ChatMessageDto;
+import com.team3.devinit_back.websocket.entity.ChatMessage;
 import com.team3.devinit_back.websocket.repository.RedisChatMessageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class ChatService {
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, ChatMessageDto> chatRedisTemplate;
     private final RedisChatMessageRepository redisChatMessageRepository;
     private final ChannelTopic channelTopic;
 
@@ -34,6 +35,8 @@ public class ChatService {
 
         log.info("[ChatService] 채팅 메시지 전송: {}", message);
         redisChatMessageRepository.saveMessage(message);
-        redisTemplate.convertAndSend(channelTopic.getTopic(), message);
+
+        log.info("[ChatService] 채팅 메시지 Pub/Sub 전송: {}", message);
+        chatRedisTemplate.convertAndSend(channelTopic.getTopic(), message);
     }
 }
