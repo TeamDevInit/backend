@@ -14,7 +14,6 @@ import com.team3.devinit_back.profile.dto.ProfileUpdateRequest;
 import com.team3.devinit_back.profile.dto.ProfileResponse;
 import com.team3.devinit_back.profile.entity.Profile;
 import com.team3.devinit_back.profile.repository.ProfileRepository;
-import com.team3.devinit_back.resume.repository.ResumeRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +34,6 @@ public class ProfileService {
     private final BoardRepository boardRepository;
     private final FollowService followService;
     private final S3Service s3Service;
-    private final ResumeRepository resumeRepository;
 
     @Transactional(readOnly = true)
     public ProfileDetailResponse getMyProfile(String memberId) {
@@ -100,7 +98,8 @@ public class ProfileService {
     private String handleProfileImage(Member member, MultipartFile newProfileImage) {
         String oldProfileImageUrl = member.getProfileImage();
 
-        if (newProfileImage != null && oldProfileImageUrl != null && !oldProfileImageUrl.isEmpty()) {
+        if (newProfileImage != null && oldProfileImageUrl != null && !oldProfileImageUrl.isEmpty()
+                && !s3Service.isDefaultProfileImage(oldProfileImageUrl)) {
             String oldFileName = extractFileNameFromUrl(oldProfileImageUrl);
             s3Service.deleteFile(oldFileName);
         }
