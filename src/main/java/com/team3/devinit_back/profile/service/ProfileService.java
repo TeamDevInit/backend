@@ -37,8 +37,7 @@ public class ProfileService {
 
     @Transactional(readOnly = true)
     public ProfileDetailResponse getMyProfile(String memberId) {
-        Profile profile = profileRepository.findByMemberId(memberId)
-            .orElseThrow(() -> new CustomException(ErrorCode.INVALID_USER));
+        Profile profile = getProfileByMemberId(memberId);
 
         FollowCountResponse followCounts = followService.getFollowCounts(memberId);
         boolean isFollowing = false;
@@ -64,6 +63,11 @@ public class ProfileService {
         boolean isFollowing = viewerId != null && followService.isFollowing(viewerId, profile.getMember().getId());
 
         return ProfileDetailResponse.fromEntity(profile, followCounts, isFollowing);
+    }
+
+    @Transactional
+    public String getProfileImage(String memberId) {
+        return getProfileByMemberId(memberId).getMember().getProfileImage();
     }
 
     @Transactional(readOnly = true)
@@ -114,6 +118,11 @@ public class ProfileService {
 
         return oldProfileImageUrl != null && !oldProfileImageUrl.isEmpty()
             ? oldProfileImageUrl : s3Service.getDefaultProfileImageUrl();
+    }
+
+    private Profile getProfileByMemberId(String memberId) {
+        return profileRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.PROFILE_NOT_FOUND));
     }
 
     private Profile getProfileById(String profileId) {
