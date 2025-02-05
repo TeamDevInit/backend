@@ -12,7 +12,7 @@ public class CorsMvcConfig implements WebMvcConfigurer {
 
         corsRegistry.addMapping("/**")
                 .exposedHeaders("Set-Cookie")
-                .allowedOrigins("http://localhost:3000","http://34.64.44.54","http://www.devinit.shop/","http://34.64.72.48");
+                .allowedOrigins("http://localhost:3000","http://34.64.44.54","http://devinit.shop","http://34.64.72.48");
     }
 
     @Override
