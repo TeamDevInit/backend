@@ -33,7 +33,7 @@ public class ActivityController {
     public ResponseEntity<List<ActivityResponseDto>> createActivities(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                                       @Valid @RequestBody List<ActivityRequestDto> activityRequestDtos){
         Resume resume = getResumeFromUserInfo(userInfo);
-        List<ActivityResponseDto> activityResponseDtos = activityService.createActivities(resume, activityRequestDtos);
+        List<ActivityResponseDto> activityResponseDtos = activityService.createItems(resume, activityRequestDtos);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(activityResponseDtos);
     }
@@ -41,11 +41,11 @@ public class ActivityController {
     @PatchMapping
     @Operation(
             summary = "대외활동 이력 수정",
-            description = "사용자의 수정된 대외활동 이력을 리스트형태로 받아 수정하고 내용을 리스트로 반환 합니다.")
+            description = "사용자의 수정된 대외활동 이력을 리스트형태로 받아 저장/수정하고 내용을 리스트로 반환 합니다.")
     public ResponseEntity<ActivityResponseDto> updateActivities(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                                 @Valid @RequestBody List<ActivityRequestDto> activityRequestDtos){
         Resume resume = getResumeFromUserInfo(userInfo);
-        activityService.updateActivities(resume, activityRequestDtos);
+        activityService.updateItems(resume, activityRequestDtos);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
     @PutMapping
@@ -55,7 +55,7 @@ public class ActivityController {
     public ResponseEntity<List<ActivityResponseDto>> saveOrUpdateActivities(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                                             @Valid @RequestBody List<ActivityRequestDto> activityRequestDtos){
         Resume resume = getResumeFromUserInfo(userInfo);
-        List<ActivityResponseDto> activityResponseDtos =  activityService.saveOrUpdateActivities(resume,activityRequestDtos);
+        List<ActivityResponseDto> activityResponseDtos =  activityService.saveOrUpdateItems(resume,activityRequestDtos);
 
         return ResponseEntity.ok(activityResponseDtos);
     }
@@ -68,7 +68,7 @@ public class ActivityController {
     public  ResponseEntity<Void> deleteActivity(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                  @PathVariable("id") Long id){
         Resume resume = getResumeFromUserInfo(userInfo);
-        activityService.deleteActivity(resume,id);
+        activityService.deleteItem(resume,id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

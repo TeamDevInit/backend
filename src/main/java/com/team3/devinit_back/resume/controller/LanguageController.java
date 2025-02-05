@@ -36,7 +36,7 @@ public class LanguageController {
     public ResponseEntity<List<LanguageResponseDto>> createLanguages(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                                      @Valid @RequestBody List<LanguageRequestDto> languageRequestDtos){
         Resume resume = getResumeFromUserInfo(userInfo);
-        List<LanguageResponseDto> languageResponseDtos = languageService.createLanguages(resume, languageRequestDtos);
+        List<LanguageResponseDto> languageResponseDtos = languageService.createItems(resume, languageRequestDtos);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(languageResponseDtos);
     }
@@ -48,7 +48,7 @@ public class LanguageController {
     public ResponseEntity<LanguageResponseDto> updateLanguages(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                                @Valid @RequestBody List<LanguageRequestDto> languageRequestDtos){
         Resume resume = getResumeFromUserInfo(userInfo);
-        languageService.updateLanguages(resume, languageRequestDtos);
+        languageService.updateItems(resume, languageRequestDtos);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
@@ -59,7 +59,7 @@ public class LanguageController {
     public ResponseEntity<List<LanguageResponseDto>> saveOrUpdateLanguages(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                                             @Valid @RequestBody List<LanguageRequestDto> languageRequestDtos){
         Resume resume = getResumeFromUserInfo(userInfo);
-        List<LanguageResponseDto> languageResponseDtos =  languageService.saveOrUpdateLanguages(resume,languageRequestDtos);
+        List<LanguageResponseDto> languageResponseDtos =  languageService.saveOrUpdateItems(resume,languageRequestDtos);
 
         return ResponseEntity.ok(languageResponseDtos);
     }
@@ -72,7 +72,7 @@ public class LanguageController {
     public ResponseEntity<Void> deleteLanguage(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                @PathVariable("id") Long id){
         Resume resume = getResumeFromUserInfo(userInfo);
-        languageService.deleteLanguage(resume,id);
+        languageService.deleteItem(resume,id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
