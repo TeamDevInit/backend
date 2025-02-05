@@ -18,7 +18,7 @@ public class CustomFailureHandler extends SimpleUrlAuthenticationFailureHandler 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
 
-        response.sendRedirect("http://34.64.72.48"); // 실패 시 홈으로 리다이렉트
+        response.sendRedirect("http://www.devinit.shop"); // 실패 시 홈으로 리다이렉트
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         log.error("Authentication failed: {}", exception.getMessage());
     }
