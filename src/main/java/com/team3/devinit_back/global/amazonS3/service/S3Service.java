@@ -29,6 +29,10 @@ public class S3Service {
         return defaultProfileImageUrl;
     }
 
+    public boolean isDefaultProfileImage(String imageUrl) {
+        return imageUrl != null && imageUrl.equals(getDefaultProfileImageUrl());
+    }
+
     public String uploadFile(MultipartFile file) {
         try {
             String fileName = generateFileName(file.getOriginalFilename());
@@ -62,6 +66,6 @@ public class S3Service {
     }
 
     private String generateFileName(String originalFilename) {
-        return UUID.randomUUID().toString() + "-" + originalFilename;
+        return UUID.randomUUID() + "-" + originalFilename;
     }
 }
