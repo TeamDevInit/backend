@@ -9,6 +9,7 @@ import com.team3.devinit_back.websocket.repository.ChatRoomRepository;
 import com.team3.devinit_back.websocket.repository.RedisChatRoomRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -16,6 +17,7 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -23,58 +25,66 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Component
 public class StompHandler implements ChannelInterceptor {
-    private static final int JWT_PREFIX_LENGTH = 7;
     private final JWTUtil jwtUtil;
     private final MemberService memberService;
     private final ChatRoomRepository chatRoomRepository;
     private final RedisChatRoomRepository redisChatRoomRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
+        // WebSocket 연결 시 JWT 인증 수행
         if (StompCommand.CONNECT == accessor.getCommand()) {
-            String jwt = accessor.getFirstNativeHeader("Authorization");
+            String jwt = accessor.getFirstNativeHeader("access");
 
-            if (jwt == null || !jwt.startsWith("Bearer ")) {
-                log.warn("WebSocket 연결 실패: Authorization 헤더가 없습니다.");
+            if (jwt == null) {
+                log.warn("WebSocket 연결 실패: access 헤더가 없습니다.");
                 throw new CustomException(ErrorCode.EMPTY_ACCESS_TOKEN);
             }
 
-            String token = jwt.substring(JWT_PREFIX_LENGTH);
-            if (jwtUtil.isExpired(token)) {
+            if (jwtUtil.isExpired(jwt)) {
                 log.warn("WebSocket 연결 실패: JWT가 만료되었습니다.");
                 throw new CustomException(ErrorCode.EXPIRED_ACCESS_TOKEN);
             }
 
-            String socialId = jwtUtil.getSocialId(token);
+            String socialId = jwtUtil.getSocialId(jwt);
             Member member = memberService.findMemberBySocialId(socialId);
             if (member == null) {
                 throw new CustomException(ErrorCode.UNAUTHORIZED);
             }
 
+            String sessionId = accessor.getSessionId();
             accessor.setUser(new UsernamePasswordAuthenticationToken(socialId, null, new ArrayList<>()));
-            log.info("WebSocket 인증 성공 - 사용자: {}", member.getNickName());
+            accessor.getSessionAttributes().put("user", socialId);
+
+            redisTemplate.opsForHash().put("USER_SESSION", sessionId, socialId);
+            log.info("WebSocket 인증 성공 - 사용자: {}, 세션ID: {}", member.getNickName(), sessionId);
         }
 
+        // 채팅방 구독 시 사용자 정보를 Redis에 저장
         if (StompCommand.SUBSCRIBE == accessor.getCommand()) {
             String destination = Optional.ofNullable((String) message.getHeaders().get("simpDestination"))
                     .orElse("InvalidRoomId");
             String roomId = extractRoomId(destination);
+            String socialId = (String) accessor.getSessionAttributes().get("user");
 
-            String jwt = accessor.getFirstNativeHeader("Authorization");
-            String accessToken = jwt.substring(JWT_PREFIX_LENGTH);
-            String socialId = jwtUtil.getSocialId(accessToken);
+            if (socialId == null) {
+                log.warn("SUBSCRIBE 요청 시 사용자 정보 없음");
+                throw new CustomException(ErrorCode.UNAUTHORIZED);
+            }
 
             redisChatRoomRepository.saveChatRoom(chatRoomRepository.findById(roomId)
                     .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NOT_FOUND)));
 
-            log.info("사용자({})가 채팅방({})에 입장했습니다.", socialId, roomId);
+            log.info("[StompHandler] 채팅방 구독 완료 - 사용자: {}, 방 ID: {}", socialId, roomId);
         }
 
         if (StompCommand.DISCONNECT == accessor.getCommand()) {
             String sessionId = accessor.getSessionId();
-            log.info("WebSocket 세션 종료: {}", sessionId);
+            String socialId = (String) redisTemplate.opsForHash().get("USER_SESSION", sessionId);
+            log.info("WebSocket 세션 종료 - 사용자: {}, 세션 ID: {}", socialId, sessionId);
         }
 
         return message;
