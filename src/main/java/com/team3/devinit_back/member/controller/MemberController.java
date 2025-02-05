@@ -39,6 +39,10 @@ public class MemberController{
     }
 
     @GetMapping("/stats/{memberId}/{year}")
+    @Operation(
+            summary = "사용자 게시물 작성 통계 테이블 조회",
+            description = "사용자의 게시물 작성 통계에 대한 연도별 정보를 반환합니다."
+                            +"조회할 멤버의 ID와 연도를 경로 변수로 전달해야 합니다.")
     public ResponseEntity<List<DailyBoardCountDto>> getYearlyStats(@PathVariable("memberId") String id,
                                                                    @PathVariable("year") int year) {
         List<DailyBoardCountDto> stats = memberService.getYearlyStats(id, year);
