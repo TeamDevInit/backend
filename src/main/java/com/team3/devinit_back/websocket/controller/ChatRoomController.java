@@ -27,7 +27,7 @@ import java.util.Map;
 @Tag(name = "ChatRoom API", description = "채팅방 관리 API")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/chat")
+@RequestMapping("/api/chat")
 public class ChatRoomController {
     private final ChatRoomService chatRoomService;
     private final MemberService memberService;
