@@ -36,7 +36,7 @@ public class ProjectController {
     public ResponseEntity<List<ProjectResponseDto>> createProject(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                                   @Valid @RequestBody List<ProjectRequestDto> projectRequestDtos){
         Resume resume = getResumeFromUserInfo(userInfo);
-        List<ProjectResponseDto> projectResponseDtos = projectService.createProjects(resume,projectRequestDtos);
+        List<ProjectResponseDto> projectResponseDtos = projectService.createItems(resume,projectRequestDtos);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(projectResponseDtos);
     }
@@ -48,7 +48,7 @@ public class ProjectController {
     public ResponseEntity<ProjectResponseDto> updateProject(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                             @Valid @RequestBody List<ProjectRequestDto> projectRequestDtos){
         Resume resume = getResumeFromUserInfo(userInfo);
-        projectService.updateProjects(resume, projectRequestDtos);
+        projectService.updateItems(resume, projectRequestDtos);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
@@ -59,7 +59,7 @@ public class ProjectController {
     public ResponseEntity<List<ProjectResponseDto>> saveOrUpdateProjects(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                                             @Valid @RequestBody List<ProjectRequestDto> projectRequestDtos){
         Resume resume = getResumeFromUserInfo(userInfo);
-        List<ProjectResponseDto> projectResponseDtos =  projectService.saveOrUpdateProjects(resume,projectRequestDtos);
+        List<ProjectResponseDto> projectResponseDtos =  projectService.saveOrUpdateItems(resume,projectRequestDtos);
 
         return ResponseEntity.ok(projectResponseDtos);
     }
@@ -72,7 +72,7 @@ public class ProjectController {
     public  ResponseEntity<Void> deleteProject(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                @PathVariable("id") Long id){
         Resume resume = getResumeFromUserInfo(userInfo);
-        projectService.deleteProject(resume,id);
+        projectService.deleteItem(resume,id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
