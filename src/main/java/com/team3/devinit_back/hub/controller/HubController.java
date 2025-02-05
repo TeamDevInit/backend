@@ -12,7 +12,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/hub")
@@ -28,6 +33,16 @@ public class HubController {
             @RequestParam(defaultValue = "latest") String sortType,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
+        if (employmentPeriod != null) {
+            employmentPeriod = URLDecoder.decode(employmentPeriod, StandardCharsets.UTF_8);
+        }
+
+        if (skills != null) {
+            skills = skills.stream()
+                    .map(skill -> URLEncoder.encode(skill, StandardCharsets.UTF_8))
+                    .collect(Collectors.toList());
+        }
+
         Pageable pageable = PageRequest.of(page, size);
 
         Page<HubProfileResponseDto> profiles = hubService.getFilteredProfiles(skills, employmentPeriod, sortType, pageable);

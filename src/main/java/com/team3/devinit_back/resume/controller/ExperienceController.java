@@ -35,7 +35,7 @@ public class ExperienceController {
     public ResponseEntity<List<ExperienceResponseDto>> createExperiences(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                                         @Valid @RequestBody List<ExperienceRequestDto> experienceRequestDtos){
         Resume resume = getResumeFromUserInfo(userInfo);
-        List<ExperienceResponseDto> experienceResponseDtos = experienceService.createExperiences(resume, experienceRequestDtos);
+        List<ExperienceResponseDto> experienceResponseDtos = experienceService.createItems(resume, experienceRequestDtos);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(experienceResponseDtos);
 
@@ -48,7 +48,7 @@ public class ExperienceController {
     public ResponseEntity<ExperienceResponseDto> updateExperience(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                                   @Valid @RequestBody List<ExperienceRequestDto> experienceRequestDtos){
         Resume resume = getResumeFromUserInfo(userInfo);
-        experienceService.updateExperiences(resume, experienceRequestDtos);
+        experienceService.updateItems(resume, experienceRequestDtos);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
@@ -59,7 +59,7 @@ public class ExperienceController {
     public ResponseEntity<List<ExperienceResponseDto>> saveOrUpdateExperiences(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                                                @Valid @RequestBody List<ExperienceRequestDto> experienceRequestDtos){
         Resume resume = getResumeFromUserInfo(userInfo);
-        List<ExperienceResponseDto> experienceResponseDtos =  experienceService.saveOrUpdateExperiences(resume,experienceRequestDtos);
+        List<ExperienceResponseDto> experienceResponseDtos =  experienceService.saveOrUpdateItems(resume,experienceRequestDtos);
 
         return ResponseEntity.ok(experienceResponseDtos);
     }
@@ -72,7 +72,7 @@ public class ExperienceController {
     public  ResponseEntity<Void> deleteExperience(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                   @PathVariable("id") Long id){
         Resume resume = getResumeFromUserInfo(userInfo);
-        experienceService.deleteExperience(resume,id);
+        experienceService.deleteItem(resume,id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

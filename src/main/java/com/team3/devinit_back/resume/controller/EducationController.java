@@ -34,7 +34,7 @@ public class EducationController {
     public ResponseEntity<List<EducationResponseDto>>createEducations(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                                       @Valid @RequestBody List<EducationRequestDto> educationRequestDtos){
         Resume resume = getResumeFromUserInfo(userInfo);
-        List<EducationResponseDto> educationResponseDtos = educationService.createEducations(resume, educationRequestDtos);
+        List<EducationResponseDto> educationResponseDtos = educationService.createItems(resume, educationRequestDtos);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(educationResponseDtos);
     }
@@ -46,7 +46,7 @@ public class EducationController {
     public ResponseEntity<EducationResponseDto> updateEducations(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                                  @Valid @RequestBody List<EducationRequestDto> educationRequestDtos){
         Resume resume = getResumeFromUserInfo(userInfo);
-        educationService.updateEducations(resume, educationRequestDtos);
+        educationService.updateItems(resume, educationRequestDtos);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
@@ -57,7 +57,7 @@ public class EducationController {
     public ResponseEntity<List<EducationResponseDto>> saveOrUpdateActivities(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                                             @Valid @RequestBody List<EducationRequestDto> educationRequestDtos){
         Resume resume = getResumeFromUserInfo(userInfo);
-        List<EducationResponseDto> educationResponseDtos =  educationService.saveOrUpdateEducations(resume,educationRequestDtos);
+        List<EducationResponseDto> educationResponseDtos =  educationService.saveOrUpdateItems(resume,educationRequestDtos);
 
         return ResponseEntity.ok(educationResponseDtos);
     }
@@ -70,7 +70,7 @@ public class EducationController {
     public  ResponseEntity<Void> deleteEducation(@AuthenticationPrincipal CustomOAuth2User userInfo,
                                                  @PathVariable("id") Long id){
         Resume resume = getResumeFromUserInfo(userInfo);
-        educationService.deleteEducation(resume,id);
+        educationService.deleteItem(resume,id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
