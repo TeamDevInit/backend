@@ -7,6 +7,8 @@ import com.team3.devinit_back.comment.dto.CommentRequestDto;
 import com.team3.devinit_back.comment.dto.CommentResponseDto;
 import com.team3.devinit_back.comment.entity.Comment;
 import com.team3.devinit_back.comment.repository.CommentRepository;
+import com.team3.devinit_back.global.exception.CustomException;
+import com.team3.devinit_back.global.exception.ErrorCode;
 import com.team3.devinit_back.member.entity.Member;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.AccessDeniedException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,35 +31,84 @@ public class CommentService {
         Comment parentComment = null;
         Long parentId = commentRequestDto.getParentCommentId();
         if(parentId != null){
-            parentComment = commentRepository.findById(parentId)
-                    .orElseThrow(() -> new EntityNotFoundException("부모 댓글을 찾을 수 없습니다."));
+            parentComment = getCommentById(parentId);
+            parentComment.setCommentCnt(parentComment.getCommentCnt() + 1);//분리
         }
         Comment comment = Comment.builder()
                 .content(commentRequestDto.getContent())
                 .member(member)
                 .board(board)
+                .parentComment(parentComment)
                 .build();
         Comment savedComment = commentRepository.save(comment);
+
+        board.setCommentCnt(board.getCommentCnt() + 1); //분리
+        boardRepository.save(board);
         return  CommentResponseDto.fromEntity(savedComment);
 
     }
 
+    @Transactional
+    public void updateComment(String memberId, CommentRequestDto commentRequestDto, Long commentId){
+        Comment comment = isAuthorizedForComment(commentId, memberId);
+        comment.setContent(commentRequestDto.getContent());
+        commentRepository.save(comment);
+    }
 
+    @Transactional
+    public void deleteComment(String memberId, CommentRequestDto commentRequestDto, Long commentId) {
+        Comment comment = isAuthorizedForComment(commentId, memberId, commentRequestDto.getBoardId());
+        if (comment.getParentComment() != null) {
+            Comment parentComment = comment.getParentComment();
+            parentComment.setCommentCnt(parentComment.getCommentCnt() - 1); //분리
+            commentRepository.save(parentComment);
+        }
+        commentRepository.delete(comment);
 
+        Board board = getBoardById(commentRequestDto.getBoardId());
+        board.setCommentCnt(getCommentCount(board.getId()));
+        boardRepository.save(board);
+    }
 
+    public List<CommentResponseDto> getRecommentById(Long id){
+        Comment parentComment  = getCommentById(id);
+        return commentRepository.findAllByParentComment(parentComment).stream()
+                .map(CommentResponseDto::fromEntity)
+                .toList();
+    }
 
-
-
-    // boardId -> 게시글객체 조회
     private Board getBoardById(Long id) {
         return boardRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("ID에 해당하는 게시물을 찾을 수 없습니다." + id));
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
     }
-    private Board isAuthorized(Long id, String memberId) throws AccessDeniedException {
+
+    private Comment getCommentById(Long id){
+        return commentRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
+    }
+
+    public  int getCommentCount(Long id){
         Board board = getBoardById(id);
-        if (!board.getMember().getId().equals(memberId)) {
-            throw new AccessDeniedException("해당 게시물에 대한 권한이 없습니다.");
-        }
-        return board;
+        return commentRepository.countByBoard(board);
     }
+
+    private Comment isAuthorizedForComment(Long commentId, String memberId){
+        Comment comment = getCommentById(commentId);
+        if ( !comment.getMember().getId().equals(memberId)) {
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
+        }
+        return comment;
+    }
+
+    private Comment isAuthorizedForComment(Long commentId, String memberId, Long boardId){
+        Board board = getBoardById(boardId);
+        Comment comment = getCommentById(commentId);
+        if (!board.getMember().getId().equals(memberId) & !comment.getMember().getId().equals(memberId)) {
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
+        }
+        return comment;
+    }
+
+
+
 }

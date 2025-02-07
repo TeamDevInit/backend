@@ -1,6 +1,7 @@
 package com.team3.devinit_back.board.entity;
 
-import com.team3.devinit_back.common.BaseEntity;
+import com.team3.devinit_back.comment.entity.Comment;
+import com.team3.devinit_back.global.common.BaseEntity;
 import com.team3.devinit_back.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -23,8 +24,10 @@ public class Board extends BaseEntity {
 
     @Column(nullable = false)
     private String title;
-    @Column(nullable = false)
+    @Column(nullable = false ,columnDefinition = "TEXT")
     private String content;
+    @Column(length = 2000)
+    private String thumbnail;
 
     private int upCnt;
     private int commentCnt;
@@ -44,11 +47,13 @@ public class Board extends BaseEntity {
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TagBoard> tagBoards = new ArrayList<>();
 
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comment  = new ArrayList<>();
 
 
     @Builder
     public Board(String title, String content, Member member, int upCnt,
-                  int commentCnt, int viewCnt, Category category){
+                  int commentCnt, int viewCnt, Category category, String thumbnail){
         this.title = title;
         this.content = content;
         this.member = member;
@@ -56,5 +61,6 @@ public class Board extends BaseEntity {
         this.commentCnt = commentCnt;
         this.viewCnt = viewCnt;
         this.category = category;
+        this.thumbnail = thumbnail;
     }
 }

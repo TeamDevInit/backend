@@ -1,24 +1,26 @@
 version: "3.8"
 
 services:
-  db:
-    image: mysql:8.0
-    container_name: mysql
-    restart: always
-    ports:
-      - "3306:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: 4078
-      MYSQL_DATABASE: devinit
-      TZ: Asia/Seoul
-
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
+  app:
+    image: moonsunmean/devinit-back
+    container_name: devinit-back
     ports:
       - "8080:8080"
     env_file:
       - .env
-    depends_on:
-      - db
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      JWT_SECRET: ${JWT_SECRET}
+      NAVER_CLIENT_ID: ${NAVER_CLIENT_ID}
+      NAVER_CLIENT_SECRET: ${NAVER_CLIENT_SECRET}
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
+      S3_BUCKET: ${S3_BUCKET}
+      DB_URL_PROD: ${DB_URL_PROD}
+      DB_USERNAME_PROD: ${DB_USERNAME_PROD}
+      DB_PASSWORD_PROD: ${DB_PASSWORD_PROD}
+      BASE_URL: ${BASE_URL}
+    restart: always

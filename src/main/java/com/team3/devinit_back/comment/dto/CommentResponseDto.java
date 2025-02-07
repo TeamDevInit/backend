@@ -14,6 +14,7 @@ public class CommentResponseDto {
     private Long id;
     private String content;
     private Long parentCommentId;
+    private int commentCnt;
 
     private Long boardId;
 
@@ -27,14 +28,22 @@ public class CommentResponseDto {
     public CommentResponseDto(Comment comment){
         this.id = comment.getId();
         this.content= comment.getContent();
-        this.parentCommentId = comment.getParentComment().getId();
         this.boardId = comment.getBoard().getId();
+        this.commentCnt = comment.getCommentCnt();
+
+        if (comment.getParentComment() != null) {
+            this.parentCommentId = comment.getParentComment().getId();
+        } else {
+            this.parentCommentId = null;
+        }
+
         Member member = comment.getMember();
         if(member != null){
             this.memberId = member.getId();
             this.nickName = member.getNickName();
             this.profileImage = member.getProfileImage();
         }
+
         this.createdAt = comment.getCreatedAt();
         this.updatedAt = comment.getUpdatedAt();
     }

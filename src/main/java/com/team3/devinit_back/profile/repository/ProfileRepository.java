@@ -1,6 +1,7 @@
 package com.team3.devinit_back.profile.repository;
 
 import com.team3.devinit_back.profile.entity.Profile;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,4 +16,8 @@ public interface ProfileRepository extends JpaRepository<Profile, String> {
     List<Profile> findRandomProfiles(Pageable pageable);
 
     Optional<Profile> findByMemberId(String memberId);
+
+    Optional<Profile> findById(String id);
+
+    Page<Profile> findAll(Pageable pageable);
 }

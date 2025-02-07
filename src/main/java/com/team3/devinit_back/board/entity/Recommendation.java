@@ -1,15 +1,14 @@
 package com.team3.devinit_back.board.entity;
 
-import com.team3.devinit_back.common.BaseEntity;
+import com.team3.devinit_back.global.common.BaseEntity;
 import com.team3.devinit_back.member.entity.Member;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Recommendation extends BaseEntity {
 
     @Id

@@ -1,7 +1,10 @@
 package com.team3.devinit_back.member.oauth2;
 
+import com.team3.devinit_back.global.exception.CustomException;
+import com.team3.devinit_back.global.exception.ErrorCode;
 import com.team3.devinit_back.member.jwt.JWTUtil;
 import com.team3.devinit_back.member.repository.RefreshRepository;
+import com.team3.devinit_back.member.service.RedisTokenService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -14,11 +17,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class CustomLogoutFilter extends GenericFilterBean {
     private final JWTUtil jwtUtil;
-    private final RefreshRepository refreshRepository;
+    private final RedisTokenService redisTokenService;
+
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
@@ -26,71 +31,20 @@ public class CustomLogoutFilter extends GenericFilterBean {
     }
     private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
 
-        //path and method verify
-        String requestUri = request.getRequestURI();
-        if (!requestUri.matches("^\\/logout$")) {
-
-            filterChain.doFilter(request, response);
-            return;
-        }
-        String requestMethod = request.getMethod();
-        if (!requestMethod.equals("POST")) {
-
+        if (!isLogoutRequest(request)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        //get refresh token
-        String refresh = null;
-        Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
+        String refresh = extractRefreshTokenFromCookies(request.getCookies());
+        validateRefreshToken(refresh);
 
-            if (cookie.getName().equals("refresh")) {
+        Optional<String> accessToken = Optional.ofNullable(request.getHeader("access"));
+        accessToken.ifPresent(token -> redisTokenService.createBlacklist(token, jwtUtil.getExpiration(token)));
 
-                refresh = cookie.getValue();
-            }
-        }
+        String socialId = jwtUtil.getSocialId(refresh);
+        redisTokenService.deleteRefreshToken(socialId);
 
-        //refresh null check
-        if (refresh == null) {
-
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return;
-        }
-
-        //expired check
-        try {
-            jwtUtil.isExpired(refresh);
-        } catch (ExpiredJwtException e) {
-
-            //response status code
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return;
-        }
-
-        // 토큰이 refresh인지 확인 (발급시 페이로드에 명시)
-        String category = jwtUtil.getCategory(refresh);
-        if (!category.equals("refresh")) {
-
-            //response status code
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return;
-        }
-
-        //DB에 저장되어 있는지 확인
-        Boolean isExist = refreshRepository.existsByRefresh(refresh);
-        if (!isExist) {
-
-            //response status code
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return;
-        }
-
-        //로그아웃 진행
-        //Refresh 토큰 DB에서 제거
-        refreshRepository.deleteByRefresh(refresh);
-
-        //Refresh 토큰 Cookie 값 0
         Cookie cookie = new Cookie("refresh", null);
         cookie.setMaxAge(0);
         cookie.setPath("/");
@@ -98,4 +52,37 @@ public class CustomLogoutFilter extends GenericFilterBean {
         response.addCookie(cookie);
         response.setStatus(HttpServletResponse.SC_OK);
     }
+
+    private boolean isLogoutRequest(HttpServletRequest request) {
+        return request.getRequestURI().equals("/logout") && request.getMethod().equalsIgnoreCase("POST");
+    }
+
+    private String extractRefreshTokenFromCookies(Cookie[] cookies) {
+        if (cookies == null) {
+            throw new CustomException(ErrorCode.EMPTY_REFRESH_TOKEN);
+        }
+
+        for (Cookie cookie : cookies) {
+            if ("refresh".equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+        throw new CustomException(ErrorCode.EMPTY_REFRESH_TOKEN);
+    }
+    private void validateRefreshToken(String refresh) {
+        if (refresh == null) {
+            throw new CustomException(ErrorCode.EMPTY_REFRESH_TOKEN);
+        }
+
+        try {
+            jwtUtil.isExpired(refresh);
+        } catch (ExpiredJwtException e) {
+            throw new CustomException(ErrorCode.EXPIRED_REFRESH_TOKEN);
+        }
+
+        if (!"refresh".equals(jwtUtil.getCategory(refresh))) {
+            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+    }
+
 }

@@ -18,7 +18,7 @@ public class TagInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        List<String> defaultTags = List.of("프론트 엔드", "백엔드", "Spring", "React",
+        List<String> defaultTags = List.of("프론트엔드", "백엔드", "Spring", "React",
                 "JS", "TS", "Java", "C++", "C", "C#", "Python", "R", "Web", "AWS", "GCP", "Cloud",
                 "인턴", "부트캠프", "코딩테스트", "정규직", "계약직", "이직", "경력직","신입");
 

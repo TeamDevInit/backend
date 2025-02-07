@@ -1,18 +1,16 @@
 package com.team3.devinit_back.profile.entity;
 
+import com.team3.devinit_back.global.common.BaseEntity;
 import com.team3.devinit_back.member.entity.Member;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "Profile")
-public class Profile {
+public class Profile extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
@@ -29,7 +27,7 @@ public class Profile {
     @Column(name = "following_cnt", nullable = false)
     private int followingCount = 0;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
@@ -44,5 +42,28 @@ public class Profile {
 
     public void update(String about) {
         this.about = about;
+    }
+
+    public void incrementFollowerCount() {
+        this.followerCount++;
+    }
+    public void decrementFollowerCount() {
+        if (this.followerCount > 0) {
+            this.followerCount--;
+        }
+    }
+
+    public void incrementFollowingCount() {
+        this.followingCount++;
+    }
+
+    public void decrementFollowingCount() {
+        if (this.followingCount > 0) {
+            this.followingCount--;
+        }
+    }
+
+    public void incrementBoardCount() {
+        this.boardCount++;
     }
 }

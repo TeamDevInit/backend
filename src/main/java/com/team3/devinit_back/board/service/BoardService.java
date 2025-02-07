@@ -1,22 +1,40 @@
 package com.team3.devinit_back.board.service;
 
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.team3.devinit_back.board.dto.BoardRequestDto;
+import com.team3.devinit_back.board.dto.BoardDetailResponseDto;
 import com.team3.devinit_back.board.dto.BoardResponseDto;
 import com.team3.devinit_back.board.entity.*;
 import com.team3.devinit_back.board.repository.BoardRepository;
 import com.team3.devinit_back.board.repository.CategoryRepository;
 import com.team3.devinit_back.board.repository.RecommendationRepository;
+import com.team3.devinit_back.comment.repository.CommentRepository;
+import com.team3.devinit_back.follow.repository.FollowRepository;
+import com.team3.devinit_back.global.exception.CustomException;
+import com.team3.devinit_back.global.exception.ErrorCode;
+import com.team3.devinit_back.member.entity.DailyBoardCount;
 import com.team3.devinit_back.member.entity.Member;
+import com.team3.devinit_back.member.repository.DailyBoardCountRepository;
+import com.team3.devinit_back.profile.entity.Profile;
+import com.team3.devinit_back.profile.repository.ProfileRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.nio.file.AccessDeniedException;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,82 +42,100 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final CategoryRepository categoryRepository;
     private final RecommendationRepository recommendationRepository;
+    private final CommentRepository commentRepository;
+    private final FollowRepository followRepository;
+    private final ProfileRepository profileRepository;
     private final TagService tagService;
+    private final JPAQueryFactory queryFactory;
+    private final DailyBoardCountRepository dailyBoardCountRepository;
 
-    // 게시글 생성
     @Transactional
-    public BoardResponseDto createBoard(Member member, BoardRequestDto boardRequestDto) {
+    public BoardDetailResponseDto createBoard(Member member, BoardRequestDto boardRequestDto) {
 
         Category category = getCategoryById(boardRequestDto.getCategoryId());
         Board board = Board.builder()
                 .title(boardRequestDto.getTitle())
                 .content(boardRequestDto.getContent())
+                .thumbnail(extractImageUrl(boardRequestDto.getContent()))
                 .member(member)
                 .category(category)
                 .build();
-        if(boardRequestDto.getTags() != null){
-            for(String tagName : boardRequestDto.getTags()){
-                Tag tag = tagService.findTag(tagName);
-                TagBoard tagBoard = new TagBoard(board, tag);
-                board.getTagBoards().add(tagBoard);
-            }
-        }
+
+        makeTag(board, boardRequestDto);
 
         Board savedBoard = boardRepository.save(board);
-        return BoardResponseDto.fromEntity(savedBoard);
+
+        Profile profile = getProfileByMemberId(member.getId());
+        profile.incrementBoardCount();
+        profileRepository.save(profile);
+
+        updateDailyBoardCount(member.getId(), LocalDate.now());
+        return BoardDetailResponseDto.fromEntity(savedBoard);
 
     }
 
-    // 전체 게시물 조회
-    public Page<BoardResponseDto> getAllBoard(Pageable pageable){
-        return boardRepository.findAll(pageable)
-                .map(BoardResponseDto::fromEntity);
+    public Page<BoardResponseDto> getAllBoard(Pageable pageable, List<String> tagNames, String contents) {
+        QBoard board = QBoard.board;
+        QTagBoard tagBoard = QTagBoard.tagBoard;
+
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if ((tagNames != null && !tagNames.isEmpty()) || (contents != null && !contents.isEmpty())) {
+            builder = buildDynamicQuery(tagNames, contents, null);
+        }
+
+        return fetchBoards(pageable, builder, tagNames);
     }
 
-    // 카테고리별 게시물 조회
-    public Page<BoardResponseDto> getBoardByCategory(Pageable pageable, Long categoryId) {
-        Category category = getCategoryById(categoryId);
-        return boardRepository.findAllByCategory(category, pageable)
-                .map(BoardResponseDto::fromEntity);
+    public Page<BoardResponseDto> getBoardByCategory(Pageable pageable, List<String> tagNames,
+                                                        String contents,Long categoryId ) {
+        QBoard board = QBoard.board;
+        QTagBoard tagBoard = QTagBoard.tagBoard;
+        BooleanBuilder builder = new BooleanBuilder();
 
+        if ((tagNames != null && !tagNames.isEmpty()) || (contents != null && !contents.isEmpty())) {
+            builder = buildDynamicQuery(tagNames, contents, categoryId);
+        }else if(categoryId != null){
+                builder.and(board.category.id.eq(categoryId));
+        }
 
+        return fetchBoards(pageable, builder,tagNames);
     }
 
-    //게시물 상세 조회
-    public BoardResponseDto getBoardDetail(Long id){
-        Board board = getBoardById(id);
-        return BoardResponseDto.fromEntity(board);
+    public BoardDetailResponseDto getBoardDetail(Long id, Member member){
+        Board board = getBoardByIdWithComment(id);
+        board.setViewCnt(board.getViewCnt() + 1);
+        boardRepository.save(board);
+
+        boolean isFollowing = checkFollowingStatus(board, member);
+        boolean isRecommended = checkRecommendationStatus(board, member);
+
+        BoardDetailResponseDto responseDto = BoardDetailResponseDto.fromEntity(board);
+
+        responseDto.setRecommended(isRecommended);
+        responseDto.setFollowing(isFollowing);
+        return responseDto;
     }
 
-    // 게시글 수정
     @Transactional
-    public void updateBoard(String memberId, Long id,BoardRequestDto boardRequestDto) throws AccessDeniedException {
+    public void updateBoard(String memberId, Long id,BoardRequestDto boardRequestDto){
         Category category = getCategoryById(boardRequestDto.getCategoryId());
         Board board = isAuthorized(id, memberId);
         board.setTitle(boardRequestDto.getTitle());
         board.setContent(boardRequestDto.getContent());
         board.setCategory(category);
 
-        if (boardRequestDto.getTags() != null) {
-            board.getTagBoards().clear();
-            for (String tagName : boardRequestDto.getTags()) {
-                Tag tag = tagService.findTag(tagName);
-                TagBoard tagBoard = new TagBoard(board, tag);
-                board.getTagBoards().add(tagBoard);
-            }
-        }
+        makeTag(board, boardRequestDto);
 
         boardRepository.save(board);
     }
 
-    //게시글 삭제
     @Transactional
-    public void deleteBoard(Long id, String memberId) throws AccessDeniedException {
+    public void deleteBoard(Long id, String memberId) {
         Board board = isAuthorized(id, memberId);
         boardRepository.deleteById(board.getId());
     }
 
-    // 게시글 추천 토글
     @Transactional
     public boolean toggleRecommend(Long id, Member member) {
         Board board = getBoardById(id);
@@ -121,30 +157,150 @@ public class BoardService {
         }
     }
 
-    // 게시글 추천수 조회
+    private boolean checkRecommendationStatus(Board board, Member member) {
+        if (member != null) {
+            return recommendationRepository.existsByBoardAndMember(board, member);
+        }
+        return false;
+    }
+
+    private boolean checkFollowingStatus(Board board, Member member){
+        if (member != null) {
+            return followRepository.existsBySenderIdAndReceiverId(member.getId(), board.getMember().getId());
+        }
+        return false;
+    }
+
     public  int getRecommendationCount(Long id){
         Board board = getBoardById(id);
         return recommendationRepository.countByBoard(board);
     }
 
+    private Profile getProfileByMemberId(String memberId) {
+        return profileRepository.findByMemberId(memberId)
+            .orElseThrow(() -> new EntityNotFoundException("해당 멤버의 프로필을 찾을 수 없습니다. ID: " + memberId));
+    }
 
-    // boardId -> 게시글객체 조회
     private Board getBoardById(Long id) {
         return boardRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("ID에 해당하는 게시물을 찾을 수 없습니다." + id));
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
     }
 
-    //CategoryId -> 카테고리객체 조회
+    private Board getBoardByIdWithComment(Long id){
+        return boardRepository.findByIdWithComments(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
+    }
+
     private Category getCategoryById(Long categoryId) {
         return categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new EntityNotFoundException("ID에 해당하는 카테고리를 찾을 수 없습니다." + categoryId));
+                .orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
     }
 
-    // 권한 검사
-    private Board isAuthorized(Long id, String memberId) throws AccessDeniedException {
+    private void makeTag(Board board, BoardRequestDto boardRequestDto){
+        if (boardRequestDto.getTags() != null) {
+            board.getTagBoards().clear();
+            for (String tagName : boardRequestDto.getTags()) {
+                Tag tag = tagService.findTag(tagName);
+                TagBoard tagBoard = new TagBoard(board, tag);
+                board.getTagBoards().add(tagBoard);
+            }
+        }
+    }
+
+    private String extractImageUrl(String content){
+        String imageUrl;
+        String regex = "!\\[.*?\\]\\((.*?)\\)";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(content);
+
+        if(matcher.find()){ return matcher.group(1); }
+        return null;
+    }
+
+    private BooleanBuilder buildDynamicQuery(List<String> tagNames, String contents, Long categoryId) {
+        QBoard board = QBoard.board;
+        QTagBoard tagBoard = QTagBoard.tagBoard;
+        QTag tag = QTag.tag;
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (categoryId != null) {
+            builder.and(board.category.id.eq(categoryId));
+        }
+
+        if (tagNames != null && !tagNames.isEmpty()) {
+            List<Long> tagIds = queryFactory
+                    .select(tag.id)
+                    .from(tag)
+                    .where(tag.name.in(tagNames))
+                    .fetch();
+
+            builder.and(board.id.in(
+                    queryFactory
+                            .select(tagBoard.board.id)
+                            .from(tagBoard)
+                            .where(tagBoard.tag.id.in(tagIds))
+                            .groupBy(tagBoard.board.id)
+                            .having(tagBoard.tag.id.count().eq((long) tagNames.size()))
+                            .fetch()
+            ));
+        }
+
+        if (contents != null && !contents.isEmpty()) {
+            builder.and(board.content.containsIgnoreCase(contents));
+        }
+
+        return builder;
+    }
+
+    private PageImpl<BoardResponseDto> fetchBoards(Pageable pageable, BooleanBuilder builder, List<String> tagNames) {
+        QBoard board = QBoard.board;
+        QTagBoard tagBoard = QTagBoard.tagBoard;
+
+        JPAQuery<Board> query = queryFactory
+                .selectDistinct(board)
+                .from(board);
+        if (tagNames != null && !tagNames.isEmpty()) {
+            query =query.leftJoin(board.tagBoards, tagBoard);
+        }
+        List<Board> boards = query
+                .where(builder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        JPAQuery<Long> countQuery = queryFactory
+                .selectDistinct(board.id)
+                .from(board);
+
+        if (tagNames != null && !tagNames.isEmpty()) {
+            countQuery = countQuery.leftJoin(board.tagBoards, tagBoard);
+        }
+
+        long total = countQuery
+                .where(builder)
+                .fetchCount();
+
+        List<BoardResponseDto> content = boards.stream()
+                .map(BoardResponseDto::fromEntity)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(content, pageable, total);
+    }
+    public void updateDailyBoardCount(String memberId, LocalDate date) {
+        DailyBoardCount dailyBoardCount = dailyBoardCountRepository.findByMemberIdAndDate(memberId, date)
+                .map(existing -> {
+                    existing.setBoardCount(existing.getBoardCount() + 1);
+                    return existing;
+                })
+                .orElse(new DailyBoardCount(memberId, date, 1));
+
+        dailyBoardCountRepository.save(dailyBoardCount);
+    }
+
+    private Board isAuthorized(Long id, String memberId) {
         Board board = getBoardById(id);
         if (!board.getMember().getId().equals(memberId)) {
-            throw new AccessDeniedException("해당 게시물에 대한 권한이 없습니다.");
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
         return board;
     }

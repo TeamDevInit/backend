@@ -11,4 +11,6 @@ public interface RecommendationRepository extends JpaRepository<Recommendation,L
     Optional<Recommendation> findByBoardAndMember(Board board, Member member);
 
     int countByBoard(Board board);
+
+    boolean existsByBoardAndMember(Board board, Member member);
 }

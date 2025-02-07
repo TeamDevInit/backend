@@ -1,5 +1,6 @@
 package com.team3.devinit_back.follow.entity;
 
+import com.team3.devinit_back.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "Follows")
-public class Follow {
+public class Follow extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;

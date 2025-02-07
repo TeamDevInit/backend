@@ -2,12 +2,10 @@ package com.team3.devinit_back.comment.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.team3.devinit_back.board.entity.Board;
-import com.team3.devinit_back.common.BaseEntity;
+import com.team3.devinit_back.global.common.BaseEntity;
 import com.team3.devinit_back.member.entity.Member;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
 public class Comment extends BaseEntity {
 
     @Id
@@ -28,6 +27,8 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "parent_id")
     @JsonIgnore
     private Comment parentComment;
+
+    private int commentCnt;
 
     @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
@@ -43,11 +44,12 @@ public class Comment extends BaseEntity {
 
 
     @Builder
-    public Comment(String content, Member member, Board board, Comment parentComment){
+    public Comment(String content, Member member, Board board, Comment parentComment, int commentCnt){
         this.content = content;
         this.member = member;
         this.board = board;
         this.parentComment = parentComment;
+        this.commentCnt = commentCnt;
 
     }
 
